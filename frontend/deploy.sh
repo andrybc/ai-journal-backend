@@ -19,7 +19,7 @@ npm install
 npm run build
 
 sudo mkdir -p /var/www/journal-app
-sudo cp -r build/* /var/www/journal-app/
+sudo cp -r dist/* /var/www/journal-app/
 sudo systemctl reload nginx
 
 echo "Deployment complete!"
