@@ -21,7 +21,7 @@ npm run build
 sudo mkdir -p /var/www/journal-app
 sudo cp -r dist/* /var/www/journal-app/
 
-echo "Frontend deployed successfully!"
+echo "Frontend deployed successfully!!!"
 
 echo "Deploying Backend..."
 cd /home/deploy/journal-organizer/backend || exit
@@ -33,4 +33,4 @@ pm2 restart journal-backend || pm2 start server.js --name journal-backend
 
 sudo systemctl reload nginx
 
-echo "Backend deployed successfully!"
+echo "Backend deployed successfully!!!"
