@@ -1,3 +1,0 @@
-show collections
-db.createCollection("myCollection")
-use journaldb
