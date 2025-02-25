@@ -158,51 +158,5 @@ Below is a step‐by‐step guide for =developers to set up their local PC so th
   ```bash
   node server.js
   ```
-  or use PM2 for process management:
-  ```bash
-  pm2 start server.js --name journal-backend --update-env
-  ```
-- **Verify Connection:**  
-  Check the server logs to confirm that it connects to MongoDB (you should see “Connected to MongoDB”) and that it’s listening on port 3000.
 
----
 
-## **8. Test the API Endpoints**
-
-- **Using curl or Postman:**
-  - Test a simple endpoint:
-    ```bash
-    curl http://localhost:3000/api/test
-    ```
-  - Test user registration:
-    ```bash
-    curl -X POST http://localhost:3000/auth/register \
-         -H "Content-Type: application/json" \
-         -d '{"firstName": "John", "lastName": "Doe", "email": "john.doe@example.com", "password": "strongPassword123"}'
-    ```
-- **Access MongoDB Directly:**  
-  If you need to verify data in MongoDB, use:
-  ```bash
-  docker exec -it journal-mongodb mongosh -u adminUser -p adminPassword --authenticationDatabase admin
-  ```
-  Then:
-  ```javascript
-  use journaldb
-  db.getUsers()  // To see user accounts, or
-  db.messages.find().pretty()  // To see inserted messages.
-  ```
-
----
-
-## **Summary Checklist**
-
-1. **Install Node.js and npm.**
-2. **Generate an SSH key (if needed) and add it to GitHub.**
-3. **Clone the repository using SSH.**
-4. **Create and configure a `.env` file with all necessary environment variables.**
-5. **Install Docker Desktop and ensure it’s running.**
-6. **Navigate to the Docker directory and run `./start-mongodb.sh` to start MongoDB.**
-7. **Navigate to the backend directory, run `npm install`, and start the server (using `node server.js` or PM2).**
-8. **Test the API endpoints using curl or Postman, and verify MongoDB data using mongosh.**
-
-Following these steps should set up your local environment for backend development and allow you to connect to your MongoDB instance as an admin or application user, ensuring you can work with your API and database successfully.
