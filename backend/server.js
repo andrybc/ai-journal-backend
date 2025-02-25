@@ -22,8 +22,8 @@ app.get('/api/test', (req, res) => {
     res.json({ message: "Hello from the API!" });
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT;
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
 
 
 // // CODE TESTING THE API BACK END
