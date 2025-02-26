@@ -1,27 +1,27 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 
-// Define the summary schema
-const summarySchema = new mongoose.Schema({
-    summaryTitle: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    summaryContent: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    tagId: [{type: String}],
-    userId: {
-        type: Number,
-        required: true
-    },
-    summaryId: {
+// Define the Notebook schema
+const notebookSchema = new mongoose.Schema({
+    notebookId: {
         type: Number,
         required: true,
         unique: true
+    },
+    title: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    content: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    tags: [{type: String, trim: true}],
+
+    userId: {
+        type: Number,
+        required: true
     },
     timeCreated: {
         type: Date,
@@ -33,4 +33,4 @@ const summarySchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Summary', summarySchema);
+module.exports = mongoose.model('Notebook', notebookSchema);
