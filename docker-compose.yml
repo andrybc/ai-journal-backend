@@ -11,7 +11,7 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - ./data/mongo:/data/db
-  
+
   backend:
     build: ./backend
     container_name: journal-backend
@@ -22,7 +22,7 @@ services:
       - mongodb
     environment:
       - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_INITDB_DATABASE}?authSource=admin
-    
+
   frontend:
     build: ./frontend
     container_name: journal-frontend
