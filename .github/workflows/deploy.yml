@@ -1,0 +1,46 @@
+name: Deploy to Digital Ocean
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Setup SSH for doctl
+        run: |
+          mkdir -p ~/.ssh
+          doctl compute ssh-key list
+          # Create SSH key if needed: doctl compute ssh-key create deploy-key --public-key "$(cat ~/.ssh/id_rsa.pub)"
+
+      - name: Deploy to Digital Ocean
+        run: |
+          # Copy built frontend files
+          doctl compute scp ./frontend/dist/* root@134.209.175.201:/var/www/html/ --force
+
+          # Copy backend files
+          doctl compute scp ./backend/* root@134.209.175.201:/opt/journal-organizer/backend/ --force
+
+          # SSH into server and restart the service
+          doctl compute ssh 134.209.175.201 --ssh-command 'cd /opt/journal-organizer/backend && npm ci && pm2 restart server || pm2 start server.js'
