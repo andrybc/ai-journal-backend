@@ -29,6 +29,8 @@ npm run setup
 ```
 This will create a `.env` file from the template and install all dependencies. Update the `.env` file with your MongoDB credentials.
 
+> **Note for Windows Users**: The `npm run setup` command does not work properly in PowerShell. Please use Git Bash when working with this project on Windows.
+
 4. Start the Application
 ```bash
 npm run mongodb  # Start MongoDB container
