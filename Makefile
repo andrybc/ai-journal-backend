@@ -3,30 +3,16 @@
 start: mongodb frontend backend
 
 stop:
-	docker-compose down
-	@echo "MongoDB container stopped"
-	@-pkill -f "node.*backend"
-	@echo "Backend server stopped"
-	@-pkill -f "vite.*frontend"
-	@echo "Frontend server stopped"
+	docker compose down
 
 mongodb:
-	docker-compose up -d mongodb
-	@echo "MongoDB started on port 27017"
+	docker compose up -d mongodb
 
 frontend:
-	cd frontend && npm run dev &
-	@echo "Frontend dev server started on port 5173"
+	cd frontend && npm run dev
 
 backend:
-	cd backend && npm run dev &
-	@echo "Backend server started on port 3000"
-
-dev: mongodb frontend backend
-	@echo "All services started!"
-	@echo "MongoDB: localhost:27017"
-	@echo "Backend: localhost:3000"
-	@echo "Frontend: localhost:5173"
+	cd backend && npm run dev
 
 setup:
 	@echo "Setting up environment..."
