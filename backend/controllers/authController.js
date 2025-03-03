@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     // Check if user already exists
-    let existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
