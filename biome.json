@@ -13,6 +13,10 @@
   "formatter": {
     "indentStyle": "space"
   },
-  "linter": {},
-  "organizeImports": {}
+  "linter": {
+    "enabled": false
+  },
+  "organizeImports": {
+    "enabled": false
+  }
 }
