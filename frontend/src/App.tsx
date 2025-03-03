@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [apiMessage, setApiMessage] = useState('');
+  const [count, setCount] = useState(0);
+  const [apiMessage, setApiMessage] = useState("");
 
   useEffect(() => {
     // Fetch the API endpoint
-    fetch('/api/test')
+    fetch("/api/test")
       .then((res) => res.json())
       .then((data) => setApiMessage(data.message))
       .catch((err) => console.error("Error fetching API:", err));
@@ -40,7 +40,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
