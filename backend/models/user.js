@@ -13,6 +13,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
     email: {
         type: String,
         required: true,
@@ -36,6 +42,16 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    // Array of journal IDs (assuming references to a Journal model)
+    journalIDs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Journal'
+    }],
+    // Array of summary IDs (assuming references to a Summary model)
+    summaryIDs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Summary'
+    }],
     createdAt: {
         type: Date,
         default: Date.now
