@@ -29,7 +29,7 @@ function App() {
       <h1>Frontend Test</h1>
       <p>{apiMessage ? apiMessage : "Loading..."}</p>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button type="button" onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <p>
