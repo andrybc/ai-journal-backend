@@ -2,7 +2,7 @@ name: Deploy to Digital Ocean
 
 on:
   push:
-    branches: [main]
+    branches: [main, auto-deploy]
 
 jobs:
   deploy:
