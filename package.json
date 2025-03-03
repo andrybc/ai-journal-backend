@@ -10,15 +10,21 @@
   "scripts": {
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
-    "dev": "npm run dev:backend & npm run dev:frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build": "npm run build --workspace=frontend",
     "mongodb": "docker compose up -d mongodb",
     "mongodb:stop": "docker compose down",
     "setup:env": "test -f .env || cp .env.example .env",
-    "setup": "npm run setup:env && npm install"
+    "setup": "npm run setup:env && npm install",
+    "format": "biome format . --write",
+    "lint": "biome lint .",
+    "check": "biome check ."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "concurrently": "^9.1.2"
+  }
 }
-
