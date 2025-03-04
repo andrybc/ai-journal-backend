@@ -5,7 +5,7 @@ const crypto = require('crypto');
 // Register a new user
 exports.register = async (req, res) => {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { email, password } = req.body;
 
         // Check if user already exists
         let existingUser = await User.findOne({ email });
@@ -15,8 +15,6 @@ exports.register = async (req, res) => {
 
         // Create new user; the pre-save hook in the model will hash the password
         const newUser = new User({
-            firstName,
-            lastName,
             email,
             password,
             isVerified: false  // Initially not verified
