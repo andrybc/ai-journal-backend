@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 
 // Define the Notebook schema
 const notebookSchema = new mongoose.Schema({
-    notebookId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     title: {
         type: String,
         required: true,
@@ -20,7 +15,8 @@ const notebookSchema = new mongoose.Schema({
     tags: [{type: String, trim: true}],
 
     userId: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     timeCreated: {

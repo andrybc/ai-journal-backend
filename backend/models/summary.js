@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 
 // Define the summary schema
 const summarySchema = new mongoose.Schema({
@@ -13,15 +12,13 @@ const summarySchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    tagId: [{type: String}],
+    tagId: [{type: mongoose.Schema.Types.ObjectId,
+            ref: 'Notebook'
+}],
     userId: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
-    },
-    summaryId: {
-        type: Number,
-        required: true,
-        unique: true
     },
     timeCreated: {
         type: Date,
@@ -32,5 +29,4 @@ const summarySchema = new mongoose.Schema({
         default: Date.now
     }
 });
-
 module.exports = mongoose.model('Summary', summarySchema);
