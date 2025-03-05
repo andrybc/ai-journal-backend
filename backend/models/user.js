@@ -3,49 +3,49 @@ const bcrypt = require("bcrypt");
 
 // Define the User schema
 const userSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    lastName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    resetToken: {
-        type: String,
-        default: null
-    },
-    resetTokenExpiry: {
-        type: Date,
-        default: null
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  resetToken: {
+    type: String,
+    default: null
+  },
+  resetTokenExpiry: {
+    type: Date,
+    default: null
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Pre-save middleware to hash the password before saving
