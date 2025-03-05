@@ -30,3 +30,4 @@ const summarySchema = new mongoose.Schema({
     }
 });
 module.exports = mongoose.model('Summary', summarySchema);
+
