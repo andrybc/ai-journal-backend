@@ -1,6 +1,6 @@
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+const crypto = require("node:crypto");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -34,6 +34,8 @@ exports.register = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+
+
 };
 
 // Login user
@@ -73,17 +75,19 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
+
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Generate a reset token (a random string) and set token expiry to 1 hour from now
-        const resetToken = crypto.randomBytes(20).toString('hex');
+        // Generate a reset token (a random string)
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        // Set token expiry to 1 hour from now
         user.resetToken = resetToken;
         user.resetTokenExpiry = Date.now() + 3600000;
         await user.save();
 
-        // In production, send this token via email
+        // In production, send this token via email to the user
         res.json({ message: "Password reset token generated", resetToken });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -101,8 +105,9 @@ exports.resetPassword = async (req, res) => {
         // Find the user with a valid reset token
         const user = await User.findOne({
             resetToken,
-            resetTokenExpiry: { $gt: Date.now() }
+            resetTokenExpiry: { $gt: Date.now() },
         });
+
         if (!user) {
             return res.status(400).json({ error: "Invalid or expired reset token" });
         }
