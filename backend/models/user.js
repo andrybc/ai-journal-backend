@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  }
+  },
 });
 
 // Pre-save middleware to hash the password before saving

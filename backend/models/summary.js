@@ -16,7 +16,7 @@ const summarySchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Notebook",
-    }
+    },
   ],
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +30,7 @@ const summarySchema = new mongoose.Schema({
   timeUpdated: {
     type: Date,
     default: Date.now,
-  }
+  },
 });
 
 module.exports = mongoose.model("Summary", summarySchema);
