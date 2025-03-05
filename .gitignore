@@ -38,7 +38,7 @@ pids
 .DS_Store
 
 # MongoDB
-data/mongo/
+data/db/
 
 # Misc
 .DS_Store
