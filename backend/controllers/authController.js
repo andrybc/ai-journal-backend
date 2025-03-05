@@ -5,7 +5,7 @@ const crypto = require('crypto');
 // Register a new user
 exports.register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, username, password } = req.body;
 
         // Check if user already exists
         let existingUser = await User.findOne({ email });
