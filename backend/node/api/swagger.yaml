@@ -1,0 +1,230 @@
+---
+swagger: "2.0"
+info:
+  description: "API documentation for the new large project  called journal organizer\n"
+  version: "1.0.0"
+  title: "journal-organizer"
+  contact:
+    email: "cop4331swaggy@gmail.com"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+host: "virtserver.swaggerhub.com"
+basePath: "/cop4331swaggy-c49/journal-organizer/1.0.0"
+schemes:
+- "https"
+- "http"
+paths:
+  /auth/login:
+    post:
+      tags:
+      - "Authentication"
+      summary: "User Login"
+      description: "Authenticates a user and returns a JWT token. Login can be done\
+        \ using either email or username."
+      operationId: "authLoginPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "credentials"
+        description: "User login credentials (provide either email or username along\
+          \ with password)"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        "200":
+          description: "Successful login, returns JWT token."
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        "400":
+          description: "Invalid input."
+        "401":
+          description: "Unauthorized, invalid credentials."
+      x-swagger-router-controller: "Authentication"
+  /auth/register:
+    post:
+      tags:
+      - "Authentication"
+      summary: "User Registration"
+      description: "Registers a new user account."
+      operationId: "authRegisterPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "User registration details"
+        required: true
+        schema:
+          $ref: "#/definitions/Register"
+      responses:
+        "201":
+          description: "User successfully registered. Returns a verification token."
+        "400":
+          description: "Bad request, missing or invalid fields."
+        "409":
+          description: "Conflict, user already exists."
+      x-swagger-router-controller: "Authentication"
+  /auth/forgot-password:
+    post:
+      tags:
+      - "Authentication"
+      summary: "Forgot Password"
+      description: "Initiates password reset process by sending a reset email."
+      operationId: "authForgot_passwordPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "emailInfo"
+        description: "Email address of the user requesting password reset"
+        required: true
+        schema:
+          $ref: "#/definitions/emailInfo"
+      responses:
+        "200":
+          description: "Password reset token generated."
+        "400":
+          description: "Invalid email address."
+      x-swagger-router-controller: "Authentication"
+  /auth/reset-password:
+    post:
+      tags:
+      - "Authentication"
+      summary: "Reset Password"
+      description: "Resets a user's password using a valid reset token. The reset\
+        \ link sent to the user's email directs them to a page where they enter a\
+        \ new password along with a confirmation.\n"
+      operationId: "authReset_passwordPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "resetInfo"
+        description: "Reset token, new password, and password confirmation"
+        required: true
+        schema:
+          $ref: "#/definitions/resetInfo"
+      responses:
+        "200":
+          description: "Password successfully reset."
+        "400":
+          description: "Invalid token, passwords do not match, or password criteria\
+            \ not met."
+      x-swagger-router-controller: "Authentication"
+  /auth/verify-email:
+    get:
+      tags:
+      - "Authentication"
+      summary: "Verify Email"
+      description: "Verifies user's email address using a token provided via query\
+        \ parameter."
+      operationId: "authVerify_emailGET"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "Email verification token"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Email verified successfully."
+        "400":
+          description: "Invalid or expired verification token."
+      x-swagger-router-controller: "Authentication"
+definitions:
+  Login:
+    type: "object"
+    required:
+    - "password"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+        example: "user@example.com"
+      username:
+        type: "string"
+        example: "johndoe"
+      password:
+        type: "string"
+        example: "yourpassword"
+    example:
+      password: "yourpassword"
+      email: "user@example.com"
+      username: "johndoe"
+  Register:
+    type: "object"
+    required:
+    - "email"
+    - "firstName"
+    - "lastName"
+    - "password"
+    - "username"
+    properties:
+      firstName:
+        type: "string"
+        example: "John"
+      lastName:
+        type: "string"
+        example: "Doe"
+      username:
+        type: "string"
+        example: "johndoe"
+      email:
+        type: "string"
+        format: "email"
+        example: "john.doe@example.com"
+      password:
+        type: "string"
+        example: "strongPassword123"
+    example:
+      firstName: "John"
+      lastName: "Doe"
+      password: "strongPassword123"
+      email: "john.doe@example.com"
+      username: "johndoe"
+  inline_response_200:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        example: "cbmfhmbdvsfbsfbf4egnegblscmbnb9..."
+    example:
+      token: "cbmfhmbdvsfbsfbf4egnegblscmbnb9..."
+  emailInfo:
+    type: "object"
+    required:
+    - "email"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+        example: "user@example.com"
+  resetInfo:
+    type: "object"
+    required:
+    - "confirmPassword"
+    - "newPassword"
+    - "token"
+    properties:
+      token:
+        type: "string"
+        example: "reset-token-here"
+      newPassword:
+        type: "string"
+        example: "newSecretPassword"
+      confirmPassword:
+        type: "string"
+        example: "newSecretPassword"
