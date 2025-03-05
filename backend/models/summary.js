@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 // Define the summary schema
-const summarySchema = new mongoose.Schema({
-  summaryTitle: {
+const profileSchema = new mongoose.Schema({
+  title: {
     type: String,
     required: true,
     trim: true,
   },
-  summaryContent: {
+  content: {
     type: String,
     required: true,
     trim: true,
@@ -33,4 +33,4 @@ const summarySchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Summary", summarySchema);
+module.exports = mongoose.model("Profile", profileSchema);
