@@ -6,45 +6,45 @@ const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   lastName: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   username: {
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   isVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   resetToken: {
     type: String,
-    default: null
+    default: null,
   },
   resetTokenExpiry: {
     type: Date,
-    default: null
+    default: null,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   }
 });
 

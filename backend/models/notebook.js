@@ -30,4 +30,3 @@ const notebookSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("Notebook", notebookSchema);
-
