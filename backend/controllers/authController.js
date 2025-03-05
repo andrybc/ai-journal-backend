@@ -35,8 +35,8 @@ exports.register = async (req, res) => {
 // Login user
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
 
         if (!user) {
             return res.status(401).json({ error: "Invalid credentials" });
@@ -49,12 +49,12 @@ exports.login = async (req, res) => {
         }
 
         // Optionally, check if email is verified before allowing login
-        if (!user.isVerified) {
-            return res.status(403).json({ error: "Email is not verified" });
-        }
+       // if (!user.isVerified) {
+         //   return res.status(403).json({ error: "Email is not verified" });
+        //}
 
         // Generate a JWT token for the session
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ message: "Login successful", token });
     } catch (error) {
         res.status(500).json({ error: error.message });
