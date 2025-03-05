@@ -15,13 +15,10 @@ const SignUp = () => {
        <div className="w-full fixed top-0 left-0">
         <Navbar />
       </div>
-      {/* Main Sign-Up Modal */}
+      
       <div className="bg-neutral-300 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-900 mb-4">Sign Up</h2>
 
-
-
-        {/* Last Name Input */}
         <input
           type="text"
           placeholder="Email"
@@ -30,7 +27,7 @@ const SignUp = () => {
           onChange={(e) => setLastName(e.target.value)}
         />
 
-        {/* Username Input */}
+        
         <input
           type="text"
           placeholder="User Name"
@@ -39,7 +36,6 @@ const SignUp = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        {/* Password Input */}
         <div className="relative w-full">
           <input
             type={showPassword ? "text" : "password"}
@@ -51,7 +47,7 @@ const SignUp = () => {
      
         </div>
 
-        {/* Confirm Password Input */}
+        
         <div className="relative w-full mt-3">
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -63,13 +59,13 @@ const SignUp = () => {
           
         </div>
 
-        {/* Register Button */}
+        
         <button className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600">
           Register
         </button>
       </div>
 
-      {/* Smaller "Sign In" Modal */}
+      
       <div className="bg-neutral-300 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
         <p className="text-sm text-neutral-800">
           Already have an account?{" "}
