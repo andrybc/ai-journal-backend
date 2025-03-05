@@ -16,7 +16,7 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Mount auth routes at /auth
 app.use('/auth', authRoutes);
-
+//app.use('/journals', journalRoutes);
 // A simple test endpoint
 app.get('/api/test', (req, res) => {
     res.json({ message: "Hello from the API!" });
