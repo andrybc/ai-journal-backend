@@ -23,13 +23,14 @@ jobs:
       - name: Build frontend
         run: npm run build --workspace=frontend
 
-      - uses: appleboy/ssh-action@master
+      - uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "frontend/dist/*"
+          target: "/var/www/journal-app/"
           script: |
-            rsync -avz --delete $GITHUB_WORKSPACE/frontend/dist/ /var/www/journal-app/
             cd /home/deploy/journal-organizer
             git pull origin main
             npm install
