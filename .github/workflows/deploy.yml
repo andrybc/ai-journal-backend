@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            rsync -avz --delete ./frontend/dist/ /var/www/journal-app/
+            rsync -avz --delete $GITHUB_WORKSPACE/frontend/dist/ /var/www/journal-app/
             cd /home/deploy/journal-organizer
             git pull origin main
             npm install
