@@ -12,7 +12,6 @@
 
 import localVarRequest = require('request');
 import http = require('http');
-import Promise = require('bluebird');
 
 let defaultBasePath = 'https://virtserver.swaggerhub.com/cop4331swaggy-c49/journal-organizer/1.0.0';
 
@@ -383,7 +382,7 @@ export class AuthenticationApi {
      * @param emailInfo Email address of the user requesting password reset
      * @param {*} [options] Override http request options.
      */
-    public authForgotPasswordPost (emailInfo: EmailInfo, options: any = {}) : Promise<{ response: http.ClientResponse; body?: any;  }> {
+    public authForgotPasswordPost (emailInfo: EmailInfo, options: any = {}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/auth/forgot-password';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -417,7 +416,7 @@ export class AuthenticationApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any;  }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any;  }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -437,7 +436,7 @@ export class AuthenticationApi {
      * @param credentials User login credentials (provide either email or username along with password)
      * @param {*} [options] Override http request options.
      */
-    public authLoginPost (credentials: Login, options: any = {}) : Promise<{ response: http.ClientResponse; body: InlineResponse200;  }> {
+    public authLoginPost (credentials: Login, options: any = {}) : Promise<{ response: http.IncomingMessage; body: InlineResponse200;  }> {
         const localVarPath = this.basePath + '/auth/login';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -471,7 +470,7 @@ export class AuthenticationApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: InlineResponse200;  }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: InlineResponse200;  }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -492,7 +491,7 @@ export class AuthenticationApi {
      * @param user User registration details
      * @param {*} [options] Override http request options.
      */
-    public authRegisterPost (user: Register, options: any = {}) : Promise<{ response: http.ClientResponse; body?: any;  }> {
+    public authRegisterPost (user: Register, options: any = {}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/auth/register';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -526,7 +525,7 @@ export class AuthenticationApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any;  }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any;  }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -546,7 +545,7 @@ export class AuthenticationApi {
      * @param resetInfo Reset token, new password, and password confirmation
      * @param {*} [options] Override http request options.
      */
-    public authResetPasswordPost (resetInfo: ResetInfo, options: any = {}) : Promise<{ response: http.ClientResponse; body?: any;  }> {
+    public authResetPasswordPost (resetInfo: ResetInfo, options: any = {}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/auth/reset-password';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -580,7 +579,7 @@ export class AuthenticationApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any;  }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any;  }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -600,7 +599,7 @@ export class AuthenticationApi {
      * @param token Email verification token
      * @param {*} [options] Override http request options.
      */
-    public authVerifyEmailGet (token: string, options: any = {}) : Promise<{ response: http.ClientResponse; body?: any;  }> {
+    public authVerifyEmailGet (token: string, options: any = {}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/auth/verify-email';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -637,7 +636,7 @@ export class AuthenticationApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any;  }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any;  }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
