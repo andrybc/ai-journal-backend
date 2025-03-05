@@ -30,10 +30,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "frontend/dist/*"
           target: "/var/www/journal-app/"
+
+      - name: Execute remote commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/deploy/journal-organizer
             git pull origin main
             npm install
-            cd backend && npm install
-            pm2 restart journal-backend || pm2 start server.js --name journal-backend
+            pm2 restart journal-backend || pm2 start backend/server.js --name journal-backend
             sudo systemctl reload nginx
