@@ -16,6 +16,7 @@ exports.register = async (req, res) => {
         // Create new user; the pre-save hook in the model will hash the password
         const newUser = new User({
             email,
+            username,
             password,
             isVerified: false  // Initially not verified
         });
