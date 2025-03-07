@@ -5,32 +5,35 @@ const crypto = require("node:crypto");
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    // Check if a user with the same email or username already exists
+    let existingUser = await User.findOne({
+      $or: [{ email }, { username }],
+    });
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
 
-    // Create new user; the pre-save hook in the model will hash the password
+    // Create a new user; the pre-save hook in the model will hash the password
     const newUser = new User({
-      firstName,
-      lastName,
+      username,
       email,
       password,
       isVerified: false, // Initially not verified
+      journalIDs: [], // Empty array for journal IDs
+      summaryIDs: [], // Empty array for summary IDs
     });
     await newUser.save();
 
-    // Optionally, send an email verification token (here we generate a JWT as an example)
+    // Generate an email verification token (JWT) that expires in 1 day
     const verificationToken = jwt.sign(
       { id: newUser._id },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
 
-    // In production, send the verificationToken via email
+    // In production, you would send this token via email
     res
       .status(201)
       .json({ message: "User registered successfully", verificationToken });
@@ -42,9 +45,12 @@ exports.register = async (req, res) => {
 // Login user
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { email, username, password } = req.body;
 
+    // Allow login by email OR username
+    const user = await User.findOne({
+      $or: [{ email }, { username }],
+    });
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -55,12 +61,12 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Optionally, check if email is verified before allowing login
+    // Check if email is verified before allowing login
     if (!user.isVerified) {
       return res.status(403).json({ error: "Email is not verified" });
     }
 
-    // Generate a JWT token for the session
+    // Generate a JWT token for the session that expires in 1 hour
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
