@@ -46,7 +46,7 @@ const Login = () => {
       <div className="bg-neutral-300 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
         <p className="text-sm text-neutral-800">
           Don't have an account?{" "}
-          <a href="/SignUp" className="text-neutral-700 underline hover:text-neutral-900">
+          <a href="/register" className="text-neutral-700 underline hover:text-neutral-900">
             Sign Up
           </a>
         </p>

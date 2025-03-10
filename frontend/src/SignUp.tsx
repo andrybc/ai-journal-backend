@@ -9,32 +9,7 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleRegister = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-        
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text(); // Get raw response for debugging
-        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
-      }
-
-      const data = await response.json();
-      console.log(data.message); // "User registered successfully"
-    } catch (error) {
-      console.error('Registration error:', (error as Error).message);
-    }
-  };
+  
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
@@ -87,7 +62,7 @@ const SignUp = () => {
 
         
         <button 
-          onClick={handleRegister}
+          onClick={() => {}}
           className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
         >
           Register

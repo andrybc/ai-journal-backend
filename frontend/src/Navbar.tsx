@@ -11,7 +11,7 @@ const Navbar = () => {
           <button onClick={() => navigate('/login')} className="px-4 py-2 border border-neutral-600 rounded-lg text-white !bg-neutral-400 hover:!bg-neutral-600 transition">
             Sign In
           </button>
-          <button onClick={() => navigate('/signup')} className="px-4 py-2 border border-neutral-600 rounded-lg text-white !bg-neutral-400 hover:!bg-neutral-600 transition">
+          <button onClick={() => navigate('/register')} className="px-4 py-2 border border-neutral-600 rounded-lg text-white !bg-neutral-400 hover:!bg-neutral-600 transition">
             Sign Up
           </button>
         </div>
