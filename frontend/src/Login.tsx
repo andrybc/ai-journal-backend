@@ -4,7 +4,34 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/login', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
+      }
+  
+      const data = await response.json();
+      console.log(data.message);
+      
+      //localStorage.setItem('token', data.token);
+      
+    } catch (error) {
+      console.error('Login error:', (error as Error).message);
+    }
+  };
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
       <div className="w-full fixed top-0 left-0">
@@ -31,7 +58,7 @@ const Login = () => {
           />
         </div>
 
-        <button className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600">
+        <button  onClick={handleLogin} className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600">
           Login
         </button>
       </div>
