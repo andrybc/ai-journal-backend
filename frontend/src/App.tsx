@@ -10,12 +10,7 @@ function App() {
   const [count, setCount] = useState(0)
   const [apiMessage, setApiMessage] = useState('')
 
-  useEffect(() => {
-    fetch('/api/test')
-      .then((res) => res.json())
-      .then((data) => setApiMessage(data.message))
-      .catch((err) => console.error("Error fetching API:", err))
-  }, [])
+
 
   const MainContent = () => (
     <>
@@ -49,7 +44,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<MainContent />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/register" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
   )

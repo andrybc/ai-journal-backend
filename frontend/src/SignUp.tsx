@@ -2,13 +2,39 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 
 const SignUp = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+        
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text(); // Get raw response for debugging
+        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
+      }
+
+      const data = await response.json();
+      console.log(data.message); // "User registered successfully"
+    } catch (error) {
+      console.error('Registration error:', (error as Error).message);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
@@ -23,8 +49,8 @@ const SignUp = () => {
           type="text"
           placeholder="Email"
           className="w-full px-3 py-2 border border-neutral-500 rounded-md mb-3 bg-neutral-100 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-600"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         
@@ -60,7 +86,10 @@ const SignUp = () => {
         </div>
 
         
-        <button className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600">
+        <button 
+          onClick={handleRegister}
+          className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
+        >
           Register
         </button>
       </div>
