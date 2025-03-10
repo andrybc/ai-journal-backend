@@ -1,5 +1,7 @@
-import OpenAI from "openai";
-import dotenv from "dotenv";
+const OpenAI = require("openai").default;
+const dotenv = require("dotenv");
+
+// Load environment variables
 dotenv.config({ path: "../../.env" });
 
 const openai = new OpenAI({
@@ -14,7 +16,7 @@ const openai = new OpenAI({
  * @param {string} journalContent - The content of the journal entry.
  * @returns {Promise<string[]>} - Array of extracted tags.
  */
-export async function extractTags(journalContent) {
+async function extractTags(journalContent) {
   const messages = [
     {
       role: "system",
@@ -181,7 +183,7 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
  * Body: { "tag": string, "tagType": string, "notebookContents": string[] }
  */
 // 3. CREATE PROFILE ENDPOINT HANDLER
-export async function createProfile(req, res) {
+async function createProfile(req, res) {
   try {
     const { tag, tagType, notebookContents } = req.body;
     const messages = buildProfilePrompt(tag, tagType, notebookContents);
@@ -211,3 +213,8 @@ export async function createProfile(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
+
+module.exports = {
+  extractTags,
+  createProfile,
+};

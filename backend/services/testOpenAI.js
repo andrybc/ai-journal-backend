@@ -1,4 +1,4 @@
-import { extractTags, summarizeJournal } from "./openaiService.js";
+import { extractTags } from "./openaiService.cjs";
 
 async function testOpenAI() {
   // Sample text for testing
@@ -8,10 +8,6 @@ async function testOpenAI() {
   // 1. Extract Tags
   const tags = await extractTags(sampleText);
   console.log("Extracted Tags:", tags);
-
-  // 2. Summarize
-  const summary = await summarizeJournal(sampleText);
-  console.log("Journal:", summary);
 }
 
 testOpenAI();
