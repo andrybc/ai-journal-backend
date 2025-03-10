@@ -26,5 +26,8 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "openai": "^4.86.2"
   }
 }

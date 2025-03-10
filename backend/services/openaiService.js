@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your .env
+  apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your .env
 });
 
 /**
@@ -15,15 +15,16 @@ const openai = new OpenAI({
  * @returns {Promise<string[]>} - Array of extracted tags.
  */
 export async function extractTags(journalContent) {
-    const messages = [
-        {
-            role: "system",
-            content: "You are a helpful assistant that extracts tags from text. "
-                + "You should return only valid JSON and nothing else.",
-        },
-        {
-            role: "user",
-            content: `
+  const messages = [
+    {
+      role: "system",
+      content:
+        "You are a helpful assistant that extracts tags from text. " +
+        "You should return only valid JSON and nothing else.",
+    },
+    {
+      role: "user",
+      content: `
           Extract important names, places, tasks, or keywords from the following text. 
           Return only a valid JSON object (dictionary) where:
             - Each key is the tag (string).
@@ -44,53 +45,58 @@ export async function extractTags(journalContent) {
           Text:
           "${journalContent}"
         `,
-        },
-    ];
+    },
+  ];
 
-    try {
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo", // or "gpt-4" if you have access
-            messages,
-        });
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // or "gpt-4" if you have access
+      messages,
+    });
 
-        const rawText = response.choices[0].message.content.trim();
-        // Attempt to parse the text as JSON
-        const tagsObject = JSON.parse(rawText);
+    const rawText = response.choices[0].message.content.trim();
+    // Attempt to parse the text as JSON
+    const tagsObject = JSON.parse(rawText);
 
-        // Ensure it's an object (not an array or null)
-        if (typeof tagsObject !== "object" || tagsObject === null || Array.isArray(tagsObject)) {
-            throw new Error("The response is not a JSON object.");
-        }
-
-        // Optional: Validate that each value is one of the allowed classifications
-        const allowedTypes = ["person", "place", "task", "keyword"];
-        for (const [tag, classification] of Object.entries(tagsObject)) {
-            if (!allowedTypes.includes(classification)) {
-                console.warn(`Tag "${tag}" has unrecognized classification: "${classification}"`);
-            }
-        }
-
-        return tagsObject;
-    } catch (error) {
-        console.error("Error extracting tags:", error);
-        // Return an empty object on failure
-        return {};
+    // Ensure it's an object (not an array or null)
+    if (
+      typeof tagsObject !== "object" ||
+      tagsObject === null ||
+      Array.isArray(tagsObject)
+    ) {
+      throw new Error("The response is not a JSON object.");
     }
-}
 
+    // Optional: Validate that each value is one of the allowed classifications
+    const allowedTypes = ["person", "place", "task", "keyword"];
+    for (const [tag, classification] of Object.entries(tagsObject)) {
+      if (!allowedTypes.includes(classification)) {
+        console.warn(
+          `Tag "${tag}" has unrecognized classification: "${classification}"`,
+        );
+      }
+    }
+
+    return tagsObject;
+  } catch (error) {
+    console.error("Error extracting tags:", error);
+    // Return an empty object on failure
+    return {};
+  }
+}
 
 /**
  * Helper to build a ChatCompletion prompt based on tagType,
  * with expanded fields for each profile type.
  */
 function buildProfilePrompt(tag, tagType, notebookContents) {
-    // Combine all notebook contents into one string
-    const combinedNotes = notebookContents.join("\n\n");
+  // Combine all notebook contents into one string
+  const combinedNotes = notebookContents.join("\n\n");
 
-    let fieldInstructions;
-    switch (tagType) {
-        case "person":
-            fieldInstructions = `
+  let fieldInstructions;
+  switch (tagType) {
+    case "person":
+      fieldInstructions = `
           Return valid JSON with the following fields:
           {
             "name": string or null,
@@ -102,9 +108,9 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
             "otherDetails": string or null
           }
         `;
-            break;
-        case "place":
-            fieldInstructions = `
+      break;
+    case "place":
+      fieldInstructions = `
           Return valid JSON with the following fields:
           {
             "name": string or null,
@@ -117,9 +123,9 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
             "otherDetails": string or null
           }
         `;
-            break;
-        case "task":
-            fieldInstructions = `
+      break;
+    case "task":
+      fieldInstructions = `
           Return valid JSON with the following fields:
           {
             "description": string or null,
@@ -130,10 +136,10 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
             "otherDetails": string or null
           }
         `;
-            break;
-        default:
-            // "keyword" or fallback
-            fieldInstructions = `
+      break;
+    default:
+      // "keyword" or fallback
+      fieldInstructions = `
           Return valid JSON with the following fields:
           {
             "info": string or null,
@@ -142,18 +148,19 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
             "otherDetails": string or null
           }
         `;
-            break;
-    }
+      break;
+  }
 
-    return [
-        {
-            role: "system",
-            content: "You are a helpful assistant that creates structured profiles from user notes. "
-                + "Return only valid JSON with no extra text.",
-        },
-        {
-            role: "user",
-            content: `
+  return [
+    {
+      role: "system",
+      content:
+        "You are a helpful assistant that creates structured profiles from user notes. " +
+        "Return only valid JSON with no extra text.",
+    },
+    {
+      role: "user",
+      content: `
           We have a tag named "${tag}" of type "${tagType}".
           Below are notebook contents mentioning this tag.
   
@@ -165,10 +172,9 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
           If a field isn't mentioned, set it to null or empty.
           Return valid JSON only, with no extra text.
         `,
-        },
-    ];
+    },
+  ];
 }
-
 
 /**
  * POST /profile/create-profile
@@ -176,32 +182,32 @@ function buildProfilePrompt(tag, tagType, notebookContents) {
  */
 // 3. CREATE PROFILE ENDPOINT HANDLER
 export async function createProfile(req, res) {
+  try {
+    const { tag, tagType, notebookContents } = req.body;
+    const messages = buildProfilePrompt(tag, tagType, notebookContents);
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages,
+    });
+
+    const rawText = response.choices[0].message.content.trim();
+    let profileData;
     try {
-        const { tag, tagType, notebookContents } = req.body;
-        const messages = buildProfilePrompt(tag, tagType, notebookContents);
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages,
-        });
-
-        const rawText = response.choices[0].message.content.trim();
-        let profileData;
-        try {
-            profileData = JSON.parse(rawText);
-        } catch (parseError) {
-            return res.status(500).json({
-                error: "Failed to parse JSON from OpenAI. Raw response: " + rawText,
-            });
-        }
-
-        return res.status(200).json({
-            tag,
-            tagType,
-            profile: profileData,
-        });
-    } catch (error) {
-        console.error("Error creating profile:", error);
-        return res.status(500).json({ error: error.message });
+      profileData = JSON.parse(rawText);
+    } catch (parseError) {
+      return res.status(500).json({
+        error: "Failed to parse JSON from OpenAI. Raw response: " + rawText,
+      });
     }
+
+    return res.status(200).json({
+      tag,
+      tagType,
+      profile: profileData,
+    });
+  } catch (error) {
+    console.error("Error creating profile:", error);
+    return res.status(500).json({ error: error.message });
+  }
 }
