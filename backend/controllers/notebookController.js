@@ -1,10 +1,11 @@
 const Notebook = require('../models/notebook');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
 exports.createNotebook = async (req, res) => {
   try {
-    const { title, content, tags } = req.body;
+    const { title, content } = req.body;
+
+    // TODO openAI generated tags here
+    const tags = [{ name:'name'}, { name:'sample'}, { name:'tags'}];
 
     // Create a new notebook
     const newNotebook = new Notebook({
@@ -41,7 +42,10 @@ exports.deleteNotebook = async (req, res) => {
 exports.updateNotebook = async (req, res) => {
   try {
     const { notebookId } = req.params;
-    const { title, content, tags } = req.body;
+    const { title, content } = req.body;
+
+    // TODO openAI generated tags here
+    const tags = [{name:'name'}, {name:'sample'}, {name:'tags'}];
 
     // Find and update the notebook
     const updatedNotebook = await Notebook.findByIdAndUpdate(

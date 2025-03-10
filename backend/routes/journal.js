@@ -6,9 +6,9 @@ router.post('/create-notebook', notebookController.createNotebook);
 
 router.post('/update-notebook', notebookController.updateNotebook);
 
-router.post('/create-notebook', notebookController.createNotebook);
+router.post('/create-notebook', notebookController.deleteNotebook);
 
-router.post('/delete-notebook', notebookController.createNotebook);
+router.post('/delete-notebook', notebookController.readNotebook);
 
 
 
