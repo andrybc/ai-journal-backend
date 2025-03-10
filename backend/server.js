@@ -3,6 +3,7 @@ require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth"); // Import the auth routes
+const profileRoutes = require("./routes/profileRoutes.js"); // Import the auth routes
 
 const app = express();
 app.use(express.json());
@@ -16,7 +17,7 @@ mongoose
 
 // Mount auth routes at /auth
 app.use("/auth", authRoutes);
-
+app.use("/profile", profileRoutes);
 // A simple test endpoint
 app.get("/api/test", (req, res) => {
   res.json({ message: "Hello from the API!" });
