@@ -8,32 +8,17 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleRegister = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/auth/register', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
-      }
-
-      const data = await response.json();
-      console.log(data.message); 
-    } catch (error) {
-      console.error('Registration error:', (error as Error).message);
+  const handleRegister = () => {
+    setIsSubmitted(true);
+    if (!email || !username || !password || !confirmPassword) {
+      setErrorMessage("Please fill in all fields");
+      return;
     }
   };
+
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
       <div className="w-full fixed top-0 left-0">
@@ -41,12 +26,20 @@ const SignUp = () => {
       </div>
 
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-white mb-4">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
+
+        <p
+          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
+        >
+          {errorMessage}
+        </p>
 
         <input
           type="text"
           placeholder="Email"
-          className="w-full px-3 py-2 border border-neutral-500 rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+            isSubmitted && !email ? "border-red-600" : "border-neutral-500"
+          }`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -54,7 +47,9 @@ const SignUp = () => {
         <input
           type="text"
           placeholder="User Name"
-          className="w-full px-3 py-2 border border-neutral-500 rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+            isSubmitted && !username ? "border-red-600" : "border-neutral-500"
+          }`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -63,7 +58,9 @@ const SignUp = () => {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className="w-full px-3 py-2 border border-neutral-500 rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+              isSubmitted && !password ? "border-red-600" : "border-neutral-500"
+            }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -73,7 +70,11 @@ const SignUp = () => {
           <input
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
-            className="w-full px-3 py-2 border border-neutral-500 rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+              isSubmitted && !confirmPassword
+                ? "border-red-600"
+                : "border-neutral-500"
+            }`}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -81,7 +82,7 @@ const SignUp = () => {
 
         <button
           onClick={handleRegister}
-          className="w-full mt-4 !bg-neutral-800 text-neutral-50 py-2 rounded-md hover:!bg-neutral-400"
+          className="w-full mt-4 !bg-neutral-800 text-neutral-50 py-2 rounded-md hover:!bg-neutral-500"
         >
           Register
         </button>
