@@ -38,7 +38,7 @@ const Login = () => {
         <Navbar />
       </div>
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-4">Sign In</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Sign In</h2>
 
         <input
           type="text"
@@ -63,12 +63,12 @@ const Login = () => {
         </button>
       </div>
 
-      <div className="bg-neutral-300 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
-        <p className="text-sm text-neutral-800">
+      <div className="bg-neutral-700 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
+        <p className="text-sm text-white">
           Don't have an account?{" "}
           <a
             href="/register"
-            className="text-neutral-700 underline hover:text-neutral-900"
+            className="!text-white !underline hover:text-white"
           >
             Sign Up
           </a>
