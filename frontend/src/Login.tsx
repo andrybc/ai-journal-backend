@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const Login = () => {
@@ -8,6 +9,7 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const navigate = useNavigate();
   const handleLogin = async () => { // Added 'async'
     setIsSubmitted(true);
     if (!username || !password) {
@@ -35,7 +37,7 @@ const Login = () => {
       console.log(data.message);
       
       //localStorage.setItem('token', data.token);
-      
+      navigate("/");
     } catch (error) {
       console.error('Login error:', (error as Error).message);
     }

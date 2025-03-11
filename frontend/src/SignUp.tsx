@@ -37,6 +37,7 @@ const SignUp = () => {
 
       const data = await response.json();
       console.log(data.message); 
+      console.log(data.verificationToken);
     } catch (error) {
       console.error('Registration error:', (error as Error).message);
     }
