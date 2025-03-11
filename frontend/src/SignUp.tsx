@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const navigate = useNavigate();
   const handleRegister = async () => { 
     setIsSubmitted(true);
     if (!email || !username || !password || !confirmPassword) {
@@ -38,6 +40,7 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message); 
       console.log(data.verificationToken);
+      navigate("/login");
     } catch (error) {
       console.error('Registration error:', (error as Error).message);
     }
@@ -106,7 +109,7 @@ const SignUp = () => {
 
         <button
           onClick={handleRegister}
-          className="w-full mt-4 !bg-neutral-800 text-neutral-50 py-2 rounded-md hover:!bg-neutral-500"
+          className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-500"
         >
           Register
         </button>
