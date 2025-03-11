@@ -11,36 +11,34 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleRegister = async () => { // Added async for await
+  const handleRegister = async () => { 
     setIsSubmitted(true);
     if (!email || !username || !password || !confirmPassword) {
       setErrorMessage("Please fill in all fields");
       return;
     }
     try {
-      const response = await fetch('http://localhost:3000/auth/login', { 
+      const response = await fetch('http://localhost:3000/auth/register', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           username,
+          email,
           password,
         }),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
       }
-  
+
       const data = await response.json();
-      console.log(data.message);
-      
-      //localStorage.setItem('token', data.token);
-      
+      console.log(data.message); 
     } catch (error) {
-      console.error('Login error:', (error as Error).message);
+      console.error('Registration error:', (error as Error).message);
     }
   }; // Removed extra brace here
 
@@ -93,7 +91,7 @@ const SignUp = () => {
 
         <div className="relative w-full mt-3">
           <input
-            type={showConfirmPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
               isSubmitted && !confirmPassword
