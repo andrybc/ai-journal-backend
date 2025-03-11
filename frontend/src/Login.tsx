@@ -37,13 +37,13 @@ const Login = () => {
       <div className="w-full fixed top-0 left-0">
         <Navbar />
       </div>
-      <div className="bg-neutral-300 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
+      <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-900 mb-4">Sign In</h2>
 
         <input
           type="text"
           placeholder="User Name"
-          className="w-full px-3 py-2 border border-neutral-500 rounded-md mb-3 bg-neutral-100 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+          className="w-full px-3 py-2 border border-neutral-500 rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -52,7 +52,7 @@ const Login = () => {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className="w-full px-3 py-2 border border-neutral-500 rounded-md bg-neutral-100 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+            className="w-full px-3 py-2 border border-neutral-500 rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
