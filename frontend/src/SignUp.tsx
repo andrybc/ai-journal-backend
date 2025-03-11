@@ -40,7 +40,7 @@ const SignUp = () => {
         <Navbar />
       </div>
 
-      <div className="bg-neutral-300 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
+      <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-900 mb-4">Sign Up</h2>
 
         <input
