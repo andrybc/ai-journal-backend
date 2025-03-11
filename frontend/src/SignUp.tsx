@@ -81,7 +81,7 @@ const SignUp = () => {
 
         <button
           onClick={handleRegister}
-          className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
+          className="w-full mt-4 !bg-neutral-800 text-neutral-50 py-2 rounded-md hover:!bg-neutral-400"
         >
           Register
         </button>
@@ -92,7 +92,7 @@ const SignUp = () => {
           Already have an account?{" "}
           <a
             href="/login"
-            className="text-neutral-700 underline hover:text-neutral-900"
+            className="!text-white !underline hover:text-neutral-900"
           >
             Sign In
           </a>

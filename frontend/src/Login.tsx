@@ -58,7 +58,7 @@ const Login = () => {
           />
         </div>
 
-        <button  onClick={handleLogin} className="w-full mt-4 !bg-neutral-400 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600">
+        <button  onClick={handleLogin} className="w-full mt-4 !bg-neutral-800 text-neutral-50 py-2 rounded-md hover:!bg-neutral-400">
           Login
         </button>
       </div>
@@ -68,7 +68,7 @@ const Login = () => {
           Don't have an account?{" "}
           <a
             href="/register"
-            className="!text-white !underline hover:text-white"
+            className="!text-white !underline hover:text-neutral-900"
           >
             Sign Up
           </a>
