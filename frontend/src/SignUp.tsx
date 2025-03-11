@@ -11,13 +11,38 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => { // Added async for await
     setIsSubmitted(true);
     if (!email || !username || !password || !confirmPassword) {
       setErrorMessage("Please fill in all fields");
       return;
     }
-  };
+    try {
+      const response = await fetch('http://localhost:3000/auth/login', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
+      }
+  
+      const data = await response.json();
+      console.log(data.message);
+      
+      //localStorage.setItem('token', data.token);
+      
+    } catch (error) {
+      console.error('Login error:', (error as Error).message);
+    }
+  }; // Removed extra brace here
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
