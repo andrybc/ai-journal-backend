@@ -83,9 +83,9 @@ const Login = () => {
         </div>
 
         <button
-          onClick={handleLogin}
-          className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
-        >
+           onClick={() => navigate("/")}
+           className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
+          >
           Login
         </button>
       </div>
