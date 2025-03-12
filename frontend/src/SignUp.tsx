@@ -13,17 +13,17 @@ const SignUp = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
-  const handleRegister = async () => { 
+  const handleRegister = async () => {
     setIsSubmitted(true);
     if (!email || !username || !password || !confirmPassword) {
       setErrorMessage("Please fill in all fields");
       return;
     }
     try {
-      const response = await fetch('http://localhost:3000/auth/register', { 
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username,
@@ -34,15 +34,17 @@ const SignUp = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`,
+        );
       }
 
       const data = await response.json();
-      console.log(data.message); 
+      console.log(data.message);
       console.log(data.verificationToken);
       navigate("/login");
     } catch (error) {
-      console.error('Registration error:', (error as Error).message);
+      console.error("Registration error:", (error as Error).message);
     }
   }; // Removed extra brace here
 

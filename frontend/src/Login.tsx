@@ -10,36 +10,39 @@ const Login = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
-  const handleLogin = async () => { // Added 'async'
+  const handleLogin = async () => {
+    // Added 'async'
     setIsSubmitted(true);
     if (!username || !password) {
       setErrorMessage("Please fill in all fields");
       return;
     }
     try {
-      const response = await fetch('http://localhost:3000/auth/login', { 
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username,
           password,
         }),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Server error ${response.status}: ${errorText || 'No details'}`);
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`,
+        );
       }
-  
+
       const data = await response.json();
       console.log(data.message);
-      
+
       //localStorage.setItem('token', data.token);
       navigate("/");
     } catch (error) {
-      console.error('Login error:', (error as Error).message);
+      console.error("Login error:", (error as Error).message);
     }
   };
 
