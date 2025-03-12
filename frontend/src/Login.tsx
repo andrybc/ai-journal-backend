@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  //const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -18,7 +18,7 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("http://134.209.175.201:3000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const Login = () => {
 
         <div className="relative w-full">
           <input
-            type={showPassword ? "text" : "password"}
+           // type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700 ${
               isSubmitted && !password ? "border-red-600" : "border-neutral-500"

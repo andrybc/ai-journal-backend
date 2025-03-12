@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -8,7 +8,7 @@ import SignUp from "./SignUp";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [apiMessage, setApiMessage] = useState("");
+  //const [apiMessage, setApiMessage] = useState("");
 
   const MainContent = () => (
     <>
@@ -22,7 +22,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <h1>Frontend Test</h1>
-      <p>{apiMessage ? apiMessage : "Loading..."}</p>
+      <p>{/*apiMessage ? apiMessage : "Loading..."*/}</p>
       <div className="card">
         <button type="button" onClick={() => setCount((count) => count + 1)}>
           count is {count}
