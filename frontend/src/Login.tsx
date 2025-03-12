@@ -6,8 +6,8 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   //const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  //const [errorMessage, setErrorMessage] = useState("");
+  //const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
   /*const handleLogin = async () => {
@@ -54,18 +54,18 @@ const Login = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-white mb-4">Sign In</h2>
 
+        {/*}
         <p
-          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
+         // className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
         >
-          {errorMessage}
-        </p>
+         {//errorMessage}
+         </p>*/}
 
         <input
           type="text"
           placeholder="User Name"
-          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700 ${
-            isSubmitted && !username ? "border-red-600" : "border-neutral-500"
-          }`}
+          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`
+           }
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -74,9 +74,8 @@ const Login = () => {
           <input
            // type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700 ${
-              isSubmitted && !password ? "border-red-600" : "border-neutral-500"
-            }`}
+            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700` 
+            }
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
