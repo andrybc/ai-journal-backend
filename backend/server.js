@@ -5,7 +5,9 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth"); // Import the auth routes
 
 const app = express();
+const cors = require("cors");
 app.use(express.json());
+app.use(cors());
 
 // Connect to MongoDB using your connection string from .env
 const mongoURI = process.env.MONGO_URI;
