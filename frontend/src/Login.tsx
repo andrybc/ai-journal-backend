@@ -10,7 +10,7 @@ const Login = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
-  const handleLogin = async () => {
+  /*const handleLogin = async () => {
     // Added 'async'
     setIsSubmitted(true);
     if (!username || !password) {
@@ -44,7 +44,7 @@ const Login = () => {
     } catch (error) {
       console.error("Login error:", (error as Error).message);
     }
-  };
+  };*/
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
