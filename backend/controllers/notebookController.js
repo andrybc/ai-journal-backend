@@ -1,22 +1,27 @@
-const Notebook = require('../models/notebook');
+const Notebook = require("../models/notebook");
 
 exports.createNotebook = async (req, res) => {
   try {
     const { title, content, userId } = req.body;
 
     // TODO openAI generated tags here
-    const tags = [{ name:'name'}, { name:'sample'}, { name:'tags'}];
+    const tags = [{ name: "name" }, { name: "sample" }, { name: "tags" }];
 
     // Create a new notebook
     const newNotebook = new Notebook({
       title,
       content,
       tags,
-      userId
+      userId,
     });
     await newNotebook.save();
 
-    res.status(200).json({ message: "Notebook created successfully", notebook: newNotebook });
+    res
+      .status(200)
+      .json({
+        message: "Notebook created successfully",
+        notebook: newNotebook,
+      });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -46,19 +51,24 @@ exports.updateNotebook = async (req, res) => {
     const { title, content } = req.body;
 
     // TODO openAI generated tags here
-    const tags = [{name:'name'}, {name:'sample'}, {name:'tags'}];
+    const tags = [{ name: "name" }, { name: "sample" }, { name: "tags" }];
 
     // Find and update the notebook
     const updatedNotebook = await Notebook.findByIdAndUpdate(
       notebookId,
       { title, content, tags },
-      { new: true }
+      { new: true },
     );
     if (!updatedNotebook) {
       return res.status(404).json({ error: "Notebook not found" });
     }
 
-    res.status(200).json({ message: "Notebook updated successfully", notebook: updatedNotebook });
+    res
+      .status(200)
+      .json({
+        message: "Notebook updated successfully",
+        notebook: updatedNotebook,
+      });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

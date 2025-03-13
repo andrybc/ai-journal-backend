@@ -1,16 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const notebookController = require('../controllers/notebookController');
+const notebookController = require("../controllers/notebookController");
 
-router.post('/create-notebook', notebookController.createNotebook);
+router.post("/create-notebook", notebookController.createNotebook);
 
-router.put('/update-notebook', notebookController.updateNotebook);
+router.put("/update-notebook", notebookController.updateNotebook);
 
-router.delete('/delete-notebook', notebookController.deleteNotebook);
+router.delete("/delete-notebook", notebookController.deleteNotebook);
 
-router.get('/read-notebook', notebookController.readNotebook);
+router.get("/read-notebook", notebookController.readNotebook);
 
 module.exports = router;
-
-
-
