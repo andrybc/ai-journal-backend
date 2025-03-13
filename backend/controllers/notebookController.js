@@ -2,7 +2,7 @@ const Notebook = require('../models/notebook');
 
 exports.createNotebook = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, userId } = req.body;
 
     // TODO openAI generated tags here
     const tags = [{ name:'name'}, { name:'sample'}, { name:'tags'}];
@@ -12,6 +12,7 @@ exports.createNotebook = async (req, res) => {
       title,
       content,
       tags,
+      userId
     });
     await newNotebook.save();
 
