@@ -4,10 +4,10 @@ const notebookController = require("../controllers/notebookController");
 
 router.post("/create-notebook", notebookController.createNotebook);
 
-router.put("/update-notebook", notebookController.updateNotebook);
+router.put("/update-notebook/:notebookId", notebookController.updateNotebook);
 
-router.delete("/delete-notebook", notebookController.deleteNotebook);
+router.delete("/delete-notebook/:notebookId", notebookController.deleteNotebook);
 
-router.get("/read-notebook", notebookController.readNotebook);
+router.get("/read-notebook/:notebookId", notebookController.readNotebook);
 
 module.exports = router;

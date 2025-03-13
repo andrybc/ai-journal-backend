@@ -5,7 +5,7 @@ exports.createNotebook = async (req, res) => {
     const { title, content, userId } = req.body;
 
     // TODO openAI generated tags here
-    const tags = [{ name: "name" }, { name: "sample" }, { name: "tags" }];
+    const tags = ["name", "sample", "tags"];
 
     // Create a new notebook
     const newNotebook = new Notebook({
@@ -38,7 +38,7 @@ exports.deleteNotebook = async (req, res) => {
       return res.status(404).json({ error: "Notebook not found" });
     }
 
-    res.status(204).json({ message: "Notebook successfully deleted" });
+    res.status(200).json({ message: "Notebook successfully deleted" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -51,7 +51,7 @@ exports.updateNotebook = async (req, res) => {
     const { title, content } = req.body;
 
     // TODO openAI generated tags here
-    const tags = [{ name: "name" }, { name: "sample" }, { name: "tags" }];
+    const tags = [ "name", "sample", "tags"];
 
     // Find and update the notebook
     const updatedNotebook = await Notebook.findByIdAndUpdate(
