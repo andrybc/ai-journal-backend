@@ -1,30 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import closeSideNav from "../assets/closeNavIcon.svg";
-import notesPage from "../assets/notesPageIcon.svg";
-import summaryIcon from "../assets/peopleSummaryIcon.svg";
-import contactIcon from "../assets/contactIcon.svg";
-import logoutIcon from "../assets/logoutIcon.svg";
+import closeSideNav from "../assets/icons/close-nav-icon.svg";
+import notesPage from "../assets/icons/notes-page-icon.svg";
+import summaryIcon from "../assets/icons/people-summary-icon.svg";
+import contactIcon from "../assets/icons/contact-icon.svg";
+import logoutIcon from "../assets/icons/logout-icon.svg";
 
 type Props = {
   page: string;
-  selectedItem: number | null;
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedItem: React.Dispatch<React.SetStateAction<number | null>>;
+  getSelectedItem: (id: number) => void;
 };
 
 const SideNav: React.FC<Props> = ({
   page, // Page Name (Notes or Summary)
-  selectedItem, // Get the ID of Notes/Summary
   closeNav, // Close the SideNav
-  setSelectedItem, // Set the ID of Notes/Summary to retrieve the data
+  getSelectedItem, // Get the selectedItem to display
 }) => {
   const [search, setSearch] = useState<string>(""); // Search Input
   const [displayList, setDisplayList] = useState<
     { name: string; id: number; [key: string]: string | number | boolean }[]
   >([]); // List of Notes/Summary to display in SideNav
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Store ID of Notes/Summary
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
+  const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
 
   // Use Effect to put mock data into displayList
   useEffect(() => {
@@ -97,7 +97,9 @@ const SideNav: React.FC<Props> = ({
     const removeUserDropdown = (event: MouseEvent): void => {
       // Check if clicked outside of the dropdown
       if (!userDropdown.current?.contains(event.target as Node)) {
-        event.stopPropagation(); // Prevent the open dropdown button event from running
+        if (event.target !== navModal.current) {
+          event.stopPropagation(); // Prevent the open dropdown button event from running
+        }
         setUserDropdownOpen(false);
       }
     };
@@ -114,7 +116,15 @@ const SideNav: React.FC<Props> = ({
 
   return (
     <>
-      <div className="absolute top-0 left-0 w-dvw opacity-75 h-dvh sm:hidden bg-black"></div>
+      <div
+        ref={navModal}
+        className="z-10 absolute top-0 left-0 w-dvw opacity-75 h-dvh sm:hidden bg-black"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            closeNav(false);
+          }
+        }}
+      ></div>
       <div className="shrink-0 border-r z-20 absolute top-0 left-0 w-[300px] h-dvh overflow-hidden flex flex-col bg-white sm:static">
         {/* Top Nav */}
         <div className="flex items-center justify-between py-2 pl-2 pr-2.5 border-b">
@@ -162,7 +172,7 @@ const SideNav: React.FC<Props> = ({
         </div>
 
         {/* Search and Display List */}
-        <div className="grow flex flex-col py-4 gap-3.5 overflow-hidden">
+        <div className="grow flex flex-col pt-4 pb-3.5 gap-3.5 overflow-hidden">
           {/* Search Bar */}
           <input
             className="px-2.5 py-1 rounded-lg border-[0.5px] mx-5"
@@ -174,15 +184,19 @@ const SideNav: React.FC<Props> = ({
           />
 
           {/* Display List */}
-          <div className="grow flex flex-col gap-1.5 overflow-auto mx-3.5">
+          <div className="grow flex flex-col gap-1 overflow-auto mx-3.5">
             {displayList.map((item, index) => (
               <button
                 key={index}
                 className={`text-left px-4 py-2 rounded-xl truncate shrink-0 ${
-                  selectedItem === item.id ? "bg-gray-300" : "hover:bg-gray-200"
+                  selectedId === item.id ? "bg-gray-300" : "hover:bg-gray-200"
                 }`}
                 onClick={() => {
-                  setSelectedItem(item.id);
+                  setSelectedId(item.id);
+                  getSelectedItem(item.id);
+                  if (window.innerWidth < 640) {
+                    closeNav(false);
+                  }
                 }}
               >
                 {item.name}
