@@ -19,7 +19,7 @@ mongoose
 
 // Mount auth routes at /auth
 app.use("/auth", authRoutes);
-app.use("/profile", profileRoutes)
+app.use("/profile", profileRoutes);
 
 // A simple test endpoint
 app.get("/api/test", (req, res) => {
