@@ -4,15 +4,14 @@ const Profile = require("../models/summary");
 // create profile
 exports.createProfile = async (req, res) => {
   try {
-    const { tagId, userId } = req.body;
-    if (!tagId || !Array.isArray(tagId) || tagId.length === 0 || !userId) {
+    const { title, content, userId } = req.body;
+    if (!title || !content || !userId) {
       return res.status(400).json({ error: "Invalid input data" });
     }
     //TODO: implement AI to search content in notebooks
     const newProfile = new Profile({
       title,
       content,
-      tagId,
       userId,
     });
     await newProfile.save();
