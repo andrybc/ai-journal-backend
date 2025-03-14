@@ -3,9 +3,12 @@ require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth"); // Import the auth routes
+const profileRoutes = require("./routes/profile");
 
 const app = express();
+const cors = require("cors");
 app.use(express.json());
+app.use(cors());
 
 // Connect to MongoDB using your connection string from .env
 const mongoURI = process.env.MONGO_URI;
@@ -16,6 +19,7 @@ mongoose
 
 // Mount auth routes at /auth
 app.use("/auth", authRoutes);
+app.use("/profile", profileRoutes)
 
 // A simple test endpoint
 app.get("/api/test", (req, res) => {
