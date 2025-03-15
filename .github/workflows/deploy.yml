@@ -29,8 +29,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           timeout: 120s
-          source: "frontend/dist/*"
+          source: "frontend/dist/"
           target: "/var/www/journal-app/"
+          strip_components: 2
 
       - name: Execute remote commands
         uses: appleboy/ssh-action@master
