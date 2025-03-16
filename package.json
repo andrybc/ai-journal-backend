@@ -8,20 +8,32 @@
     "backend"
   ],
   "scripts": {
+    "setup:env": "test -f .env || cp .env.example .env",
+    "setup": "npm run setup:env && npm install",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
-    "dev:mobile": "cd mobile && flutter run",
-    "dev": "npm run dev:backend & npm run dev:frontend",
-    "build": "npm run build --workspace=frontend",
-    "build:mobile": "cd mobile && flutter build apk",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "mongodb": "docker compose up -d mongodb",
     "mongodb:stop": "docker compose down",
-    "setup:env": "cp .env.example .env || echo '.env already exists'",
-    "setup": "npm run setup:env && npm install",
+    "mobile": "cd mobile && flutter run",
+    "build": "npm run build --workspace=frontend",
+    "build:mobile": "cd mobile && flutter build apk",
     "mobile:clean": "cd mobile && flutter clean",
-    "mobile:test": "cd mobile && flutter test"
+    "mobile:test": "cd mobile && flutter test",
+    "format": "biome format . --write"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.9",
+    "cors": "^2.8.5",
+    "react-router": "^7.2.0",
+    "react-router-dom": "^7.2.0",
+    "tailwindcss": "^4.0.9"
+  }
 }

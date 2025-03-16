@@ -1,0 +1,48 @@
+name: Deploy to Digital Ocean
+
+on:
+  push:
+    branches: [main, auto-deploy]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build --workspace=frontend
+
+      - uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 120s
+          source: "frontend/dist/"
+          target: "/var/www/journal-app/"
+          strip_components: 2
+
+      - name: Execute remote commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /home/deploy/journal-organizer || exit 1
+            git pull origin main || exit 1
+            npm install || exit 1
+            pm2 restart journal-backend || pm2 start backend/server.js --name journal-backend
+            sudo systemctl reload nginx || exit 1
