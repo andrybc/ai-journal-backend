@@ -52,10 +52,10 @@ const Login = () => {
         <h2 className="text-2xl font-bold text-white mb-4">Sign In</h2>
 
         <p
-         className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
+          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
         >
-         {errorMessage}
-         </p>
+          {errorMessage}
+        </p>
 
         <input
           type="text"
@@ -67,7 +67,7 @@ const Login = () => {
 
         <div className="relative w-full">
           <input
-            type={showPassword ? "text" : "password"} 
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700 pr-10"
             value={password}
@@ -111,7 +111,7 @@ const Login = () => {
         </div>
 
         <button
-          onClick={handleLogin} 
+          onClick={handleLogin}
           className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
         >
           Login

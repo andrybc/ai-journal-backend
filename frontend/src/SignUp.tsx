@@ -20,20 +20,17 @@ const SignUp = () => {
       return;
     }
     try {
-      const response = await fetch(
-        "http://localhost:3000/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-          }),
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -45,12 +42,12 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      localStorage.setItem('verificationToken', data.verificationToken);
-      navigate('/verify');
+      localStorage.setItem("verificationToken", data.verificationToken);
+      navigate("/verify");
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
-  };  
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">

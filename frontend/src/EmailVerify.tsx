@@ -7,7 +7,7 @@ const EmailVerify = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleVerify = async () => {
-    const token = localStorage.getItem('verificationToken');
+    const token = localStorage.getItem("verificationToken");
 
     if (!token) {
       setErrorMessage("No verification token found");
@@ -15,19 +15,22 @@ const EmailVerify = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/auth/verify-email?token=${token}`, {
-        method: "GET",
-        headers: {
-          "accept": "application/json"
-        }
-      });
+      const response = await fetch(
+        `http://localhost:3000/auth/verify-email?token=${token}`,
+        {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+          },
+        },
+      );
 
       if (!response.ok) {
-        throw new Error('Verification failed');
+        throw new Error("Verification failed");
       }
 
       console.log("Email successfully verified");
-      localStorage.removeItem('verificationToken');
+      localStorage.removeItem("verificationToken");
       navigate("/login");
     } catch (error) {
       console.error("Email verification failed:", error);
@@ -41,12 +44,12 @@ const EmailVerify = () => {
         <Navbar />
       </div>
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-white mb-4">Verify your email</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Verify your email
+        </h2>
 
         {errorMessage && (
-          <p className="text-sm text-red-600 mb-4">
-            {errorMessage}
-          </p>
+          <p className="text-sm text-red-600 mb-4">{errorMessage}</p>
         )}
 
         <button
@@ -60,4 +63,4 @@ const EmailVerify = () => {
   );
 };
 
-export default EmailVerify; 
+export default EmailVerify;
