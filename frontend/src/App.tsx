@@ -1,11 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Summary from "./pages/Summary";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import Relationships from "./pages/Relationships";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/summary" element={<Summary />} />
+        <Route path="/relationships" element={<Relationships />} />
       </Routes>
     </Router>
   );
