@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import notesPage from "../assets/icons/notes-page-icon.svg";
-import summaryIcon from "../assets/icons/people-summary-icon.svg";
+import relationshipIcon from "../assets/icons/people-relationship-icon.svg";
 import contactIcon from "../assets/icons/contact-icon.svg";
 import logoutIcon from "../assets/icons/logout-icon.svg";
 
@@ -13,15 +13,15 @@ type Props = {
 };
 
 const SideNav: React.FC<Props> = ({
-  page, // Page Name (Notes or Summary)
+  page, // Page Name (Notes or Relationships)
   closeNav, // Close the SideNav
   getSelectedItem, // Get the selectedItem to display
 }) => {
   const [search, setSearch] = useState<string>(""); // Search Input
   const [displayList, setDisplayList] = useState<
     { name: string; id: number; [key: string]: string | number | boolean }[]
-  >([]); // List of Notes/Summary to display in SideNav
-  const [selectedId, setSelectedId] = useState<number | null>(null); // Store ID of Notes/Summary
+  >([]); // List of Notes/Relationships to display in SideNav
+  const [selectedId, setSelectedId] = useState<number | null>(null); // Store ID of Notes/Relationships
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
@@ -155,16 +155,16 @@ const SideNav: React.FC<Props> = ({
                 />
               </button>
             </Link>
-            <Link to="/summary">
+            <Link to="/relationships">
               <button
                 className={`p-1.5 rounded-lg cursor-pointer ${
-                  page === "Summary" ? "bg-gray-300" : "hover:bg-gray-200"
+                  page === "Relationships" ? "bg-gray-300" : "hover:bg-gray-200"
                 }`}
               >
                 <img
                   className="w-[25px] h-[25px]"
-                  src={summaryIcon}
-                  alt="People Summary Icon"
+                  src={relationshipIcon}
+                  alt="People Relationships Icon"
                 />
               </button>
             </Link>
@@ -214,7 +214,7 @@ const SideNav: React.FC<Props> = ({
               className="z-10 w-[calc(100%-16px)] absolute left-1/2 -translate-x-1/2 bottom-full mb-2 rounded-xl border-[0.5px] flex flex-col bg-gray-200"
             >
               <Link to="/user-profile">
-                <button className="flex border-b items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-tl-xl rounded-tr-xl cursor-pointer">
+                <button className="w-full flex border-b items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-tl-xl rounded-tr-xl cursor-pointer">
                   <img
                     className="w-[20px] h-[20px]"
                     src={contactIcon}
@@ -223,7 +223,7 @@ const SideNav: React.FC<Props> = ({
                   <span className="whitespace-nowrap">User Profileeee</span>
                 </button>
               </Link>
-              <button className="flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer">
+              <button className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer">
                 <img
                   className="w-[20px] h-[20x]"
                   src={logoutIcon}

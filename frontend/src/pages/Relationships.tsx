@@ -1,20 +1,19 @@
 import SideNav from "../components/SideNav";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import ghostIcon from "../assets/icons/ghost-icon.svg";
 
-const Summary = () => {
+const Relationships = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
-  const [selectedSummary, setSelectedSummary] = useState<{
+  const [selectedRelationship, setSelectedRelationship] = useState<{
     name: string;
     id: number;
     [key: string]: string | number | boolean;
   } | null>(null);
-  const summarySectionRef = useRef<HTMLDivElement>(null);
 
-  const getSelectedSummary = (id: number) => {
+  const getSelectedRelationship = (id: number) => {
     console.log(id);
-    setSelectedSummary({
+    setSelectedRelationship({
       name: "John Doe",
       id: 1,
       summary: `John Doe is a name that has long been associated with anonymity, mystery, and adaptability. Used widely in legal, medical, and fictional contexts, John Doe can represent an unidentified individual, a person seeking to keep their identity secret, or even a symbol of the everyday, average person. Over time, the name has evolved beyond its practical applications and taken on a cultural significance, appearing in literature, film, and media as an archetype of the unknown or forgotten man.  
@@ -29,58 +28,42 @@ Despite his anonymity, John Doe is paradoxically well-known. The name is instant
     });
   };
 
-  useEffect(() => {
-    const disableBodyScroll = () => {
-      if (summarySectionRef.current) {
-        if (sideNavOpen && window.innerWidth < 640) {
-          summarySectionRef.current.style.overflowY = "hidden";
-        } else {
-          summarySectionRef.current.style.overflowY = "auto";
-        }
-      }
-    };
-
-    disableBodyScroll();
-    window.addEventListener("resize", disableBodyScroll);
-
-    return () => {
-      window.addEventListener("resize", disableBodyScroll);
-    };
-  }, [sideNavOpen]);
-
   return (
     <div className="flex h-dvh overflow-hidden">
       {sideNavOpen && (
         <SideNav
-          getSelectedItem={getSelectedSummary}
-          page="Summary"
+          getSelectedItem={getSelectedRelationship}
+          page="Relationships"
           closeNav={setSideNavOpen}
         />
       )}
 
       <div
-        ref={summarySectionRef}
-        className="flex flex-col h-full grow overflow-y-auto"
+        className={`flex flex-col h-full grow sm:overflow-y-auto ${
+          sideNavOpen && "overflow-y-hidden"
+        }`}
       >
-        {(!sideNavOpen || window.innerWidth < 640) && (
-          <div className="px-2.5 py-2.5 flex items-center border-b">
-            <button
-              className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
-              onClick={() => setSideNavOpen(true)}
-            >
-              <img
-                className="w-[25px] h-[25px] rotate-180"
-                src={closeSideNav}
-                alt="Open Navbar Icon"
-              />
-            </button>
-            <span className="grow text-center ml-[-33px] font-semibold text-lg">
-              Summary
-            </span>
-          </div>
-        )}
+        <div
+          className={`px-2.5 py-2.5 flex items-center border-b ${
+            sideNavOpen && "sm:hidden"
+          }`}
+        >
+          <button
+            className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
+            onClick={() => setSideNavOpen(true)}
+          >
+            <img
+              className="w-[25px] h-[25px] rotate-180"
+              src={closeSideNav}
+              alt="Open Navbar Icon"
+            />
+          </button>
+          <span className="grow text-center ml-[-33px] font-semibold text-lg">
+            Relationship
+          </span>
+        </div>
 
-        {selectedSummary ? (
+        {selectedRelationship ? (
           <div
             className={`px-10 ${
               sideNavOpen ? "sm:px-10" : "sm:px-14"
@@ -89,10 +72,10 @@ Despite his anonymity, John Doe is paradoxically well-known. The name is instant
             } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto`}
           >
             <h3 className="text-4xl font-semibold font-montserrat">
-              {selectedSummary.name}
+              {selectedRelationship.name}
             </h3>
             <span className="text-[18px]/[1.45]">
-              {selectedSummary.summary}
+              {selectedRelationship.summary}
             </span>
           </div>
         ) : (
@@ -112,4 +95,4 @@ Despite his anonymity, John Doe is paradoxically well-known. The name is instant
   );
 };
 
-export default Summary;
+export default Relationships;
