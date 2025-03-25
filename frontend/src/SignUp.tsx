@@ -8,27 +8,31 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]); 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
   const handleRegister = async () => {
     setIsSubmitted(true);
+    const errors = []; 
+
     if (!email || !username || !password || !confirmPassword) {
-      setErrorMessage("Please fill in all fields");
-      return;
+      errors.push("Please fill in all fields");
     }
-  
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
-      return;
+      errors.push("Passwords do not match");
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setErrorMessage("Please enter a valid email address");
+      errors.push("Please enter a valid email address");
+    }
+
+    if (errors.length > 0) {
+      setErrorMessages(errors);
       return;
     }
+
     try {
       const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
@@ -68,17 +72,21 @@ const SignUp = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
-        <p
-          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
-        >
-          {errorMessage}
-        </p>
+        {errorMessages.length > 0 && ( // Render if there are errors
+          <div className="mb-4">
+            {errorMessages.map((error, index) => (
+              <p key={index} className="text-sm text-red-600">
+                {error}
+              </p>
+            ))}
+          </div>
+        )}
 
         <input
           type="text"
           placeholder="Email"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && !email ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ? "border-red-600" : "border-neutral-500"
           }`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -88,7 +96,7 @@ const SignUp = () => {
           type="text"
           placeholder="User Name"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && !username ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!username) ? "border-red-600" : "border-neutral-500"
           }`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -99,7 +107,7 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && !password ? "border-red-600" : "border-neutral-500"
+              isSubmitted && (!password || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
             }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -111,9 +119,7 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && !confirmPassword
-                ? "border-red-600"
-                : "border-neutral-500"
+              isSubmitted && (!confirmPassword || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
             }`}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
