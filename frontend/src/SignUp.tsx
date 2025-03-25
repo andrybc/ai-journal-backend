@@ -7,7 +7,7 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword/*, setShowPassword*/] = useState(false);
+  const [showPassword /*, setShowPassword*/] = useState(false);
   //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
