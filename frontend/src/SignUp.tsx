@@ -19,6 +19,16 @@ const SignUp = () => {
       setErrorMessage("Please fill in all fields");
       return;
     }
+  
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address");
+      return;
+    }
     try {
       const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
