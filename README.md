@@ -8,6 +8,7 @@ This project is organized as an npm workspace monorepo with the following struct
 
 - `/frontend` - React + TypeScript frontend built with Vite
 - `/backend` - Express.js API server with MongoDB
+- `/flutter` - Flutter mobile application
 - `docker-compose.yml` - MongoDB container configuration
 
 ## Setup Instructions
@@ -16,6 +17,7 @@ This project is organized as an npm workspace monorepo with the following struct
 - Node.js
 - npm
 - Docker Desktop
+- Flutter
 
 2. Clone the Repository
 ```bash
@@ -58,6 +60,28 @@ npm run mongodb:stop  # Stop MongoDB container
 - `npm run build` - Build frontend for production
 - `npm run mongodb` - Start MongoDB container
 - `npm run mongodb:stop` - Stop MongoDB container
+
+## Flutter Development Setup
+
+1. Install Flutter:
+   - Follow the official [Flutter installation guide](https://docs.flutter.dev/get-started/install) for your operating system
+   - Verify installation with `flutter doctor` and resolve any issues indicated
+
+2. Setup Flutter Project:
+   ```bash
+   cd flutter
+   flutter pub get
+   ```
+
+3. Run the Flutter App:
+   ```bash
+   cd flutter
+   flutter run
+   ```
+
+4. Flutter Development Tools:
+   - Use VS Code with Flutter extension for best development experience
+   - Enable hot reload during development by pressing `r` in the terminal after running the app
 
 ## Managing Dependencies
 
