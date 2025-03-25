@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Summary from "./pages/Summary";
+import Summary from "./pages/summary";
 import Notes from "./pages/Notes";
 
 function App() {
