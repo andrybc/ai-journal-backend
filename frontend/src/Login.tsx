@@ -64,27 +64,25 @@ const Login = () => {
         <input
           type="text"
           placeholder="User Name"
-          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`
-           }
+          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <div className="relative w-full">
           <input
-           // type={showPassword ? "text" : "password"}
+            // type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700` 
-            }
+            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
         <button
-           onClick={() => navigate("/")}
-           className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
-          >
+          onClick={() => navigate("/")}
+          className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
+        >
           Login
         </button>
       </div>
