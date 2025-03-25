@@ -9,13 +9,13 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessages, setErrorMessages] = useState<string[]>([]); 
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
   const handleRegister = async () => {
     setIsSubmitted(true);
-    const errors = []; 
+    const errors = [];
 
     if (!email || !username || !password || !confirmPassword) {
       errors.push("Please fill in all fields");
@@ -86,7 +86,9 @@ const SignUp = () => {
           type="text"
           placeholder="Email"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+              ? "border-red-600"
+              : "border-neutral-500"
           }`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -107,7 +109,9 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!password || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
+              isSubmitted && (!password || password !== confirmPassword)
+                ? "border-red-600"
+                : "border-neutral-500"
             }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -119,7 +123,9 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!confirmPassword || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
+              isSubmitted && (!confirmPassword || password !== confirmPassword)
+                ? "border-red-600"
+                : "border-neutral-500"
             }`}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
