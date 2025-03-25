@@ -16,12 +16,10 @@ exports.createNotebook = async (req, res) => {
     });
     await newNotebook.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Notebook created successfully",
-        notebook: newNotebook,
-      });
+    res.status(200).json({
+      message: "Notebook created successfully",
+      notebook: newNotebook,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -51,7 +49,7 @@ exports.updateNotebook = async (req, res) => {
     const { title, content } = req.body;
 
     // TODO openAI generated tags here
-    const tags = [ "name", "sample", "tags"];
+    const tags = ["name", "sample", "tags"];
 
     // Find and update the notebook
     const updatedNotebook = await Notebook.findByIdAndUpdate(
@@ -63,12 +61,10 @@ exports.updateNotebook = async (req, res) => {
       return res.status(404).json({ error: "Notebook not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Notebook updated successfully",
-        notebook: updatedNotebook,
-      });
+    res.status(200).json({
+      message: "Notebook updated successfully",
+      notebook: updatedNotebook,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

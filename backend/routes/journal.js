@@ -6,7 +6,10 @@ router.post("/create-notebook", notebookController.createNotebook);
 
 router.put("/update-notebook/:notebookId", notebookController.updateNotebook);
 
-router.delete("/delete-notebook/:notebookId", notebookController.deleteNotebook);
+router.delete(
+  "/delete-notebook/:notebookId",
+  notebookController.deleteNotebook,
+);
 
 router.get("/read-notebook/:notebookId", notebookController.readNotebook);
 

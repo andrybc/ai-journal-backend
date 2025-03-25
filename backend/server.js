@@ -3,7 +3,7 @@ require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth"); // Import the auth routes
-const journalRoutes = require("./routes/journal"); 
+const journalRoutes = require("./routes/journal");
 const profileRoutes = require("./routes/profile");
 const userRoutes = require("./routes/users");
 
