@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -28,8 +28,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       return;
     }
 
-    final uri =
-        Uri.parse("http://localhost:3000/auth/verify?token=${widget.token}");
+    final uri = Uri.parse(
+      "${dotenv.env['API_BASE_URL']}/auth/verify?token=${widget.token}",
+    );
     try {
       final response = await http.get(uri);
       if (response.statusCode == 200) {
@@ -60,20 +61,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             const SizedBox(height: 20),
             TextField(
               controller: codeController,
-              decoration:
-                  const InputDecoration(labelText: 'Enter Verification Code'),
+              decoration: const InputDecoration(
+                labelText: 'Enter Verification Code',
+              ),
             ),
             const SizedBox(height: 10),
             if (error != null)
               Text(error!, style: const TextStyle(color: Colors.red)),
             if (success)
-              const Text("Email verified successfully!",
-                  style: TextStyle(color: Colors.green)),
+              const Text(
+                "Email verified successfully!",
+                style: TextStyle(color: Colors.green),
+              ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: verifyCode,
               child: const Text("Verify Email"),
-            )
+            ),
           ],
         ),
       ),
