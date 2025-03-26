@@ -32,13 +32,13 @@ const SignUp = () => {
             email,
             password,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
 
