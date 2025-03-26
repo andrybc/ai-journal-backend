@@ -8,7 +8,6 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword] = useState(false);
-
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -76,7 +75,7 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
         {errorMessages.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-4 text-center"> {/* Added text-center */}
             {errorMessages.map((error, index) => (
               <p key={index} className="text-sm text-red-600">
                 {error}
