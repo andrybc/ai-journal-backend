@@ -7,8 +7,8 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
-  //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword] = useState(false);
+  
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -49,7 +49,7 @@ const SignUp = () => {
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
-  }; // Removed extra brace here
+  }; 
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
@@ -88,7 +88,7 @@ const SignUp = () => {
 
         <div className="relative w-full">
           <input
-            // type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
               isSubmitted && !password ? "border-red-600" : "border-neutral-500"
@@ -100,7 +100,7 @@ const SignUp = () => {
 
         <div className="relative w-full mt-3">
           <input
-            //type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
               isSubmitted && !confirmPassword
