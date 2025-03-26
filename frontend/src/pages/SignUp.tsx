@@ -7,21 +7,34 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
-  //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword] = useState(false);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
   const handleRegister = async () => {
     setIsSubmitted(true);
+    const errors = [];
+
     if (!email || !username || !password || !confirmPassword) {
-      setErrorMessage("Please fill in all fields");
+      errors.push("Please fill in all fields");
+    }
+    if (password !== confirmPassword) {
+      errors.push("Passwords do not match");
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push("Please enter a valid email address");
+    }
+
+    if (errors.length > 0) {
+      setErrorMessages(errors);
       return;
     }
+
     try {
       const response = await fetch(
-        "http://134.209.175.201:3000/auth/register",
+        `${import.meta.env.VITE_API_URL}/auth/register`,
         {
           method: "POST",
           headers: {
@@ -45,11 +58,14 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      navigate("/login");
+      if (data.verificationToken) {
+        localStorage.setItem("verificationToken", data.verificationToken);
+      }
+      navigate("/verify");
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
-  }; // Removed extra brace here
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
@@ -60,19 +76,23 @@ const SignUp = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
-        <p
-          className={`text-sm text-red-600 mb-4 ${
-            errorMessage ? "block" : "hidden"
-          }`}
-        >
-          {errorMessage}
-        </p>
+        {errorMessages.length > 0 && (
+          <div className="mb-4 text-center">
+            {errorMessages.map((error, index) => (
+              <p key={index} className="text-sm text-red-600">
+                {error}
+              </p>
+            ))}
+          </div>
+        )}
 
         <input
           type="text"
           placeholder="Email"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && !email ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+              ? "border-red-600"
+              : "border-neutral-500"
           }`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +102,7 @@ const SignUp = () => {
           type="text"
           placeholder="User Name"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && !username ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!username) ? "border-red-600" : "border-neutral-500"
           }`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -90,10 +110,13 @@ const SignUp = () => {
 
         <div className="relative w-full">
           <input
-            // type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && !password ? "border-red-600" : "border-neutral-500"
+              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
+              isSubmitted && (!password || password !== confirmPassword)
+                ? "border-red-600"
+                : "border-neutral-500"
             }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -102,10 +125,11 @@ const SignUp = () => {
 
         <div className="relative w-full mt-3">
           <input
-            //type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && !confirmPassword
+              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
+              isSubmitted && (!confirmPassword || password !== confirmPassword)
                 ? "border-red-600"
                 : "border-neutral-500"
             }`}
