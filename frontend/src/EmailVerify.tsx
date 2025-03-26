@@ -16,7 +16,7 @@ const EmailVerify = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.API_URL}/auth/verify-email?token=${token}`,
+        `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`,
         {
           method: "GET",
           headers: {
