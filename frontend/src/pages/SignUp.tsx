@@ -9,7 +9,7 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword] = useState(false);
 
-  const [errorMessages, setErrorMessages] = useState<string[]>([]); 
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
@@ -34,17 +34,20 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch("http://134.209.175.201:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://134.209.175.201:3000/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -86,7 +89,9 @@ const SignUp = () => {
           type="text"
           placeholder="Email"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ? "border-red-600" : "border-neutral-500"
+            isSubmitted && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+              ? "border-red-600"
+              : "border-neutral-500"
           }`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -107,7 +112,9 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!password || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
+              isSubmitted && (!password || password !== confirmPassword)
+                ? "border-red-600"
+                : "border-neutral-500"
             }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -119,7 +126,9 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!confirmPassword || password !== confirmPassword) ? "border-red-600" : "border-neutral-500"
+              isSubmitted && (!confirmPassword || password !== confirmPassword)
+                ? "border-red-600"
+                : "border-neutral-500"
             }`}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
