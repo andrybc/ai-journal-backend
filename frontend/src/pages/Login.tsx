@@ -15,7 +15,7 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch("http://134.209.175.201:3000/auth/login", {
+      const response = await fetch( `${import.meta.env.API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

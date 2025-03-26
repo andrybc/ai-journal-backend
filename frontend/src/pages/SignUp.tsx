@@ -34,7 +34,7 @@ const SignUp = () => {
 
     try {
       const response = await fetch(
-        "http://134.209.175.201:3000/auth/register",
+        `${import.meta.env.API_URL}/auth/register`, 
         {
           method: "POST",
           headers: {
