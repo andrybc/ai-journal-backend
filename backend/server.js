@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth"); // Import the auth routes
 const profileRoutes = require("./routes/profile");
 const userRoutes = require("./routes/users");
+const notebookRoutes = require("./routes/journal"); // Notebook/journal routes
+
 
 const app = express();
 const cors = require("cors");
@@ -22,6 +24,8 @@ mongoose
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.use("/users", userRoutes);
+app.use("/journal", notebookRoutes);
+
 // A simple test endpoint
 app.get("/api/test", (req, res) => {
   res.json({ message: "Hello from the API!" });

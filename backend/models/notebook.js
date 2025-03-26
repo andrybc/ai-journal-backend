@@ -12,8 +12,13 @@ const notebookSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  tags: [{ type: String, trim: true }],
-
+  // Tags will be extracted from content (e.g., names) and updated via the profile service
+  tags: [
+    {
+      type: String,
+      trim: true,
+    }
+  ],
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
