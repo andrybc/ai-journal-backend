@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'note_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,11 +11,15 @@ class HomeScreen extends StatelessWidget {
       {
         "title": "A Day in Tokyo",
         "preview": "Explored Shibuya and found the coziest ramen spot...",
+        "content":
+            "# A Day in Tokyo\n\nExplored Shibuya and found the coziest ramen spot. The chef was very friendly and recommended their special tonkotsu ramen which was amazing! :heart_eyes:\n\nAfter lunch, I visited the famous Shibuya crossing and took some photos. The energy of the city is incredible.",
       },
       {
         "title": "Thoughts on Creativity",
         "preview":
             "Today I reflected on the role of solitude in creative work...",
+        "content":
+            "# Thoughts on Creativity\n\nToday I reflected on the role of solitude in creative work. Many great artists and writers throughout history have emphasized how important it is to have quiet, uninterrupted time for deep thinking and creation.\n\n## Key insights:\n* Distraction is the enemy of depth\n* Regular solitude creates space for new ideas\n* Balancing collaboration and solo work is crucial",
       },
     ];
 
@@ -56,7 +61,16 @@ class HomeScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         onTap: () {
-                          // TODO: Navigate to full entry view
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => NoteScreen(
+                                    title: entry['title']!,
+                                    content: entry['content']!,
+                                  ),
+                            ),
+                          );
                         },
                       ),
                     );

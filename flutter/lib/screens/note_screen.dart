@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class NoteScreen extends StatefulWidget {
+  const NoteScreen({super.key, required this.title, required this.content});
 
   final String title;
+  final String content;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<NoteScreen> createState() => _NoteScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _NoteScreenState extends State<NoteScreen> {
   bool _isSelectable = false;
   bool _useMarkdownBody = false;
   bool _isEditMode = false;
-  final TextEditingController _editingController = TextEditingController();
+  late final TextEditingController _editingController;
 
   // Custom extension set with emoji support
   final _markdownExtensionSet = md.ExtensionSet(
@@ -26,54 +27,11 @@ class _MyHomePageState extends State<MyHomePage> {
     ],
   );
 
-  // Updated sample markdown content with emojis and image examples
-  final String _markdownContent = '''
-# Markdown Example :notebook:
-
-This is a **bold text** and this is an *italic text*. I'm happy :smiley: about this!
-
-## Lists
-* Item 1 :apple:
-* Item 2 :banana:
-  * Subitem 1 :cherry:
-  * Subitem 2 :grapes:
-
-## Code
-```dart
-void main() {
-  print('Hello, Markdown!');
-}
-```
-
-## Links
-[Flutter](https://flutter.dev)
-
-## Images
-### Network Image
-![Flutter Logo](https://flutter.dev/assets/images/shared/brand/flutter/logo/flutter-lockup.png)
-
-### Asset Image (example syntax)
-![Asset Image](resource:assets/images/example.png)
-
-### Local File Image (example syntax)
-![Local Image](/data/user/0/com.example.app/files/image.jpg)
-
-## Blockquotes
-> This is a blockquote :bulb:
-> It can span multiple lines
-
-## Tables
-| Column 1 | Column 2 |
-|----------|----------|
-| Cell 1   | Cell 2 :thumbsup: |
-| Cell 3   | Cell 4 :star: |
-''';
-
   @override
   void initState() {
     super.initState();
-    // Set the text after controller is initialized
-    _editingController.text = _markdownContent;
+    // Initialize controller with the journal entry content
+    _editingController = TextEditingController(text: widget.content);
   }
 
   @override
