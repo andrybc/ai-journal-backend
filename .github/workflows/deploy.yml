@@ -29,8 +29,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           timeout: 120s
-          source: "frontend/dist/*"
+          source: "frontend/dist/"
           target: "/var/www/journal-app/"
+          strip_components: 2
 
       - name: Execute remote commands
         uses: appleboy/ssh-action@master
@@ -39,8 +40,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/deploy/journal-organizer
-            git pull origin main
-            npm install
+            set -e
+            cd /home/deploy/journal-organizer || exit 1
+            git pull origin main || exit 1
+            npm install || exit 1
             pm2 restart journal-backend || pm2 start backend/server.js --name journal-backend
-            sudo systemctl reload nginx
+            sudo systemctl reload nginx || exit 1
