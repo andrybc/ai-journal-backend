@@ -27,7 +27,9 @@ const EmailVerify = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Verification failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Verification failed: ${response.status} - ${errorText}`,
+        );
       }
 
       console.log("Email successfully verified");
