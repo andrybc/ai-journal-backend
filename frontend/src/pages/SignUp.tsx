@@ -58,7 +58,9 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      localStorage.setItem("verificationToken", data.verificationToken);
+      if (data.verificationToken) {
+        localStorage.setItem("verificationToken", data.verificationToken);
+      }
       navigate("/verify");
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
