@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
 import '../services/api_service.dart';
+import 'home_screen.dart'; // Import your home screen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,18 +15,37 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool showPassword = false;
   String? error;
+  bool isLoading = false;
 
   void handleLogin() async {
-    final response = await ApiService.login(
-      usernameController.text,
-      passwordController.text,
-    );
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
+    setState(() {
+      error = null;
+      isLoading = true;
+    });
+
+    if (username.isEmpty || password.isEmpty) {
+      setState(() {
+        error = "Please fill in all fields.";
+        isLoading = false;
+      });
+      return;
+    }
+
+    final response = await ApiService.login(username, password);
+
+    setState(() => isLoading = false);
 
     if (response['success']) {
-      // TODO: Navigate to home/dashboard
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
     } else {
       setState(() {
-        error = response['error'];
+        error = response['error'] ?? 'Login failed.';
       });
     }
   }
@@ -88,13 +108,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[800],
-                  ),
-                  child: const Text("Login"),
-                ),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[800],
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                        ),
+                        child: const Text("Login"),
+                      ),
                 TextButton(
                   onPressed: () => Navigator.push(
                     context,
