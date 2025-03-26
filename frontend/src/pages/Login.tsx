@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import EyeOpenIcon from "../assets/icon/eye-open.svg"; 
+import EyeOpenIcon from "../assets/icon/eye-open.svg";
 import EyeClosedIcon from "../assets/icon/eye-closed.svg";
 
 const Login = () => {
@@ -17,16 +17,19 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, { 
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
