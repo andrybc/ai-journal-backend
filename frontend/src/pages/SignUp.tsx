@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Navbar from "./Navbar";
-import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -61,7 +61,9 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
         <p
-          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
+          className={`text-sm text-red-600 mb-4 ${
+            errorMessage ? "block" : "hidden"
+          }`}
         >
           {errorMessage}
         </p>
