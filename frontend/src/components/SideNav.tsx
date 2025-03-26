@@ -147,7 +147,7 @@ const SideNav: React.FC<Props> = ({
             {page === "Notes" && (
               <button
                 className={`p-1.5 rounded-lg cursor-pointer ${"hover:bg-gray-200"}`}
-                onClick={() => getSelectedItem(Date.now())}
+                onClick={() => getSelectedItem(-1)}
               >
                 <img
                   className="w-[25px] h-[25px]"
