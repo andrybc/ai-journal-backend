@@ -28,7 +28,6 @@ function App() {
       <h1>Vite + React</h1>
       <h1>Frontend Test</h1>
       <p>{/*apiMessage ? apiMessage : "Loading..."*/}</p>
-      <p>{/*apiMessage ? apiMessage : "Loading..."*/}</p>
       <div className="card">
         <button type="button" onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -47,7 +46,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Summary />} />
+        <Route path="/summary" element={<Summary />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/register" element={<SignUp />} />
       </Routes>
