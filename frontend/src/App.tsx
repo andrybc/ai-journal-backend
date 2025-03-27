@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
-import Relationships from "./pages/Relationships";
+import { BrowserRouter, Routes, Route } from "react-router";
 import Notes from "./pages/Notes";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
