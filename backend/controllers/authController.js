@@ -42,12 +42,10 @@ exports.register = async (req, res) => {
     `;
 
     await sendEmail(newUser.email, "Email Verification", emailContent);
-    res
-      .status(201)
-      .json({
-        message:
-          "User registered successfully. Please check email for verification.",
-      });
+    res.status(201).json({
+      message:
+        "User registered successfully. Please check email for verification.",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
