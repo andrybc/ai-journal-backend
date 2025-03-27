@@ -1,33 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import Navbar from "../components/Navbar";
+import EyeOpenIcon from "../assets/icons/eye-open.svg";
+import EyeClosedIcon from "../assets/icons/eye-closed.svg";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //const [showPassword, setShowPassword] = useState(false);
-  //const [errorMessage, setErrorMessage] = useState("");
-  //const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
-  /*const handleLogin = async () => {
-    // Added 'async'
-    setIsSubmitted(true);
+  const handleLogin = async () => {
     if (!username || !password) {
       setErrorMessage("Please fill in all fields");
       return;
     }
     try {
-      const response = await fetch("http://134.209.175.201:3000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -44,7 +46,7 @@ const Login = () => {
     } catch (error) {
       console.error("Login error:", (error as Error).message);
     }
-  };*/
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col justify-center items-center bg-neutral-900">
@@ -54,33 +56,51 @@ const Login = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-white mb-4">Sign In</h2>
 
-        {/*}
         <p
-         // className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
+          className={`text-sm text-red-600 mb-4 ${errorMessage ? "block" : "hidden"}`}
         >
-         {//errorMessage}
-         </p>*/}
+          {errorMessage}
+        </p>
 
         <input
           type="text"
           placeholder="User Name"
-          className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`}
+          className="w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <div className="relative w-full">
           <input
-            // type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700`}
+            className="w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 hover:border-neutral-700 pr-10"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {showPassword ? (
+            <img
+              src={EyeOpenIcon}
+              width="15"
+              height="15"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+              alt="Show password"
+            />
+          ) : (
+            <img
+              src={EyeClosedIcon}
+              width="15"
+              height="15"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+              alt="Hide password"
+            />
+          )}
         </div>
 
         <button
-          onClick={() => navigate("/")}
+          onClick={handleLogin}
           className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-600"
         >
           Login
