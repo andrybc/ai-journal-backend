@@ -4,22 +4,25 @@ const Profile = require("../models/summary");
 // create profile
 exports.createProfile = async (req, res) => {
   try {
-    const { title, content, tagId, userId } = req.body;
-    if (!title || !content || !tagId || !userId) {
+    const { title, content, notebookIDs = [], userId } = req.body;
+
+    if (!title || !content || !userId) {
       return res.status(400).json({ error: "Invalid input data" });
     }
-    //TODO: implement AI to search content in notebooks
+
     const newProfile = new Profile({
       title,
       content,
-      tagId,
+      notebookIDs, // optional array of Notebook IDs
       userId,
     });
+
     await newProfile.save();
 
-    res
-      .status(200)
-      .json({ message: "Profile created successfully", profile: newProfile });
+    res.status(200).json({
+      message: "Profile created successfully",
+      profile: newProfile,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -75,13 +78,14 @@ exports.readProfile = async (req, res) => {
   }
 };
 
-
 exports.searchProfiles = async (req, res) => {
   try {
     const { userId, query } = req.query;
 
     if (!userId || !query) {
-      return res.status(400).json({ error: "Missing userId or query parameter" });
+      return res
+        .status(400)
+        .json({ error: "Missing userId or query parameter" });
     }
 
     const profiles = await Profile.find({
@@ -100,7 +104,6 @@ exports.searchProfiles = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.getProfileById = async (req, res) => {
   try {
@@ -133,7 +136,9 @@ exports.getAllProfiles = async (req, res) => {
       return res.status(400).json({ error: "Missing userId parameter" });
     }
 
-    const profiles = await Profile.find({ userId }).select("_id title timeCreated");
+    const profiles = await Profile.find({ userId }).select(
+      "_id title timeCreated",
+    );
 
     res.status(200).json({
       message: "Profiles retrieved successfully",
