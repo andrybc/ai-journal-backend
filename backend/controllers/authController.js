@@ -34,7 +34,7 @@ exports.register = async (req, res) => {
       { expiresIn: "1d" },
     );
 
-    const verificationLink = `http://journal-organizer.com/verify-email?token=${verificationToken}`;
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
     const emailContent = `
     <h1>Verify Your Email</h1>
     <p>Click the link below to verify your email:</p>
@@ -104,7 +104,7 @@ exports.forgotPassword = async (req, res) => {
     user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
 
-    const resetLink = `http://journal-organizer.com/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     const resetContent = `
     <h1>Reset Your Password</h1>
     <p>Click the link below to reset your password:</p>
@@ -165,7 +165,7 @@ exports.verifyEmail = async (req, res) => {
     user.isVerified = true;
     await user.save();
 
-    res.json({ message: "Email verified successfully" });
+    res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     res.status(400).json({ error: "Invalid or expired verification token" });
   }
