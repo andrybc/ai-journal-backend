@@ -34,7 +34,7 @@ exports.register = async (req, res) => {
       { expiresIn: "1d" },
     );
 
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+    const verificationLink = `${process.env.BASE_URL}/verify-email?token=${verificationToken}`;
     const emailContent = `
     <h1>Verify Your Email</h1>
     <p>Click the link below to verify your email:</p>
@@ -104,7 +104,7 @@ exports.forgotPassword = async (req, res) => {
     user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
     const resetContent = `
     <h1>Reset Your Password</h1>
     <p>Click the link below to reset your password:</p>
