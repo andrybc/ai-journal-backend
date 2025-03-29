@@ -50,9 +50,9 @@ jobs:
             npm install || exit 1
 
             # Ensure docker containers are running
-            docker-compose down || true
-            docker-compose up -d
-            docker-compose ps
+            docker compose down || true
+            docker compose up -d
+            docker compose ps
 
             # restart the backend service
             pm2 restart journal-backend || pm2 start backend/server.js --name journal-backend
