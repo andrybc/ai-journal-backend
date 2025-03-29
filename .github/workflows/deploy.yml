@@ -26,7 +26,8 @@ jobs:
       - name: Build frontend
         run: npm run build --workspace=frontend
 
-      - uses: appleboy/scp-action@master
+      - name: Transfer frontend build to server
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
