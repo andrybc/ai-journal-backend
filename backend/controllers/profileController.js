@@ -1,4 +1,5 @@
 const Profile = require("../models/summary");
+
 //const Notebook = require('../models/Notebook');
 
 // create profile
@@ -9,6 +10,12 @@ exports.createProfile = async (req, res) => {
     if (!title || !content || !userId) {
       return res.status(400).json({ error: "Invalid input data" });
     }
+
+    if (notebookIDs && !Array.isArray(notebookIDs)) {
+      return res.status(400).json({ error: "notebookIDs must be an array" });
+    }
+
+    // Further validation of notebookIDs can be added here
 
     const newProfile = new Profile({
       title,
@@ -101,7 +108,8 @@ exports.searchProfiles = async (req, res) => {
       profiles,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error in searchProfiles:", error);
+    res.status(500).json({ error: "Internal server error" }); // Generic server error
   }
 };
 
@@ -123,7 +131,8 @@ exports.getProfileById = async (req, res) => {
       profile,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error in getProfileById:", error);
+    res.status(500).json({ error: "Internal server error" }); // Generic server error
   }
 };
 
@@ -145,6 +154,7 @@ exports.getAllProfiles = async (req, res) => {
       profiles,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error in getAllProfiles:", error);
+    res.status(500).json({ error: "Internal server error" }); // Generic server error
   }
 };
