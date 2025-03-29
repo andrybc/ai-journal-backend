@@ -113,6 +113,7 @@ exports.getUserIdByUsername = async (req, res) => {
 
     res.json({ userId: user._id });
   } catch (error) {
+    console.error("Error fetching user ID:", error);
     res.status(500).json({ error: error.message });
   }
 };
