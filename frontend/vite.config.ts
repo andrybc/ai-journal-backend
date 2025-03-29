@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
-  envDir: '../',
+  envDir: "../",
   server: {
     proxy: {
       // When the client makes a request to /api, forward it to the backend at localhost:3001

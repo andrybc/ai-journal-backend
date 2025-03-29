@@ -34,22 +34,19 @@ const SignUp = () => {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      console.log("API URL:", apiUrl); 
+      console.log("API URL:", apiUrl);
 
-      const response = await fetch(
-        "http://localhost:3000/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-          }),
+      const response = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();

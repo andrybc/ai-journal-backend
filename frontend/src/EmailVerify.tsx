@@ -19,9 +19,10 @@ const EmailVerify = () => {
     handleVerify(token);
   }, []);
 
-  const handleVerify = async (token: string) => { 
+  const handleVerify = async (token: string) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api"; // Fallback
+      const apiUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:3000/api"; // Fallback
       console.log("API URL for verify:", apiUrl);
 
       const response = await fetch(
@@ -62,7 +63,9 @@ const EmailVerify = () => {
         <Navbar />
       </div>
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-white mb-4">Verify Your Email</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Verify Your Email
+        </h2>
         <p className="text-neutral-100 text-center mb-4">{message}</p>
         {errorMessage && (
           <p className="text-sm text-red-600 mb-4">{errorMessage}</p>
