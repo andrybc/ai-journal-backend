@@ -33,8 +33,11 @@ const SignUp = () => {
     }
 
     try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      console.log("API URL:", apiUrl); 
+
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
+        "http://localhost:3000/api/auth/register",
         {
           method: "POST",
           headers: {
@@ -50,6 +53,7 @@ const SignUp = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("Error response:", errorText);
         throw new Error(
           `Server error ${response.status}: ${errorText || "No details"}`,
         );
@@ -58,10 +62,10 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      if (data.verificationToken) {
+      /*if (data.verificationToken) {
         localStorage.setItem("verificationToken", data.verificationToken);
-      }
-      navigate("/verify");
+      }*/
+      navigate("/verify-email");
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
@@ -113,7 +117,6 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
               isSubmitted && (!password || password !== confirmPassword)
                 ? "border-red-600"
                 : "border-neutral-500"
@@ -128,7 +131,6 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
               isSubmitted && (!confirmPassword || password !== confirmPassword)
                 ? "border-red-600"
                 : "border-neutral-500"
