@@ -38,7 +38,7 @@ const ProfileSchema = z.object({
   family: z.string().nullable(),
   relationshipStatus: z.string().nullable(),
   memorableQuotes: z.array(z.string()),
-  additionalNotes: z.string().nullable()
+  additionalNotes: z.string().nullable(),
 });
 
 async function extractTags(journalContent) {
@@ -127,7 +127,7 @@ async function createProfile(name, notebookContents) {
     const completion = await openai.beta.chat.completions.parse({
       model: "gpt-4o-mini-2024-07-18",
       messages,
-      response_format: zodResponseFormat(ProfileSchema, "profile")
+      response_format: zodResponseFormat(ProfileSchema, "profile"),
     });
     const profileData = completion.choices[0].message.parsed;
     return profileData;
