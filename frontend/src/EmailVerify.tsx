@@ -21,11 +21,10 @@ const EmailVerify = () => {
 
   const handleVerify = async (token: string) => {
     try {
-    
       console.log("API URL for verify:", import.meta.env.VITE_API_URL);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`, 
+        `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`,
         {
           method: "GET",
           headers: {
@@ -38,7 +37,7 @@ const EmailVerify = () => {
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Verification failed: ${response.status} - ${errorText || "No details"}`,
+          `Verification failed: ${response.status} - ${errorText || "An error occurred during verification."}`,
         );
       }
 

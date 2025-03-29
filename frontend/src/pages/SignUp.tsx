@@ -50,7 +50,7 @@ const SignUp = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response:", errorText);
+        console.error("Error response:", errorText, response);
         throw new Error(
           `Server error ${response.status}: ${errorText || "No details"}`,
         );
