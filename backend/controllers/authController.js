@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
+const sendEmail = require("../services/sendEmail");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -33,10 +34,18 @@ exports.register = async (req, res) => {
       { expiresIn: "1d" },
     );
 
-    // In production, you would send this token via email
-    res
-      .status(201)
-      .json({ message: "User registered successfully", verificationToken });
+    const verificationLink = `${process.env.BASE_URL}/verify-email?token=${verificationToken}`;
+    const emailContent = `
+    <h1>Verify Your Email</h1>
+    <p>Click the link below to verify your email:</p>
+    <a href="${verificationLink}">Verify Email</a>
+    `;
+
+    await sendEmail(newUser.email, "Email Verification", emailContent);
+    res.status(201).json({
+      message:
+        "User registered successfully. Please check email for verification.",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -100,8 +109,17 @@ exports.forgotPassword = async (req, res) => {
     user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
 
+    const resetLink = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
+    const resetContent = `
+    <h1>Reset Your Password</h1>
+    <p>Click the link below to reset your password:</p>
+    <a href="${resetLink}">Reset Password</a>
+    `;
+
+    await sendEmail(user.email, "Password Reset", resetContent);
+
     // In production, send this token via email to the user
-    res.json({ message: "Password reset token generated", resetToken });
+    res.json({ message: "Password reset email sent." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -152,7 +170,7 @@ exports.verifyEmail = async (req, res) => {
     user.isVerified = true;
     await user.save();
 
-    res.json({ message: "Email verified successfully" });
+    res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     res.status(400).json({ error: "Invalid or expired verification token" });
   }
