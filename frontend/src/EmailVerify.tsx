@@ -21,12 +21,11 @@ const EmailVerify = () => {
 
   const handleVerify = async (token: string) => {
     try {
-      const apiUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:3000/api"; // Fallback
-      console.log("API URL for verify:", apiUrl);
+    
+      console.log("API URL for verify:", import.meta.env.VITE_API_URL);
 
       const response = await fetch(
-        `${apiUrl}/auth/verify-email?token=${token}`, // Use GET with query param
+        `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`, 
         {
           method: "GET",
           headers: {

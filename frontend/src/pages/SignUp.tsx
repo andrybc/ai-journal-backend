@@ -36,7 +36,7 @@ const SignUp = () => {
       const apiUrl = import.meta.env.VITE_API_URL;
       console.log("API URL:", apiUrl);
 
-      const response = await fetch("http://localhost:3000/api/auth/register", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
