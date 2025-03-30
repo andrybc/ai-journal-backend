@@ -4,10 +4,11 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: adminUser
-      MONGO_INITDB_ROOT_PASSWORD: adminPassword
-      MONGO_INITDB_DATABASE: journaldb
-    volumes:
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      
+"27017:27017"
+  environment:
+    MONGO_INITDB_ROOT_USERNAME: admin
+    MONGO_INITDB_ROOT_PASSWORD: admin
+    MONGO_INITDB_DATABASE: jo
+  volumes:
+./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
