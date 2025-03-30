@@ -1,8 +1,9 @@
 import SideNav from "../components/SideNav";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css"; // Import SimpleMDE styles
+import { debounce } from "lodash";
 
 const Notes = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
@@ -14,30 +15,101 @@ const Notes = () => {
   } | null>(null);
 
   const getSelectedNotes = (id: number) => {
-    console.log(id);
     if (id === -1) {
-      createNewNote(-1);
-    } else {
+      createNewNote();
+    } /*else {
       setSelectedNotes({
-        //have to update this manipulation the API
-        title: "Cookies",
-        id: 1,
-        content:
-          "I love cookies so much because of their sweetness and crisp. It reminds me of home and the fun times I used to have back then",
+        title: "",
+        id,
+        content: "",
       });
-    }
+    }*/
   };
 
   useEffect(() => {
-    createNewNote(-1);
+    createNewNote();
   }, []);
 
-  const createNewNote = (id: number) => {
+  const createNewNote = () => {
     setSelectedNotes({
       title: "Untitled Note",
-      id,
-      content: "",
+      id: 0,
+      content: "Hello",
     });
+  };
+
+  const handleSave = async () => {
+    if (selectedNotes?.id === 0) {
+      try {
+        const API_URL = "http://localhost:3000";
+        const response = await fetch(`${API_URL}/journal/create-notebook`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: selectedNotes.title,
+            content: selectedNotes.content,
+            userId: "507f191e810c19729de860ea",
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
+          );
+        }
+        const data = await response.json();
+        console.log(data.message);
+        console.log(data.verificationToken);
+        console.log(data.notebook);
+
+        if (data.verificationToken) {
+          localStorage.setItem("verificationToken", data.verificationToken);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
+      }
+
+      console.log("New note created");
+    } /*else {
+      //IF note already exists, simply update its content
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/journal/update-notebook`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: selectedNotes?.title,
+              content: selectedNotes?.content,
+              userId: selectedNotes?.id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
+          );
+        }
+        const data = await response.json();
+        console.log(data.message);
+        console.log(data.verificationToken);
+
+        if (data.verificationToken) {
+          localStorage.setItem("verificationToken", data.verificationToken);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
+      }
+    }*/
   };
 
   return (
@@ -83,16 +155,50 @@ const Notes = () => {
               sideNavOpen ? "sm:py-8" : "sm:py-12"
             } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto`}
           >
-            <h3 className="text-4xl font-semibold font-montserrat">
-              {selectedNotes.title}
-            </h3>
+            <input
+              type="text"
+              placeholder="Journal Title"
+              className="text-4xl font-semibold font-montserrat"
+              value={selectedNotes.title}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setSelectedNotes((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        title: e.target.value,
+                      }
+                    : null
+                );
+              }}
+            />
             <SimpleMDE
               value={selectedNotes.content || ""}
+              onChange={
+                debounce((value: string) => {
+                  setSelectedNotes((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          content: value,
+                        }
+                      : null
+                  );
+                }, 300) // Debounce to limit the number of updates
+              }
               options={{
                 spellChecker: false,
                 placeholder: "Write your notes here...",
               }}
             />
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
           </div>
         ) : (
           <div className="h-full p-8 flex flex-col justify-center items-center gap-5 text-center"></div>
