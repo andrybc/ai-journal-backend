@@ -20,18 +20,18 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Mount auth routes at /auth
-app.use("/auth", authRoutes);
-app.use("/journal", journalRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/journal", journalRoutes);
 
-app.use("/profile", profileRoutes);
-app.use("/users", userRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/users", userRoutes);
 // A simple test endpoint
 app.get("/api/test", (req, res) => {
   res.json({ message: "Hello from the API!" });
 });
 
 const PORT = process.env.PORT;
-app.listen(PORT, "0.0.0.0", () =>
+app.listen(PORT, "localhost", () =>
   console.log(`Server running on port ${PORT}`),
 );
 
