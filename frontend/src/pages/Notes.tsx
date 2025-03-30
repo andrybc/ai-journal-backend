@@ -1,9 +1,8 @@
 import SideNav from "../components/SideNav";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css"; // Import SimpleMDE styles
-import { debounce } from "lodash";
 
 const Notes = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
@@ -34,22 +33,32 @@ const Notes = () => {
     setSelectedNotes({
       title: "Untitled Note",
       id: 0,
-      content: "Hello",
+      content: "",
     });
   };
+  const editorContentRef = useRef<string>("");
 
   const handleSave = async () => {
+    setSelectedNotes((prev) =>
+      prev
+        ? {
+            ...prev,
+            content: editorContentRef.current,
+          }
+        : null
+    );
+    const updatedContent = editorContentRef.current;
     if (selectedNotes?.id === 0) {
       try {
         const API_URL = "http://localhost:3000";
-        const response = await fetch(`${API_URL}/journal/create-notebook`, {
+        const response = await fetch(`${API_URL}/api/journal/create-notebook`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             title: selectedNotes.title,
-            content: selectedNotes.content,
+            content: updatedContent, // Use the updated content from the editor
             userId: "507f191e810c19729de860ea",
           }),
         });
@@ -65,6 +74,17 @@ const Notes = () => {
         console.log(data.verificationToken);
         console.log(data.notebook);
 
+        setSelectedNotes((prev) =>
+          prev
+            ? {
+                ...prev,
+                notebookId: data.notebook._id,
+              }
+            : null
+        );
+
+        console.log("New note created with ID:", data.notebook._id);
+
         if (data.verificationToken) {
           localStorage.setItem("verificationToken", data.verificationToken);
         }
@@ -75,41 +95,79 @@ const Notes = () => {
 
       console.log("New note created");
     } /*else {
-      //IF note already exists, simply update its content
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/journal/update-notebook`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: selectedNotes?.title,
-              content: selectedNotes?.content,
-              userId: selectedNotes?.id,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+        //IF note already exists, simply update its content
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/journal/update-notebook`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: selectedNotes?.title,
+                content: selectedNotes?.content,
+                userId: selectedNotes?.id,
+              }),
+            }
           );
-        }
-        const data = await response.json();
-        console.log(data.message);
-        console.log(data.verificationToken);
 
-        if (data.verificationToken) {
-          localStorage.setItem("verificationToken", data.verificationToken);
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              `Server error ${response.status}: ${errorText || "No details"}`
+            );
+          }
+          const data = await response.json();
+          console.log(data.message);
+          console.log(data.verificationToken);
+
+          if (data.verificationToken) {
+            localStorage.setItem("verificationToken", data.verificationToken);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while saving the note.");
         }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
+      }*/
+  };
+
+  const handleDelete = async () => {
+    try {
+      const API_URL = "http://localhost:3000";
+      const response = await fetch(
+        `${API_URL}/api/journal/delete-notebook/${selectedNotes?.notebookId}`, // Use the notebookId from selectedNotes to delete the specific note
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            notebookId: selectedNotes?.notebookId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
+        );
       }
-    }*/
+      const data = await response.json();
+      console.log(data.message);
+      console.log(data.verificationToken);
+      console.log(data.notebook);
+
+      if (data.verificationToken) {
+        localStorage.setItem("verificationToken", data.verificationToken);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while saving the note.");
+    }
+
+    console.log("New note created");
   };
 
   return (
@@ -173,18 +231,9 @@ const Notes = () => {
             />
             <SimpleMDE
               value={selectedNotes.content || ""}
-              onChange={
-                debounce((value: string) => {
-                  setSelectedNotes((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          content: value,
-                        }
-                      : null
-                  );
-                }, 300) // Debounce to limit the number of updates
-              }
+              onChange={(value: string) => {
+                editorContentRef.current = value;
+              }}
               options={{
                 spellChecker: false,
                 placeholder: "Write your notes here...",
@@ -197,6 +246,15 @@ const Notes = () => {
                 onClick={handleSave}
               >
                 Save
+              </button>
+            </div>
+            {/* Delete Button */}
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleDelete}
+              >
+                Delete
               </button>
             </div>
           </div>

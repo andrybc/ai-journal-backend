@@ -7,7 +7,7 @@ router.post("/create-notebook", notebookController.createNotebook);
 router.put("/update-notebook/:notebookId", notebookController.updateNotebook);
 
 router.delete(
-  "/delete-notebook/:notebookId",
+  "/delete-notebook/:notebookId", 
   notebookController.deleteNotebook,
 );
 

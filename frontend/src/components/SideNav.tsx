@@ -234,7 +234,7 @@ const SideNav: React.FC<Props> = ({
                     src={contactIcon}
                     alt="User Profile Icon"
                   />
-                  <span className="whitespace-nowrap">User Profileeee</span>
+                  <span className="whitespace-nowrap">User Profile</span>
                 </button>
               </Link>
               <button className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer">
