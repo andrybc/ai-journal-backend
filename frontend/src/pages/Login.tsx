@@ -105,6 +105,18 @@ const Login = () => {
         >
           Login
         </button>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-white">
+            Don't remember your password?{" "}
+            <a
+              href="/forgot-password"
+              className="!text-white !underline hover:text-neutral-900"
+            >
+              Forgot Password
+            </a>
+          </p>
+        </div>
       </div>
 
       <div className="bg-neutral-700 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
