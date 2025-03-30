@@ -45,7 +45,7 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current,
           }
-        : null
+        : null,
     );
     const updatedContent = editorContentRef.current;
     if (selectedNotes?.id === 0) {
@@ -66,7 +66,7 @@ const Notes = () => {
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -81,7 +81,7 @@ const Notes = () => {
                 id: 1,
                 notebookId: data.notebook._id,
               }
-            : null
+            : null,
         );
 
         console.log("New note created with ID:", data.notebook._id);
@@ -146,13 +146,13 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNotes?.notebookId,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -222,7 +222,7 @@ const Notes = () => {
                         ...prev,
                         title: e.target.value,
                       }
-                    : null
+                    : null,
                 );
               }}
             />
