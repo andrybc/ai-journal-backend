@@ -31,7 +31,7 @@ const Notes = () => {
 
   const createNewNote = () => {
     setSelectedNotes({
-      title: "Untitled Note",
+      title: "",
       id: 0,
       content: "",
     });
@@ -78,6 +78,7 @@ const Notes = () => {
           prev
             ? {
                 ...prev,
+                id: 1,
                 notebookId: data.notebook._id,
               }
             : null
@@ -156,8 +157,6 @@ const Notes = () => {
       }
       const data = await response.json();
       console.log(data.message);
-      console.log(data.verificationToken);
-      console.log(data.notebook);
 
       if (data.verificationToken) {
         localStorage.setItem("verificationToken", data.verificationToken);
@@ -166,8 +165,6 @@ const Notes = () => {
       console.error("Error:", error);
       alert("An error occurred while saving the note.");
     }
-
-    console.log("New note created");
   };
 
   return (
@@ -215,7 +212,7 @@ const Notes = () => {
           >
             <input
               type="text"
-              placeholder="Journal Title"
+              placeholder="Untitled Note" // Placeholder for the input field
               className="text-4xl font-semibold font-montserrat"
               value={selectedNotes.title}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
