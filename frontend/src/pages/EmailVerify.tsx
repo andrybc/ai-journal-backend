@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import Navbar from "./components/Navbar";
+import Navbar from "../components/Navbar";
 import { useState } from "react";
 
 const EmailVerify = () => {
@@ -22,13 +22,13 @@ const EmailVerify = () => {
           headers: {
             accept: "application/json",
           },
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Verification failed: ${response.status} - ${errorText}`,
+          `Verification failed: ${response.status} - ${errorText}`
         );
       }
 

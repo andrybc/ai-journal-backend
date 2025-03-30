@@ -13,10 +13,12 @@ const Notes = () => {
     [key: string]: string | number | boolean | undefined;
   } | null>(null);
 
+  const userID = localStorage.getItem("userId");
+
   const getSelectedNotes = (id: number) => {
     if (id === -1) {
       createNewNote();
-    } /*else {
+    } /*else { //MAYBE I HAVE TO CALL READ NOTEBOOK END POINT HERE???????
       setSelectedNotes({
         title: "",
         id,
@@ -45,28 +47,34 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current,
           }
-        : null,
+        : null
     );
     const updatedContent = editorContentRef.current;
     if (selectedNotes?.id === 0) {
+      /*if (userID === null) {
+        console.error("User ID is not available in local storage.");
+        return;
+      }*/
       try {
-        const API_URL = "http://localhost:3000";
-        const response = await fetch(`${API_URL}/api/journal/create-notebook`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: selectedNotes.title,
-            content: updatedContent, // Use the updated content from the editor
-            userId: "507f191e810c19729de860ea",
-          }),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/journal/create-notebook`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: selectedNotes.title,
+              content: updatedContent, // Use the updated content from the editor
+              userId: "507f1f77bcf86cd799439011",
+            }),
+          }
+        );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`,
+            `Server error ${response.status}: ${errorText || "No details"}`
           );
         }
         const data = await response.json();
@@ -81,7 +89,7 @@ const Notes = () => {
                 id: 1,
                 notebookId: data.notebook._id,
               }
-            : null,
+            : null
         );
 
         console.log("New note created with ID:", data.notebook._id);
@@ -146,13 +154,13 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNotes?.notebookId,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -222,7 +230,7 @@ const Notes = () => {
                         ...prev,
                         title: e.target.value,
                       }
-                    : null,
+                    : null
                 );
               }}
             />

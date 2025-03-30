@@ -45,13 +45,13 @@ const SignUp = () => {
             email,
             password,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
@@ -102,7 +102,7 @@ const SignUp = () => {
           type="text"
           placeholder="User Name"
           className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-            isSubmitted && (!username) ? "border-red-600" : "border-neutral-500"
+            isSubmitted && !username ? "border-red-600" : "border-neutral-500"
           }`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
