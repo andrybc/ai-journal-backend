@@ -13,7 +13,7 @@ function App() {
         <Route path="/register" element={<SignUp />} />
         <Route path="/relationships" element={<Relationships />} />
         <Route path="/notes" element={<Notes />} />
-        <Route path="/verify" element={<EmailVerify />} />
+        <Route path="/verify-email" element={<EmailVerify />} />
       </Routes>
     </BrowserRouter>
   );

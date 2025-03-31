@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import Navbar from "./components/Navbar";
+import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 
 const EmailVerify = () => {
