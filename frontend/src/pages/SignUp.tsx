@@ -59,10 +59,8 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      /*if (data.verificationToken) {
-        localStorage.setItem("verificationToken", data.verificationToken);
-      }*/
-      navigate("/verify-email");
+      alert(`We have sent a verification link to ${email}`);
+      setTimeout(() => navigate("/login"), 5000);
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
