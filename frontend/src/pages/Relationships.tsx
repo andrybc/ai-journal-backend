@@ -10,22 +10,55 @@ const Relationships = () => {
     id: number;
     [key: string]: string | number | boolean;
   } | null>(null);
+  const userId = 1;
 
-  const getSelectedRelationship = (id: number) => {
-    console.log(id);
-    setSelectedRelationship({
-      name: "John Doe",
-      id: 1,
-      summary: `John Doe is a name that has long been associated with anonymity, mystery, and adaptability. Used widely in legal, medical, and fictional contexts, John Doe can represent an unidentified individual, a person seeking to keep their identity secret, or even a symbol of the everyday, average person. Over time, the name has evolved beyond its practical applications and taken on a cultural significance, appearing in literature, film, and media as an archetype of the unknown or forgotten man.  
+  const searchProfiles = async (query: string) => {
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/profile/search?userId=${userId}&query=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+        },
+      );
 
-In legal and medical settings, John Doe (or Jane Doe for females) is a placeholder used when an individual's real name is unknown or cannot be disclosed. This practice dates back centuries and is still commonly employed today in court cases, autopsies, and police investigations. Whether it is an unidentified body, a witness who wishes to remain anonymous, or a defendant whose identity is unknown, the name John Doe serves as a neutral stand-in, allowing proceedings to move forward without revealing sensitive or unavailable information.  
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(
+          errorMessage.error || "Unexpected error while searching for profiles",
+        );
+      }
 
-Beyond legal and administrative use, John Doe has taken on a broader cultural and symbolic role. In fiction, he is often depicted as an everyman character—someone without distinguishing traits or a unique identity, representing the common person in society. At the same time, John Doe can also be used to portray someone shrouded in mystery, an individual with a hidden past, a secret identity, or even a person who has been erased from public records. In crime dramas, thrillers, and conspiracy narratives, the name is frequently attached to characters who either do not remember their past or are deliberately concealed from the world.  
+      const responseData = await response.json();
+      console.log(responseData.message);
 
-In the realm of psychological and philosophical discussions, John Doe serves as a symbol of the faceless masses, the countless individuals who go unnoticed in the grand scheme of history. His identity—or lack thereof—raises questions about individuality, anonymity, and the significance of a name. It also touches on themes of existentialism, as a person labeled "John Doe" may struggle with their own sense of self, especially if the name is imposed upon them due to circumstances beyond their control.  
+      console.log(responseData.profiles);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-Despite his anonymity, John Doe is paradoxically well-known. The name is instantly recognizable and understood across different cultures and contexts. Whether he is the victim of a crime, a witness seeking protection, or a protagonist in a gripping mystery, John Doe remains one of the most famous unknown figures in history. His identity may be uncertain, but his presence is undeniably significant.`,
-    });
+  const getSelectedRelationship = async (profileId: number) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`,
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(
+          errorMessage.error || "Unexpected error while retrieving profile",
+        );
+      }
+
+      const responseData = await response.json();
+      console.log(responseData.message);
+
+      setSelectedRelationship(responseData.profile);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -35,12 +68,13 @@ Despite his anonymity, John Doe is paradoxically well-known. The name is instant
           getSelectedItem={getSelectedRelationship}
           page="Relationships"
           closeNav={setSideNavOpen}
+          searchItems={searchProfiles}
         />
       )}
 
       <div
         className={`flex flex-col h-full grow sm:overflow-y-auto ${
-          sideNavOpen && "overflow-y-hidden"
+          sideNavOpen ? "overflow-y-hidden" : "overflow-y-auto"
         }`}
       >
         <div
@@ -69,12 +103,12 @@ Despite his anonymity, John Doe is paradoxically well-known. The name is instant
               sideNavOpen ? "sm:px-10" : "sm:px-14"
             } md:px-14 py-8 ${
               sideNavOpen ? "sm:py-8" : "sm:py-12"
-            } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto`}
+            } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto w-full`}
           >
             <h3 className="text-4xl font-semibold font-montserrat">
               {selectedRelationship.name}
             </h3>
-            <span className="text-[18px]/[1.45]">
+            <span className="text-[18px]/[1.6]">
               {selectedRelationship.summary}
             </span>
           </div>

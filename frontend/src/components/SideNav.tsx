@@ -10,12 +10,14 @@ type Props = {
   page: string;
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   getSelectedItem: (id: number) => void;
+  searchItems: (query: string) => Promise<void>;
 };
 
 const SideNav: React.FC<Props> = ({
   page, // Page Name (Notes or Relationships)
   closeNav, // Close the SideNav
   getSelectedItem, // Get the selectedItem to display
+  searchItems,
 }) => {
   const [search, setSearch] = useState<string>(""); // Search Input
   const [displayList, setDisplayList] = useState<
@@ -28,68 +30,7 @@ const SideNav: React.FC<Props> = ({
 
   // Use Effect to put mock data into displayList
   useEffect(() => {
-    setDisplayList([
-      {
-        name: "John Doe",
-        id: 1,
-        summary: "This is a summary of person 1",
-      },
-      {
-        name: "Richard Leindecker",
-        id: 2,
-        summary: "This is a summary of person 2",
-      },
-      {
-        name: "Person 3 has a long name. Like extremely long name",
-        id: 3,
-        summary: "This is a summary of person 3",
-      },
-      {
-        name: "TheChosenOne",
-        id: 4,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 5,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 6,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 7,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 8,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 9,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 10,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 11,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 12,
-        summary: "This is a summary of person 4",
-      },
-    ]);
+    searchItems("");
   }, []);
 
   // Use Effect to close User Dropdown if clicked outside of the dropdown
@@ -179,6 +120,7 @@ const SideNav: React.FC<Props> = ({
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
+              searchItems(event.target.value);
             }}
             placeholder={"Search " + page}
           />
