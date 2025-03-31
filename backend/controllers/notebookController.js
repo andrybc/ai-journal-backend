@@ -118,6 +118,10 @@ exports.searchNotebooks = async (req, res) => {
 exports.getNotebookById = async (req, res) => {
   try {
     const { userId, notebookId } = req.params;
+	
+    if (!mongoose.Types.ObjectId.isValid(notebookId)) {
+      return res.status(400).json({ error: "Invalid notebookId" });
+    }
 
     const notebook = await Notebook.findOne({
       _id: notebookId,
