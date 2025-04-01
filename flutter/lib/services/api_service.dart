@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   static final String baseUrl =
-      dotenv.env['BASE_API_URL'] ?? 'http://localhost:3000/api';
+      dotenv.env['API_BASE_URL'] ?? 'http://journal-organizer.com/api';
 
   static Future<Map<String, dynamic>> login(
     String emailOrUsername,
@@ -37,7 +37,7 @@ class ApiService {
     String email,
     String password,
   ) async {
-    final url = Uri.parse('http://localhost:3000/auth/register');
+    final url = Uri.parse('$baseUrl/auth/register');
     debugPrint('URL: $url');
 
     final response = await http.post(
