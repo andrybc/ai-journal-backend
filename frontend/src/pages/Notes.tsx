@@ -3,12 +3,14 @@ import { useEffect, useState, useRef } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css"; // Import SimpleMDE styles
+import SaveNoteIcon from "../assets/icons/save-note-icon.svg";
+import DeleteNoteIcon from "../assets/icons/delete-note-icon.svg";
 
 const Notes = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
   const [selectedNotes, setSelectedNotes] = useState<{
     title: string;
-    id: number;
+    existingNoteFlag: number; //0 if it's a new note, 1 if it's an existing note
     content?: string;
     [key: string]: string | number | boolean | undefined;
   } | null>(null);
@@ -34,7 +36,7 @@ const Notes = () => {
   const createNewNote = () => {
     setSelectedNotes({
       title: "",
-      id: 0,
+      existingNoteFlag: 0,
       content: "",
     });
   };
@@ -50,11 +52,12 @@ const Notes = () => {
         : null
     );
     const updatedContent = editorContentRef.current;
-    if (selectedNotes?.id === 0) {
-      /*if (userID === null) {
+
+    if (selectedNotes?.existingNoteFlag === 0) {
+      if (userID === null) {
         console.error("User ID is not available in local storage.");
         return;
-      }*/
+      }
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/journal/create-notebook`,
@@ -79,73 +82,63 @@ const Notes = () => {
         }
         const data = await response.json();
         console.log(data.message);
-        console.log(data.verificationToken);
         console.log(data.notebook);
 
         setSelectedNotes((prev) =>
           prev
             ? {
                 ...prev,
-                id: 1,
+                existingNoteFlag: 1,
                 notebookId: data.notebook._id,
               }
             : null
         );
-
-        console.log("New note created with ID:", data.notebook._id);
-
-        if (data.verificationToken) {
-          localStorage.setItem("verificationToken", data.verificationToken);
-        }
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while saving the note.");
       }
+    } else {
+      //UPDATING AN EXISTING NOTE
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/journal/update-notebook/${
+            selectedNotes?.notebookId
+          }`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: selectedNotes?.title,
+              content: updatedContent,
+              notebookId: selectedNotes?.notebookId,
+            }),
+          }
+        );
 
-      console.log("New note created");
-    } /*else {
-        //IF note already exists, simply update its content
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/journal/update-notebook`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                title: selectedNotes?.title,
-                content: selectedNotes?.content,
-                userId: selectedNotes?.id,
-              }),
-            }
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
           );
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(
-              `Server error ${response.status}: ${errorText || "No details"}`
-            );
-          }
-          const data = await response.json();
-          console.log(data.message);
-          console.log(data.verificationToken);
-
-          if (data.verificationToken) {
-            localStorage.setItem("verificationToken", data.verificationToken);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("An error occurred while saving the note.");
         }
-      }*/
+        const data = await response.json();
+        console.log(data.message);
+        console.log(data.notebook);
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
+      }
+    }
   };
 
   const handleDelete = async () => {
     try {
-      const API_URL = "http://localhost:3000";
       const response = await fetch(
-        `${API_URL}/api/journal/delete-notebook/${selectedNotes?.notebookId}`, // Use the notebookId from selectedNotes to delete the specific note
+        `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
+          selectedNotes?.notebookId
+        }`, // Use the notebookId from selectedNotes to delete the specific note
         {
           method: "DELETE",
           headers: {
@@ -165,14 +158,12 @@ const Notes = () => {
       }
       const data = await response.json();
       console.log(data.message);
-
-      if (data.verificationToken) {
-        localStorage.setItem("verificationToken", data.verificationToken);
-      }
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while saving the note.");
     }
+
+    createNewNote();
   };
 
   return (
@@ -244,23 +235,32 @@ const Notes = () => {
                 placeholder: "Write your notes here...",
               }}
             />
-            {/* Save Button */}
-            <div className="flex justify-end">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </div>
-            {/* Delete Button */}
-            <div className="flex justify-end">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleDelete}
-              >
-                Delete
-              </button>
+            <div className="relative">
+              {/* Buttons Container */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                {/* Save Button */}
+                <button
+                  className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
+                  onClick={handleSave}
+                >
+                  <img
+                    src={SaveNoteIcon}
+                    alt="Save Icon"
+                    className="w-[40px] h-[35px]"
+                  />
+                </button>
+                {/* Delete Button */}
+                <button
+                  className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
+                  onClick={handleDelete}
+                >
+                  <img
+                    src={DeleteNoteIcon}
+                    alt="Delete Icon"
+                    className="w-[35px] h-[35px]"
+                  />
+                </button>
+              </div>
             </div>
           </div>
         ) : (
