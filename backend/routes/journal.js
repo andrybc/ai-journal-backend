@@ -13,4 +13,8 @@ router.delete(
 
 router.get("/read-notebook/:notebookId", notebookController.readNotebook);
 
+router.get("/search", notebookController.searchNotebooks);
+router.get("/all/:userId", notebookController.getAllNotebooks);
+router.get("/:userId/:notebookId", notebookController.getNotebookById);
+
 module.exports = router;
