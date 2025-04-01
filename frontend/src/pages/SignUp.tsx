@@ -7,8 +7,7 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword /*, setShowPassword*/] = useState(false);
-  //const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -34,17 +33,20 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -56,7 +58,9 @@ const SignUp = () => {
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      localStorage.setItem("verificationToken", data.verificationToken);
+      if (data.verificationToken) {
+        localStorage.setItem("verificationToken", data.verificationToken);
+      }
       navigate("/verify");
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
@@ -72,8 +76,8 @@ const SignUp = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
-        {errorMessages.length > 0 && ( // Render if there are errors
-          <div className="mb-4">
+        {errorMessages.length > 0 && (
+          <div className="mb-4 text-center">
             {errorMessages.map((error, index) => (
               <p key={index} className="text-sm text-red-600">
                 {error}
@@ -109,6 +113,7 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
               isSubmitted && (!password || password !== confirmPassword)
                 ? "border-red-600"
                 : "border-neutral-500"
@@ -123,6 +128,7 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+              // Check if the form is submitted and either the password is empty or the password does not match the confirm password and change color of textboxes accordingly
               isSubmitted && (!confirmPassword || password !== confirmPassword)
                 ? "border-red-600"
                 : "border-neutral-500"

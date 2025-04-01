@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
+import { useNavigate } from "react-router";
+import Navbar from "./components/Navbar";
 import { useState } from "react";
 
 const EmailVerify = () => {
@@ -16,7 +16,7 @@ const EmailVerify = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/auth/verify-email?token=${token}`,
+        `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`,
         {
           method: "GET",
           headers: {
@@ -26,7 +26,10 @@ const EmailVerify = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Verification failed");
+        const errorText = await response.text();
+        throw new Error(
+          `Verification failed: ${response.status} - ${errorText}`,
+        );
       }
 
       console.log("Email successfully verified");
