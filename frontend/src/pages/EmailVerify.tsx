@@ -31,7 +31,7 @@ const EmailVerify = () => {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -39,7 +39,7 @@ const EmailVerify = () => {
         throw new Error(
           `Verification failed: ${response.status} - ${
             errorText || "An error occurred during verification."
-          }`
+          }`,
         );
       }
 

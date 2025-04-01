@@ -49,7 +49,7 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current,
           }
-        : null
+        : null,
     );
     const updatedContent = editorContentRef.current;
 
@@ -71,13 +71,13 @@ const Notes = () => {
               content: updatedContent, // Use the updated content from the editor
               userId: userID,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -91,7 +91,7 @@ const Notes = () => {
                 existingNoteFlag: 1,
                 notebookId: data.notebook._id,
               }
-            : null
+            : null,
         );
       } catch (error) {
         console.error("Error:", error);
@@ -114,13 +114,13 @@ const Notes = () => {
               content: updatedContent,
               notebookId: selectedNotes?.notebookId,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -147,13 +147,13 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNotes?.notebookId,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -221,7 +221,7 @@ const Notes = () => {
                         ...prev,
                         title: e.target.value,
                       }
-                    : null
+                    : null,
                 );
               }}
             />
