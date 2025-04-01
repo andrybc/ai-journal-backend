@@ -54,6 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    debugPrint("Email: $email, Username: $username, Password: $password");
     final response = await ApiService.signup(username, email, password);
 
     if (response['success']) {
@@ -99,11 +100,15 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 30),
                 if (errorMessage != null)
-                  Text(errorMessage!,
-                      style: const TextStyle(color: Colors.red)),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 if (successMessage != null)
-                  Text(successMessage!,
-                      style: const TextStyle(color: Colors.green)),
+                  Text(
+                    successMessage!,
+                    style: const TextStyle(color: Colors.green),
+                  ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: emailController,

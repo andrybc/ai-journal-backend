@@ -1,13 +1,19 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://134.209.175.201:3000/auth';
+  static final String baseUrl =
+      dotenv.env['BASE_API_URL'] ?? 'http://localhost:3000/api';
 
   static Future<Map<String, dynamic>> login(
-      String emailOrUsername, String password) async {
+    String emailOrUsername,
+    String password,
+  ) async {
+    final url = Uri.parse('$baseUrl/auth/login');
     final response = await http.post(
-      Uri.parse('$baseUrl/login'),
+      url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         "email": emailOrUsername, // Can be email or username
@@ -21,14 +27,18 @@ class ApiService {
     } else {
       return {
         "success": false,
-        "error": jsonDecode(response.body)['error'] ?? "Login failed"
+        "error": jsonDecode(response.body)['error'] ?? "Login failed",
       };
     }
   }
 
   static Future<Map<String, dynamic>> signup(
-      String username, String email, String password) async {
-    final url = Uri.parse('$baseUrl/register');
+    String username,
+    String email,
+    String password,
+  ) async {
+    final url = Uri.parse('http://localhost:3000/auth/register');
+    debugPrint('URL: $url');
 
     final response = await http.post(
       url,
@@ -61,10 +71,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return {
-        'success': true,
-        'message': jsonDecode(response.body)['message'],
-      };
+      return {'success': true, 'message': jsonDecode(response.body)['message']};
     } else {
       return {
         'success': false,
