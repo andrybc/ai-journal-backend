@@ -20,7 +20,7 @@ class _RelationshipPageState extends State<RelationshipPage> {
   };
 
   List<Map<String, dynamic>> profiles = [];
-  final userId = 1;
+  final String userId = "1";
 
   void searchProfilesFunct(String query) async {
     final response = await ApiService().searchProfiles(query, userId);

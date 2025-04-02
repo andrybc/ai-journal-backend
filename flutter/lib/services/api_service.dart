@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  Future<Map<String, dynamic>> searchProfiles(String query, userId) async {
+  Future<Map<String, dynamic>> searchProfiles(
+    String query,
+    String userId,
+  ) async {
     try {
       final String apiUrl = dotenv.env["VITE_API_URL"] ?? "";
       if (apiUrl.isEmpty) {
@@ -40,7 +43,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getProfile(int profileId, int userId) async {
+  Future<Map<String, dynamic>> getProfile(int profileId, String userId) async {
     try {
       final String apiUrl = dotenv.env["VITE_API_URL"] ?? "";
       if (apiUrl.isEmpty) {
