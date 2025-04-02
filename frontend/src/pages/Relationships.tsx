@@ -1,74 +1,46 @@
-import SideNav from "../components/SideNav";
-import { useState } from "react";
+import SideNav from "../components/SideNavProfile";
+import { useEffect, useState } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import ghostIcon from "../assets/icons/ghost-icon.svg";
+import { useNavigate } from "react-router";
 
 const Relationships = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
   const [selectedRelationship, setSelectedRelationship] = useState<{
-    name: string;
-    id: number;
+    profileTitle: string;
+    _id: number;
     [key: string]: string | number | boolean;
   } | null>(null);
-  const userId = 1;
+  const [userId, setUserId] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string>("");
+  const navigate = useNavigate();
 
-  const searchProfiles = async (query: string) => {
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/profile/search?userId=${userId}&query=${encodeURIComponent(query)}`,
-        {
-          method: "GET",
-        },
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        throw new Error(
-          errorMessage.error || "Unexpected error while searching for profiles",
-        );
-      }
-
-      const responseData = await response.json();
-      console.log(responseData.message);
-
-      console.log(responseData.profiles);
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(parseInt(storedUserId, 10));
+    } else {
+      console.error("User ID not found in local storage.");
+      navigate("/login");
     }
-  };
 
-  const getSelectedRelationship = async (profileId: number) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`,
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        throw new Error(
-          errorMessage.error || "Unexpected error while retrieving profile",
-        );
-      }
-
-      const responseData = await response.json();
-      console.log(responseData.message);
-
-      setSelectedRelationship(responseData.profile);
-    } catch (error) {
-      console.error(error);
+    const storedUserName = localStorage.getItem("username");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    } else {
+      console.error("Username not found in local storage.");
+      navigate("/login");
     }
-  };
+  }, []);
 
   return (
     <div className="flex h-dvh overflow-hidden">
-      {sideNavOpen && (
+      {sideNavOpen && userId !== null && (
         <SideNav
-          getSelectedItem={getSelectedRelationship}
-          page="Relationships"
           closeNav={setSideNavOpen}
-          searchItems={searchProfiles}
+          userName={userName}
+          userId={userId}
+          setSelectedRelationship={setSelectedRelationship}
         />
       )}
 
@@ -106,10 +78,10 @@ const Relationships = () => {
             } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto w-full`}
           >
             <h3 className="text-4xl font-semibold font-montserrat">
-              {selectedRelationship.name}
+              {selectedRelationship.profileTitle}
             </h3>
             <span className="text-[18px]/[1.6]">
-              {selectedRelationship.summary}
+              {selectedRelationship.profileContent}
             </span>
           </div>
         ) : (
