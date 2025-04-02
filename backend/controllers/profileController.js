@@ -59,7 +59,7 @@ exports.updateProfile = async (req, res) => {
     const updateProfile = await Profile.findByIdAndUpdate(
       profileId,
       { title, content },
-      { new: true },
+      { new: true }
     );
     if (!updateProfile) {
       return res.status(404).json({ error: "Profile not found" });
@@ -89,7 +89,7 @@ exports.searchProfiles = async (req, res) => {
   try {
     const { userId, query } = req.query;
 
-    if (!userId || query === null) {
+    if (!userId || query === null || query === undefined) {
       return res
         .status(400)
         .json({ error: "Missing userId or query parameter" });
@@ -146,7 +146,7 @@ exports.getAllProfiles = async (req, res) => {
     }
 
     const profiles = await Profile.find({ userId }).select(
-      "_id title timeCreated",
+      "_id title timeCreated"
     );
 
     res.status(200).json({
