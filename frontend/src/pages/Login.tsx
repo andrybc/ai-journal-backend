@@ -45,6 +45,19 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       console.error("Login error:", (error as Error).message);
+      const errorMsg = (error as Error).message;
+      const parts = errorMsg.split(": ", 2);
+      if (parts.length === 2) {
+        const jsonPart = parts[1];
+        try {
+          const errorData = JSON.parse(jsonPart);
+          setErrorMessage(errorData.error || "Unknown error");
+        } catch (parseError) {
+          setErrorMessage(jsonPart);
+        }
+      } else {
+        setErrorMessage(errorMsg);
+      }
     }
   };
 
