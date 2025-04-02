@@ -1,9 +1,4 @@
 const Profile = require("../models/summary");
-<<<<<<< HEAD
-=======
-
-//const Notebook = require('../models/Notebook');
->>>>>>> main
 
 // Helper function to check if a profile is effectively empty.
 function isProfileEmpty(profile) {
@@ -60,7 +55,6 @@ function isProfileEmpty(profile) {
 // Create profile manually (if needed) using the rich set of fields.
 exports.createProfile = async (req, res) => {
   try {
-<<<<<<< HEAD
     const {
       name,
       nickname,
@@ -131,24 +125,6 @@ exports.createProfile = async (req, res) => {
       memorableQuotes: Array.isArray(memorableQuotes) ? memorableQuotes : [],
       additionalNotes: additionalNotes || null,
       notebookIDs: Array.isArray(notebookIDs) ? notebookIDs : [],
-=======
-    const { title, content, notebookIDs = [], userId } = req.body;
-
-    if (!title || !content || !userId) {
-      return res.status(400).json({ error: "Invalid input data" });
-    }
-
-    if (notebookIDs && !Array.isArray(notebookIDs)) {
-      return res.status(400).json({ error: "notebookIDs must be an array" });
-    }
-
-    // Further validation of notebookIDs can be added here
-
-    const newProfile = new Profile({
-      title,
-      content,
-      notebookIDs, // optional array of Notebook IDs
->>>>>>> main
       userId,
     });
 

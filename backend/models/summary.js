@@ -1,9 +1,5 @@
 const mongoose = require("mongoose");
 
-<<<<<<< HEAD
-=======
-// Define the summary (profile) schema
->>>>>>> main
 const profileSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -14,7 +10,6 @@ const profileSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-<<<<<<< HEAD
   birthday: {
     type: Date,
     default: null,
@@ -109,8 +104,6 @@ const profileSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-=======
->>>>>>> main
   notebookIDs: [
     {
       type: mongoose.Schema.Types.ObjectId,
