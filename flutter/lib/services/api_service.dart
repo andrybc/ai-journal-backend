@@ -12,7 +12,7 @@ class ApiService {
 
       final response = await http.get(
         Uri.parse(
-          "${apiUrl}/profile/search?userId=$userId&query=${Uri.encodeComponent(query)}",
+          "$apiUrl/profile/search?userId=$userId&query=${Uri.encodeComponent(query)}",
         ),
       );
 
@@ -48,7 +48,7 @@ class ApiService {
       }
 
       final response = await http.get(
-        Uri.parse("${apiUrl}/profile/$userId/$profileId"),
+        Uri.parse("$apiUrl/profile/$userId/$profileId"),
       );
 
       if (response.statusCode == 200) {
