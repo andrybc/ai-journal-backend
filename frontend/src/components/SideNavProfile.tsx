@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import notesPage from "../assets/icons/notes-page-icon.svg";
 import relationshipIcon from "../assets/icons/people-relationship-icon.svg";
@@ -9,7 +9,7 @@ import logoutIcon from "../assets/icons/logout-icon.svg";
 type Props = {
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   userName: string;
-  userId: number; // User ID to fetch profiles
+  userId: string; // User ID to fetch profiles
   setSelectedRelationship: React.Dispatch<
     React.SetStateAction<{
       [key: string]: string | number | boolean;
@@ -37,6 +37,13 @@ const SideNav: React.FC<Props> = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    navigate("/login");
+  };
 
   const searchProfiles = async (query: string) => {
     try {
@@ -46,13 +53,13 @@ const SideNav: React.FC<Props> = ({
         }/profile/search?userId=${userId}&query=${encodeURIComponent(query)}`,
         {
           method: "GET",
-        }
+        },
       );
 
       if (!response.ok) {
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while searching for profiles"
+          errorMessage.error || "Unexpected error while searching for profiles",
         );
       }
 
@@ -67,13 +74,13 @@ const SideNav: React.FC<Props> = ({
   const getSelectedRelationship = async (profileId: number) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`
+        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`,
       );
 
       if (!response.ok) {
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while retrieving profile"
+          errorMessage.error || "Unexpected error while retrieving profile",
         );
       }
 
@@ -205,7 +212,10 @@ const SideNav: React.FC<Props> = ({
               ref={userDropdown}
               className="z-10 w-[calc(100%-16px)] absolute left-1/2 -translate-x-1/2 bottom-full mb-2 rounded-xl border-[0.5px] flex flex-col bg-gray-200"
             >
-              <button className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer">
+              <button
+                className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer"
+                onClick={handleLogout}
+              >
                 <img
                   className="w-[20px] h-[20x]"
                   src={logoutIcon}

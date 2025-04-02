@@ -11,14 +11,14 @@ const Relationships = () => {
     _id: number;
     [key: string]: string | number | boolean;
   } | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
-      setUserId(parseInt(storedUserId, 10));
+      setUserId(storedUserId);
     } else {
       console.error("User ID not found in local storage.");
       navigate("/login");
