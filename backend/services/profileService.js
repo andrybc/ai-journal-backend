@@ -2,16 +2,42 @@ const Profile = require("../models/summary");
 const Notebook = require("../models/notebook");
 const openaiService = require("./openaiService.cjs");
 
+function formatProfileContent(data) {
+  return `Name: ${data.name}
+Nickname: ${data.nickname || "N/A"}
+Birthday: ${data.birthday || "N/A"}
+Age: ${data.age || "N/A"}
+Occupation: ${data.occupation || "N/A"}
+Location: ${data.location || "N/A"}
+Education: ${data.education || "N/A"}
+Interests: ${data.interests?.join(", ") || "N/A"}
+Hobbies: ${data.hobbies?.join(", ") || "N/A"}
+Skills: ${data.skills?.join(", ") || "N/A"}
+Experience: ${data.experience || "N/A"}
+Personality Traits: ${data.personalityTraits?.join(", ") || "N/A"}
+Goals: ${data.goals || "N/A"}
+Challenges: ${data.challenges || "N/A"}
+Background: ${data.background || "N/A"}
+Affiliations: ${data.affiliations?.join(", ") || "N/A"}
+Favorite Books: ${data.favoriteBooks?.join(", ") || "N/A"}
+Favorite Movies: ${data.favoriteMovies?.join(", ") || "N/A"}
+Favorite Music: ${data.favoriteMusic?.join(", ") || "N/A"}
+Achievements: ${data.achievements?.join(", ") || "N/A"}
+Family: ${data.family || "N/A"}
+Relationship Status: ${data.relationshipStatus || "N/A"}
+Memorable Quotes: ${data.memorableQuotes?.join("\n- ") || "N/A"}
+Additional Notes: ${data.additionalNotes || "N/A"}`;
+}
+
 exports.updateProfilesForNotebook = async (notebook, operation) => {
   if (operation === "create" || operation === "update") {
-    // Extract names using GPT‑4o-mini
     const namesArray = await openaiService.extractTags(notebook.content);
     notebook.tags = Array.isArray(namesArray) ? namesArray : [];
     await notebook.save();
 
     for (const name of notebook.tags) {
       let profile = await Profile.findOne({
-        name: name,
+        profileTitle: name,
         userId: notebook.userId,
       });
 
@@ -21,85 +47,24 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
         }
       } else {
         profile = new Profile({
-          name: name,
+          profileTitle: name,
           userId: notebook.userId,
           notebookIDs: [notebook._id],
         });
       }
 
-      // Retrieve all notebooks associated with this profile
       const notebooks = await Notebook.find({
         _id: { $in: profile.notebookIDs },
       });
       const notebookContents = notebooks.map((n) => n.content);
 
-      // Create a structured profile using GPT‑4o-mini and our Zod schema
       const profileData = await openaiService.createProfile(
         name,
         notebookContents,
       );
       if (profileData) {
-        profile.name = profileData.name || profile.name;
-
-        profile.nickname = profileData.nickname || null;
-
-        // Parse birthday safely.
-        if (profileData.birthday) {
-          const parsedBirthday = new Date(profileData.birthday);
-          profile.birthday = isNaN(parsedBirthday.getTime())
-            ? null
-            : parsedBirthday;
-        } else {
-          profile.birthday = null;
-        }
-
-        profile.age = profileData.age || null;
-        profile.occupation = profileData.occupation || null;
-        profile.location = profileData.location || null;
-        profile.education = profileData.education || null;
-        profile.interests = Array.isArray(profileData.interests)
-          ? profileData.interests
-          : [];
-        profile.hobbies = Array.isArray(profileData.hobbies)
-          ? profileData.hobbies
-          : [];
-        profile.skills = Array.isArray(profileData.skills)
-          ? profileData.skills
-          : [];
-        profile.experience = profileData.experience || null;
-        profile.personalityTraits = Array.isArray(profileData.personalityTraits)
-          ? profileData.personalityTraits
-          : [];
-        profile.goals = profileData.goals || null;
-        profile.challenges = profileData.challenges || null;
-        profile.background = profileData.background || null;
-        profile.affiliations = Array.isArray(profileData.affiliations)
-          ? profileData.affiliations
-          : [];
-        profile.socialMedia = profileData.socialMedia || {
-          twitter: null,
-          linkedin: null,
-          facebook: null,
-          instagram: null,
-        };
-        profile.favoriteBooks = Array.isArray(profileData.favoriteBooks)
-          ? profileData.favoriteBooks
-          : [];
-        profile.favoriteMovies = Array.isArray(profileData.favoriteMovies)
-          ? profileData.favoriteMovies
-          : [];
-        profile.favoriteMusic = Array.isArray(profileData.favoriteMusic)
-          ? profileData.favoriteMusic
-          : [];
-        profile.achievements = Array.isArray(profileData.achievements)
-          ? profileData.achievements
-          : [];
-        profile.family = profileData.family || null;
-        profile.relationshipStatus = profileData.relationshipStatus || null;
-        profile.memorableQuotes = Array.isArray(profileData.memorableQuotes)
-          ? profileData.memorableQuotes
-          : [];
-        profile.additionalNotes = profileData.additionalNotes || null;
+        profile.profileTitle = profileData.name || profile.profileTitle;
+        profile.profileContent = formatProfileContent(profileData);
       }
       profile.timeUpdated = Date.now();
       await profile.save();
@@ -110,6 +75,7 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
       profile.notebookIDs = profile.notebookIDs.filter(
         (id) => id.toString() !== notebook._id.toString(),
       );
+
       if (profile.notebookIDs.length === 0) {
         await Profile.findByIdAndDelete(profile._id);
       } else {
@@ -118,69 +84,12 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
         });
         const notebookContents = notebooks.map((n) => n.content);
         const profileData = await openaiService.createProfile(
-          profile.name,
+          profile.profileTitle,
           notebookContents,
         );
         if (profileData) {
-          profile.name = profileData.name || profile.name;
-          profile.nickname = profileData.nickname || null;
-          if (profileData.birthday) {
-            const parsedBirthday = new Date(profileData.birthday);
-            profile.birthday = isNaN(parsedBirthday.getTime())
-              ? null
-              : parsedBirthday;
-          } else {
-            profile.birthday = null;
-          }
-          profile.age = profileData.age || null;
-          profile.occupation = profileData.occupation || null;
-          profile.location = profileData.location || null;
-          profile.education = profileData.education || null;
-          profile.interests = Array.isArray(profileData.interests)
-            ? profileData.interests
-            : [];
-          profile.hobbies = Array.isArray(profileData.hobbies)
-            ? profileData.hobbies
-            : [];
-          profile.skills = Array.isArray(profileData.skills)
-            ? profileData.skills
-            : [];
-          profile.experience = profileData.experience || null;
-          profile.personalityTraits = Array.isArray(
-            profileData.personalityTraits,
-          )
-            ? profileData.personalityTraits
-            : [];
-          profile.goals = profileData.goals || null;
-          profile.challenges = profileData.challenges || null;
-          profile.background = profileData.background || null;
-          profile.affiliations = Array.isArray(profileData.affiliations)
-            ? profileData.affiliations
-            : [];
-          profile.socialMedia = profileData.socialMedia || {
-            twitter: null,
-            linkedin: null,
-            facebook: null,
-            instagram: null,
-          };
-          profile.favoriteBooks = Array.isArray(profileData.favoriteBooks)
-            ? profileData.favoriteBooks
-            : [];
-          profile.favoriteMovies = Array.isArray(profileData.favoriteMovies)
-            ? profileData.favoriteMovies
-            : [];
-          profile.favoriteMusic = Array.isArray(profileData.favoriteMusic)
-            ? profileData.favoriteMusic
-            : [];
-          profile.achievements = Array.isArray(profileData.achievements)
-            ? profileData.achievements
-            : [];
-          profile.family = profileData.family || null;
-          profile.relationshipStatus = profileData.relationshipStatus || null;
-          profile.memorableQuotes = Array.isArray(profileData.memorableQuotes)
-            ? profileData.memorableQuotes
-            : [];
-          profile.additionalNotes = profileData.additionalNotes || null;
+          profile.profileTitle = profileData.name || profile.profileTitle;
+          profile.profileContent = formatProfileContent(profileData);
         }
         profile.timeUpdated = Date.now();
         await profile.save();

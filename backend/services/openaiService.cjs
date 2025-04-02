@@ -7,11 +7,10 @@ dotenv.config({ path: "../../.env" });
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Define the schema for a detailed profile.
 const ProfileSchema = z.object({
   name: z.string(),
   nickname: z.string().nullable(),
-  birthday: z.string().nullable(), // Expect an ISO date string or null.
+  birthday: z.string().nullable(),
   age: z.number().nullable(),
   occupation: z.string().nullable(),
   location: z.string().nullable(),
@@ -25,12 +24,6 @@ const ProfileSchema = z.object({
   challenges: z.string().nullable(),
   background: z.string().nullable(),
   affiliations: z.array(z.string()),
-  socialMedia: z.object({
-    twitter: z.string().nullable(),
-    linkedin: z.string().nullable(),
-    facebook: z.string().nullable(),
-    instagram: z.string().nullable(),
-  }),
   favoriteBooks: z.array(z.string()),
   favoriteMovies: z.array(z.string()),
   favoriteMusic: z.array(z.string()),
@@ -102,7 +95,6 @@ function buildProfilePrompt(name, notebookContents) {
           - challenges (string or null)
           - background (string or null)
           - affiliations (array of strings)
-          - socialMedia (object with keys: twitter, linkedin, facebook, instagram; each a string or null)
           - favoriteBooks (array of strings)
           - favoriteMovies (array of strings)
           - favoriteMusic (array of strings)
