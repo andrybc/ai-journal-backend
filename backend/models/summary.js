@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-// Define the summary schema
+// Define the summary (profile) schema
 const profileSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -12,7 +12,7 @@ const profileSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  tagId: [
+  notebookIDs: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Notebook",
