@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
-// TODO : Fix up error message rn it dispalys the actual error message from the server
+
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -43,7 +43,19 @@ const ForgotPassword = () => {
       setMessage(data.message);
     } catch (error) {
       console.error("Forgot password error:", error);
-      setErrorMessage((error as Error).message);
+      const errorMsg = (error as Error).message;
+      const parts = errorMsg.split(": ", 2);
+      if (parts.length === 2) {
+        const jsonPart = parts[1];
+        try {
+          const errorData = JSON.parse(jsonPart);
+          setErrorMessage(errorData.error || "Unknown error");
+        } catch (parseError) {
+          setErrorMessage(jsonPart);
+        }
+      } else {
+        setErrorMessage(errorMsg);
+      }
     }
   };
 
