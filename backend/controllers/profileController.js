@@ -59,7 +59,7 @@ exports.updateProfile = async (req, res) => {
     const updateProfile = await Profile.findByIdAndUpdate(
       profileId,
       { title, content },
-      { new: true }
+      { new: true },
     );
     if (!updateProfile) {
       return res.status(404).json({ error: "Profile not found" });
@@ -146,7 +146,7 @@ exports.getAllProfiles = async (req, res) => {
     }
 
     const profiles = await Profile.find({ userId }).select(
-      "_id title timeCreated"
+      "_id title timeCreated",
     );
 
     res.status(200).json({
