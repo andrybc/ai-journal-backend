@@ -3,7 +3,6 @@ import Navbar from "./components/Navbar"; // Adjust path
 import { useNavigate } from "react-router";
 // TODO: Redice spacing between the button and the text boxes
 
-
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
