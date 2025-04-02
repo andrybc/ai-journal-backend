@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar"; // Adjust path
 import { useNavigate } from "react-router";
-// TODO: Redice spacing between the button and the text boxes
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -99,7 +98,7 @@ const ResetPassword = () => {
           <input
             type="password"
             placeholder="Confirm New Password"
-            className={`w-full px-3 py-2 border rounded-md mb-3 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+            className={`w-full px-3 py-2 border rounded-md mb-2 bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
               isSubmitted &&
               (!confirmPassword || newPassword !== confirmPassword)
                 ? "border-red-600"
@@ -111,7 +110,7 @@ const ResetPassword = () => {
         </div>
         <button
           onClick={handleResetPassword}
-          className="w-full mt-4 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-500"
+          className="w-full mt-2 !bg-neutral-800 !border-neutral-600 text-neutral-50 py-2 rounded-md hover:!bg-neutral-500"
         >
           Reset Password
         </button>
