@@ -53,13 +53,13 @@ const SideNav: React.FC<Props> = ({
         }/profile/search?userId=${userId}&query=${encodeURIComponent(query)}`,
         {
           method: "GET",
-        },
+        }
       );
 
       if (!response.ok) {
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while searching for profiles",
+          errorMessage.error || "Unexpected error while searching for profiles"
         );
       }
 
@@ -74,13 +74,13 @@ const SideNav: React.FC<Props> = ({
   const getSelectedRelationship = async (profileId: number) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`,
+        `${import.meta.env.VITE_API_URL}/profile/${userId}/${profileId}`
       );
 
       if (!response.ok) {
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while retrieving profile",
+          errorMessage.error || "Unexpected error while retrieving profile"
         );
       }
 
@@ -217,7 +217,7 @@ const SideNav: React.FC<Props> = ({
                 onClick={handleLogout}
               >
                 <img
-                  className="w-[20px] h-[20x]"
+                  className="w-[20px] h-[20px]"
                   src={logoutIcon}
                   alt="Logout Icon"
                 />
