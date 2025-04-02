@@ -86,7 +86,9 @@ const SignUp = () => {
               </p>
             ))}
             {successMessage && (
-              <p className="text-sm font-bold text-neutral-100">{successMessage}</p>
+              <p className="text-sm font-bold text-neutral-100">
+                {successMessage}
+              </p>
             )}
           </div>
         )}
