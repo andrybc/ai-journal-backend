@@ -168,8 +168,6 @@ class _RelationshipPageState extends State<RelationshipPage> {
                   // Close Nav Icon
                   IconButton(
                     style: IconButton.styleFrom(
-                      padding: EdgeInsets.all(6),
-                      minimumSize: Size(25, 25),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -196,8 +194,6 @@ class _RelationshipPageState extends State<RelationshipPage> {
                   //Notes Page Button
                   IconButton(
                     style: IconButton.styleFrom(
-                      padding: EdgeInsets.all(6),
-                      minimumSize: Size(25, 25),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -224,8 +220,6 @@ class _RelationshipPageState extends State<RelationshipPage> {
                   // People Page Button
                   IconButton(
                     style: IconButton.styleFrom(
-                      padding: EdgeInsets.all(6),
-                      minimumSize: Size(25, 25),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -383,8 +377,6 @@ class _RelationshipPageState extends State<RelationshipPage> {
                   // Logout Button
                   IconButton(
                     style: IconButton.styleFrom(
-                      padding: EdgeInsets.all(6),
-                      minimumSize: Size(25, 25),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
