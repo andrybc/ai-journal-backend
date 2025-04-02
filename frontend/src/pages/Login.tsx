@@ -45,6 +45,19 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       console.error("Login error:", (error as Error).message);
+      const errorMsg = (error as Error).message;
+      const parts = errorMsg.split(": ", 2);
+      if (parts.length === 2) {
+        const jsonPart = parts[1];
+        try {
+          const errorData = JSON.parse(jsonPart);
+          setErrorMessage(errorData.error || "Unknown error");
+        } catch (parseError) {
+          setErrorMessage(jsonPart);
+        }
+      } else {
+        setErrorMessage(errorMsg);
+      }
     }
   };
 
@@ -105,6 +118,18 @@ const Login = () => {
         >
           Login
         </button>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-white">
+            Don't remember your password?{" "}
+            <a
+              href="/forgot-password"
+              className="!text-white !underline hover:text-neutral-900"
+            >
+              Forgot Password
+            </a>
+          </p>
+        </div>
       </div>
 
       <div className="bg-neutral-700 w-96 mt-4 p-3 rounded-xl shadow-md flex justify-center">
