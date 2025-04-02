@@ -51,7 +51,6 @@ const EmailVerify = () => {
         setErrorMessage(error.message);
       } else {
         setErrorMessage("An unexpected error occurred: " + String(error)); // Or log the error type
-
       }
     }
   };
