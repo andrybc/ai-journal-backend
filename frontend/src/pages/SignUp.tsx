@@ -9,6 +9,7 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const navigate = useNavigate();
@@ -29,10 +30,14 @@ const SignUp = () => {
 
     if (errors.length > 0) {
       setErrorMessages(errors);
+      setSuccessMessage(""); // Clear success message if errors exist
       return;
     }
 
     try {
+      //const apiUrl = import.meta.env.VITE_API_URL;
+      //console.log("API URL:", apiUrl);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/auth/register`,
         {
@@ -45,24 +50,23 @@ const SignUp = () => {
             email,
             password,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Error response:", errorText, response);
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
       const data = await response.json();
       console.log(data.message);
       console.log(data.verificationToken);
-      /*if (data.verificationToken) {
-        localStorage.setItem("verificationToken", data.verificationToken);
-      }*/
-      navigate("/verify-email");
+      setSuccessMessage(`We have sent a verification link to ${email}`);
+      setErrorMessages([]); // Clear any previous errors
+      setTimeout(() => navigate("/login"), 5000);
     } catch (error) {
       console.error("Registration error:", (error as Error).message);
     }
@@ -77,13 +81,18 @@ const SignUp = () => {
       <div className="bg-neutral-700 w-96 p-6 rounded-xl shadow-md flex flex-col items-center">
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
-        {errorMessages.length > 0 && (
+        {(errorMessages.length > 0 || successMessage) && (
           <div className="mb-4 text-center">
             {errorMessages.map((error, index) => (
               <p key={index} className="text-sm text-red-600">
                 {error}
               </p>
             ))}
+            {successMessage && (
+              <p className="text-sm font-bold text-neutral-100">
+                {successMessage}
+              </p>
+            )}
           </div>
         )}
 
