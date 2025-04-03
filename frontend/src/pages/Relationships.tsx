@@ -1,4 +1,4 @@
-import SideNav from "../components/SideNav";
+import SideNav from "../components/SideNavNote";
 import { useState } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import ghostIcon from "../assets/icons/ghost-icon.svg";

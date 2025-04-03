@@ -1,4 +1,4 @@
-import SideNav from "../components/SideNav";
+import SideNav from "../components/SideNavNote";
 import { useEffect, useState, useRef } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SimpleMDE from "react-simplemde-editor";
@@ -17,16 +17,16 @@ const Notes = () => {
 
   const userID = localStorage.getItem("userId");
 
-  const getSelectedNotes = (id: number) => {
-    if (id === -1) {
+  const getSelectedNotes = (existingNoteFlag: number) => {
+    if (existingNoteFlag === -1) {
       createNewNote();
-    } /*else { //MAYBE I HAVE TO CALL READ NOTEBOOK END POINT HERE???????
+    } else {
       setSelectedNotes({
-        title: "",
-        id,
-        content: "",
+        title: localStorage.getItem("journalTitle") || "",
+        existingNoteFlag: 1,
+        content: localStorage.getItem("journalContent") || "",
       });
-    }*/
+    }
   };
 
   useEffect(() => {
@@ -42,6 +42,7 @@ const Notes = () => {
   };
   const editorContentRef = useRef<string>("");
 
+  //HANDLE SAVE----------------------------------------------------------
   const handleSave = async () => {
     setSelectedNotes((prev) =>
       prev
@@ -49,7 +50,7 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current,
           }
-        : null,
+        : null
     );
     const updatedContent = editorContentRef.current;
 
@@ -71,13 +72,13 @@ const Notes = () => {
               content: updatedContent, // Use the updated content from the editor
               userId: userID,
             }),
-          },
+          }
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`,
+            `Server error ${response.status}: ${errorText || "No details"}`
           );
         }
         const data = await response.json();
@@ -90,15 +91,31 @@ const Notes = () => {
                 ...prev,
                 existingNoteFlag: 1,
                 notebookId: data.notebook._id,
+                updateFlag: 0,
+                updateDelete: 0,
               }
-            : null,
+            : null
         );
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while saving the note.");
       }
-    } else {
-      //UPDATING AN EXISTING NOTE
+    }
+  }; //END OF HANDLESAVE--------------------------------------------------------------------
+
+  //HANDLE UPDATE--------------------------------------------------------------------------
+  const handleUpdate = async () => {
+    setSelectedNotes((prev) =>
+      prev
+        ? {
+            ...prev,
+            content: editorContentRef.current || prev.content,
+          }
+        : null
+    );
+    const updatedContent = editorContentRef.current;
+
+    if (selectedNotes?.updateFlag === 0) {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/journal/update-notebook/${
@@ -114,57 +131,140 @@ const Notes = () => {
               content: updatedContent,
               notebookId: selectedNotes?.notebookId,
             }),
-          },
+          }
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`,
+            `Server error ${response.status}: ${errorText || "No details"}`
           );
         }
         const data = await response.json();
         console.log(data.message);
         console.log(data.notebook);
+
+        setSelectedNotes((prev) =>
+          prev
+            ? {
+                ...prev,
+                updateFlag: 1,
+              }
+            : null
+        );
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
+      }
+    } else {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/journal/update-notebook/${localStorage.getItem("notebookId")}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: selectedNotes?.title,
+              content: updatedContent,
+              notebookId: localStorage.getItem("notebookId"),
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
+          );
+        }
+        const data = await response.json();
+        console.log(data.message);
+        console.log(data.notebook);
+
+        setSelectedNotes((prev) =>
+          prev
+            ? {
+                ...prev,
+                updateDelete: 1,
+              }
+            : null
+        );
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while saving the note.");
       }
     }
-  };
+  }; //END OF HANDLE UPDATE--------------------------------------------------------------------------
 
+  //HANDLE DELETE---------------------------------------------------------------------------
   const handleDelete = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
-          selectedNotes?.notebookId
-        }`, // Use the notebookId from selectedNotes to delete the specific note
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            notebookId: selectedNotes?.notebookId,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+    if (selectedNotes?.updateDelete === 0) {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
+            selectedNotes?.notebookId
+          }`, // Use the notebookId from selectedNotes to delete the specific note
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              notebookId: selectedNotes?.notebookId,
+            }),
+          }
         );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
+          );
+        }
+        const data = await response.json();
+        console.log(data.message);
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
       }
-      const data = await response.json();
-      console.log(data.message);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while saving the note.");
+    } else {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/journal/delete-notebook/${localStorage.getItem("notebookId")}`, // Use the notebookId from selectedNotes to delete the specific note
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              notebookId: localStorage.getItem("notebookId"),
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error ${response.status}: ${errorText || "No details"}`
+          );
+        }
+        const data = await response.json();
+        console.log(data.message);
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while saving the note.");
+      }
     }
 
     createNewNote();
   };
+  //END OF HANDLE DELETE--------------------------------------------------------------------------
 
   return (
     <div className="flex h-dvh overflow-hidden">
@@ -221,7 +321,7 @@ const Notes = () => {
                         ...prev,
                         title: e.target.value,
                       }
-                    : null,
+                    : null
                 );
               }}
             />
@@ -241,7 +341,11 @@ const Notes = () => {
                 {/* Save Button */}
                 <button
                   className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
-                  onClick={handleSave}
+                  onClick={
+                    selectedNotes?.existingNoteFlag === 0
+                      ? handleSave
+                      : handleUpdate
+                  }
                 >
                   <img
                     src={SaveNoteIcon}

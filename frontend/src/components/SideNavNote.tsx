@@ -8,99 +8,140 @@ import logoutIcon from "../assets/icons/logout-icon.svg";
 import addNoteIcon from "../assets/icons/add-new-note-icon.svg";
 
 type Props = {
-  //defines the expected props
-  page: string; //Identifies the current page ("Notes" or "Summary")
+  page: string; // Identifies the current page ("Notes" or "Summary")
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   getSelectedItem: (id: number) => void; // A function to handle selecting an item from the list.
 };
 
-const SideNav: React.FC<Props> = ({
-  page, // Page Name (Notes or Relationships)
-  closeNav, // Close the SideNav
-  getSelectedItem, // Get the selectedItem to display
-}) => {
+const SideNav: React.FC<Props> = ({ page, closeNav, getSelectedItem }) => {
   const [search, setSearch] = useState<string>(""); // Search Input
   const [displayList, setDisplayList] = useState<
-    { name: string; id: number; [key: string]: string | number | boolean }[]
+    { name: string; id: string }[]
   >([]); // List of Notes/Relationships to display in SideNav
-  const [selectedId, setSelectedId] = useState<number | null>(null); // Store ID of Notes/Relationships
+  const [selectedId, setSelectedId] = useState<string | null>(null); // Store ID of Notes/Relationships
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
 
-  // Use Effect to put mock data into displayList
+  const userID = localStorage.getItem("userId");
+
+  const getAllJournals = async () => {
+    if (userID === null) {
+      console.error("User ID is not available in local storage.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
+        );
+      }
+      const data = await response.json();
+
+      setDisplayList(
+        data.notebooks.map((notebook: { _id: string; title: string }) => ({
+          id: notebook._id,
+          name: notebook.title,
+        }))
+      );
+
+      console.log(data.message);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while fetching the journals.");
+    }
+  };
+
+  const viewJournal = async (id: string) => {
+    if (userID === null) {
+      console.error("User ID is not available in local storage.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/read-notebook/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
+        );
+      }
+      const data = await response.json();
+
+      localStorage.setItem("journalTitle", data.notebook.title);
+      localStorage.setItem("journalContent", data.notebook.content);
+      localStorage.setItem("notebookId", data.notebook._id);
+
+      console.log(data.message);
+      console.log(data.notebook);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while fetching the journals.");
+    }
+    getAllJournals();
+  };
+
+  const searchJournal = async (query: string) => {
+    if (!userID) {
+      console.error("User ID is missing.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(
+          errorMessage.error || "Unexpected error while searching for journal"
+        );
+      }
+
+      const data = await response.json();
+      console.log(data.message);
+      setDisplayList(data.notebooks);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    setDisplayList([
-      {
-        name: "Cookies",
-        id: 1,
-        summary: "This is a summary of person 1",
-      },
-      {
-        name: "Richard Leindecker",
-        id: 2,
-        summary: "This is a summary of person 2",
-      },
-      {
-        name: "Person 3 has a long name. Like extremely long name",
-        id: 3,
-        summary: "This is a summary of person 3",
-      },
-      {
-        name: "TheChosenOne",
-        id: 4,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 5,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 6,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 7,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 8,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 9,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 10,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 11,
-        summary: "This is a summary of person 4",
-      },
-      {
-        name: "TheChosenOne",
-        id: 12,
-        summary: "This is a summary of person 4",
-      },
-    ]);
+    searchJournal("");
+    //getAllJournals();
   }, []);
 
-  // Use Effect to close User Dropdown if clicked outside of the dropdown
   useEffect(() => {
     const removeUserDropdown = (event: MouseEvent): void => {
-      // Check if clicked outside of the dropdown
       if (!userDropdown.current?.contains(event.target as Node)) {
         if (event.target !== navModal.current) {
-          event.stopPropagation(); // Prevent the open dropdown button event from running
+          event.stopPropagation();
         }
         setUserDropdownOpen(false);
       }
@@ -110,7 +151,6 @@ const SideNav: React.FC<Props> = ({
       document.addEventListener("click", removeUserDropdown, true);
     }
 
-    // Cleanup the event listener
     return () => {
       document.removeEventListener("click", removeUserDropdown, true);
     };
@@ -130,7 +170,6 @@ const SideNav: React.FC<Props> = ({
       <div className="shrink-0 border-r z-20 absolute top-0 left-0 w-[300px] h-dvh overflow-hidden flex flex-col bg-white sm:static">
         {/* Top Nav */}
         <div className="flex items-center justify-between py-2 pl-2 pr-2.5 border-b">
-          {/* Close Navbar Butotn */}
           <button
             className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
             onClick={() => closeNav(false)}
@@ -142,7 +181,6 @@ const SideNav: React.FC<Props> = ({
             />
           </button>
 
-          {/* Page Navigation */}
           <div className="flex items-center justify-between gap-3">
             {page === "Notes" && (
               <button
@@ -187,27 +225,29 @@ const SideNav: React.FC<Props> = ({
 
         {/* Search and Display List */}
         <div className="grow flex flex-col pt-4 pb-3.5 gap-3.5 overflow-hidden">
-          {/* Search Bar */}
           <input
             className="px-2.5 py-1 rounded-lg border-[0.5px] mx-5"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
+              searchJournal(event.target.value);
             }}
             placeholder={"Search " + page}
           />
 
-          {/* Display List */}
           <div className="grow flex flex-col gap-1 overflow-auto mx-3.5">
-            {displayList.map((item, index) => (
+            {displayList.map((item) => (
               <button
-                key={index}
+                key={item.id}
                 className={`text-left px-4 py-2 rounded-xl truncate shrink-0 ${
                   selectedId === item.id ? "bg-gray-300" : "hover:bg-gray-200"
                 }`}
-                onClick={() => {
-                  setSelectedId(item.id);
-                  getSelectedItem(item.id);
+                onClick={async () => {
+                  await viewJournal(item.id);
+                  const updatedNotebookId = localStorage.getItem("notebookId");
+                  setSelectedId(updatedNotebookId);
+                  getSelectedItem(1);
+
                   if (window.innerWidth < 640) {
                     closeNav(false);
                   }
@@ -221,7 +261,6 @@ const SideNav: React.FC<Props> = ({
 
         {/* User Profile Section */}
         <div className="relative">
-          {/* User Dropdown */}
           {userDropdownOpen && (
             <div
               ref={userDropdown}
@@ -248,7 +287,6 @@ const SideNav: React.FC<Props> = ({
             </div>
           )}
 
-          {/* User Profile Button */}
           <button
             className="flex items-center border-t py-2.5 px-5 gap-3 cursor-pointer w-full"
             onClick={() => {
