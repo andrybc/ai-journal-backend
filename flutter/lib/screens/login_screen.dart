@@ -16,19 +16,21 @@ class _LoginScreenState extends State<LoginScreen> {
   bool showPassword = false;
   String? error;
   bool isLoading = false;
+  bool isSubmitted = false;
 
   void handleLogin() async {
-    final username = usernameController.text.trim();
-    final password = passwordController.text;
-
     setState(() {
+      isSubmitted = true;
       error = null;
       isLoading = true;
     });
 
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
     if (username.isEmpty || password.isEmpty) {
       setState(() {
-        error = "Please fill in all fields.";
+        error = 'Please fill in all fields';
         isLoading = false;
       });
       return;
@@ -82,6 +84,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    errorText:
+                        isSubmitted && usernameController.text.trim().isEmpty
+                            ? 'Please enter your username or email'
+                            : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -108,13 +114,40 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                     ),
+                    errorText:
+                        isSubmitted && passwordController.text.isEmpty
+                            ? 'Please enter your password'
+                            : null,
                   ),
                 ),
-                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Forgot password functionality will be implemented soon',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 isLoading
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
-                      onPressed: handleLogin,
+                      onPressed: () {
+                        setState(() {
+                          isSubmitted = true;
+                        });
+                        handleLogin();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[800],
                         padding: const EdgeInsets.symmetric(horizontal: 32),
