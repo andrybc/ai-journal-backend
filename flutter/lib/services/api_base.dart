@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiBase {
   /// Base URL for API calls
   static final String baseUrl =
-      dotenv.env['API_BASE_URL'] ?? 'http://journal-organizer.com:3000';
+      dotenv.env['API_BASE_URL'] ?? 'http://journal-organizer.com:3000/api';
 
   /// Helper method to add authorization header
   static Map<String, String> getHeaders(String? token) {
