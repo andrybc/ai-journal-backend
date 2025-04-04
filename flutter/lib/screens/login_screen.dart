@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'signup_screen.dart';
 import '../services/auth_service.dart'; // Updated import to use AuthService specifically
 import 'home_screen.dart'; // Import your home screen
@@ -47,12 +49,76 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    // Save authentication data to SharedPreferences
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userData = response['data'];
+
+      // Get the token - this is present in the response
+      final token = userData['token'];
+
+      if (token != null) {
+        // Save the auth token
+        await prefs.setString('auth_token', token);
+
+        // Extract user ID from the JWT token
+        String userId = _extractUserIdFromToken(token);
+
+        // Save the extracted user ID
+        await prefs.setString('user_id', userId);
+
+        print('Auth data saved successfully: Token and extracted userId');
+      } else {
+        print('Warning: Missing token in login response');
+        print('Response data structure: ${userData.keys.toList()}');
+      }
+    } catch (e) {
+      print('Error saving auth data: $e');
+      // Continue anyway since we have the data in memory for this session
+    }
+
     if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
+  }
+
+  // Helper method to extract user ID from JWT token
+  String _extractUserIdFromToken(String token) {
+    try {
+      // JWT format: header.payload.signature
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        print('Invalid JWT token format');
+        return 'unknown_user';
+      }
+
+      // Decode the payload (middle part)
+      String payload = parts[1];
+      // Add padding if needed
+      while (payload.length % 4 != 0) {
+        payload += '=';
+      }
+
+      // Base64 decode and convert to JSON
+      final normalized = base64Url.normalize(payload);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+      final Map<String, dynamic> decodedData = json.decode(decoded);
+
+      // Extract user ID - JWT tokens typically have user ID as 'id', 'sub', or 'user_id'
+      final userId =
+          decodedData['id'] ??
+          decodedData['sub'] ??
+          decodedData['userId'] ??
+          'unknown_user';
+      print('Extracted user ID from token: $userId');
+      return userId.toString();
+    } catch (e) {
+      print('Error extracting user ID from token: $e');
+      return 'unknown_user';
+    }
   }
 
   @override

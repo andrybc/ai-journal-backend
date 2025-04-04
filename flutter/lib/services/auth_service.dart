@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'api_base.dart';
 
@@ -38,7 +37,6 @@ class AuthService {
     String password,
   ) async {
     final url = Uri.parse('${ApiBase.baseUrl}/auth/register');
-    debugPrint('URL: $url');
 
     final response = await http.post(
       url,
