@@ -57,22 +57,23 @@ class _SignupScreenState extends State<SignupScreen> {
     debugPrint("Email: $email, Username: $username, Password: $password");
     final response = await AuthService.signup(username, email, password);
 
-    if (response['success']) {
-      setState(() {
-        successMessage =
-            "Signup successful! Please check your email to verify your account.";
-        errorMessage = null;
-      });
-
-      await Future.delayed(const Duration(seconds: 2));
-      if (context.mounted) {
-        Navigator.pushNamed(context, '/email-verification');
-      }
-    } else {
+    if (!response['success']) {
       setState(() {
         errorMessage = response['error'];
       });
+      return;
     }
+
+    setState(() {
+      successMessage =
+          "Signup successful! Please check your email to verify your account.";
+      errorMessage = null;
+    });
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    Navigator.pushNamed(context, '/email-verification');
   }
 
   @override

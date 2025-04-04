@@ -38,16 +38,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => isLoading = false);
 
-    if (response['success']) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } else {
+    if (!response['success']) {
       setState(() {
         error = response['error'] ?? 'Login failed.';
       });
+      return;
     }
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
