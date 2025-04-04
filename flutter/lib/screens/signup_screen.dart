@@ -113,6 +113,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    errorText:
+                        isSubmitted &&
+                                !RegExp(
+                                  r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                                ).hasMatch(emailController.text.trim())
+                            ? 'Please enter a valid email address'
+                            : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -127,6 +134,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    errorText:
+                        isSubmitted && usernameController.text.isEmpty
+                            ? 'Username cannot be empty'
+                            : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -153,6 +164,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                     ),
+                    errorText:
+                        isSubmitted && passwordController.text.isEmpty
+                            ? 'Password cannot be empty'
+                            : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -168,11 +183,22 @@ class _SignupScreenState extends State<SignupScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    errorText:
+                        isSubmitted &&
+                                confirmPasswordController.text !=
+                                    passwordController.text
+                            ? 'Passwords do not match'
+                            : null,
                   ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: handleSignup,
+                  onPressed: () {
+                    setState(() {
+                      isSubmitted = true;
+                    });
+                    handleSignup();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[800],
                   ),
