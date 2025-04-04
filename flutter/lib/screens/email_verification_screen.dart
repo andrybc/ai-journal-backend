@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../services/auth_service.dart'; // Updated import to use AuthService specifically
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -28,18 +27,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       return;
     }
 
-    final uri = Uri.parse(
-      "${dotenv.env['API_BASE_URL']}/auth/verify?token=${widget.token}",
-    );
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
+      final response = await AuthService.verifyEmail(widget.token);
+
+      if (response['success']) {
         setState(() {
           success = true;
           error = null;
         });
       } else {
-        setState(() => error = "Verification failed: ${response.body}");
+        setState(() => error = "Verification failed: ${response['error']}");
       }
     } catch (e) {
       setState(() => error = "Network error: $e");

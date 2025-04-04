@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart'; // Updated import to use AuthService specifically
 import 'home_screen.dart'; // Import your home screen
 
 class LoginScreen extends StatefulWidget {
@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final response = await ApiService.login(username, password);
+    final response = await AuthService.login(username, password);
 
     setState(() => isLoading = false);
 
@@ -111,23 +111,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 isLoading
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
-                        onPressed: handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[800],
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                        ),
-                        child: const Text("Login"),
+                      onPressed: handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[800],
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
                       ),
+                      child: const Text("Login"),
+                    ),
                 TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SignupScreen()),
-                  ),
+                  onPressed:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SignupScreen()),
+                      ),
                   child: const Text(
                     "Don't have an account? Sign up",
                     style: TextStyle(color: Colors.white),
                   ),
-                )
+                ),
               ],
             ),
           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart'; // Updated import to use AuthService specifically
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -55,11 +55,11 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     debugPrint("Email: $email, Username: $username, Password: $password");
-    final response = await ApiService.signup(username, email, password);
+    final response = await AuthService.signup(username, email, password);
 
     if (response['success']) {
       final token = response['token'];
-      final verifyResponse = await ApiService.verifyEmail(token);
+      final verifyResponse = await AuthService.verifyEmail(token);
 
       if (verifyResponse['success']) {
         setState(() {
