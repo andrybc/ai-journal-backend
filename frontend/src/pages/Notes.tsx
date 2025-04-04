@@ -53,7 +53,7 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current,
           }
-        : null
+        : null,
     );
     const updatedContent = editorContentRef.current;
 
@@ -75,13 +75,13 @@ const Notes = () => {
               content: updatedContent, // Use the updated content from the editor
               userId: userID,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -97,7 +97,7 @@ const Notes = () => {
                 updateFlag: 0,
                 updateDelete: 0,
               }
-            : null
+            : null,
         );
       } catch (error) {
         console.error("Error:", error);
@@ -115,7 +115,7 @@ const Notes = () => {
             ...prev,
             content: editorContentRef.current || prev.content,
           }
-        : null
+        : null,
     );
     const updatedContent = editorContentRef.current;
 
@@ -135,13 +135,13 @@ const Notes = () => {
               content: updatedContent,
               notebookId: selectedNotes?.notebookId,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -154,7 +154,7 @@ const Notes = () => {
                 ...prev,
                 updateFlag: 1,
               }
-            : null
+            : null,
         );
       } catch (error) {
         console.error("Error:", error);
@@ -176,13 +176,13 @@ const Notes = () => {
               content: updatedContent,
               notebookId: localStorage.getItem("notebookId"),
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -195,7 +195,7 @@ const Notes = () => {
                 ...prev,
                 updateDelete: 1,
               }
-            : null
+            : null,
         );
       } catch (error) {
         console.error("Error:", error);
@@ -221,13 +221,13 @@ const Notes = () => {
             body: JSON.stringify({
               notebookId: selectedNotes?.notebookId,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -250,13 +250,13 @@ const Notes = () => {
             body: JSON.stringify({
               notebookId: localStorage.getItem("notebookId"),
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
+            `Server error ${response.status}: ${errorText || "No details"}`,
           );
         }
         const data = await response.json();
@@ -286,13 +286,13 @@ const Notes = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -301,7 +301,7 @@ const Notes = () => {
         data.notebooks.map((notebook: { _id: string; title: string }) => ({
           id: notebook._id,
           name: notebook.title,
-        }))
+        })),
       );
 
       console.log(data.message);
@@ -368,7 +368,7 @@ const Notes = () => {
                         ...prev,
                         title: e.target.value,
                       }
-                    : null
+                    : null,
                 );
               }}
             />

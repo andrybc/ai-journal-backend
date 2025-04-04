@@ -49,13 +49,13 @@ const SideNav: React.FC<Props> = ({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -91,7 +91,7 @@ const SideNav: React.FC<Props> = ({
             headers: {
               "Content-Type": "application/json",
             },
-          }
+          },
         );
       } else {
         // Otherwise, perform a search
@@ -101,14 +101,14 @@ const SideNav: React.FC<Props> = ({
           }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
           {
             method: "GET",
-          }
+          },
         );
       }
 
       if (!response.ok) {
         const errorText = await response.json();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
 
@@ -117,7 +117,7 @@ const SideNav: React.FC<Props> = ({
         data.notebooks.map((notebook: { _id: string; title: string }) => ({
           id: notebook._id,
           name: notebook.title,
-        }))
+        })),
       );
       console.log(data.message);
     } catch (error) {
