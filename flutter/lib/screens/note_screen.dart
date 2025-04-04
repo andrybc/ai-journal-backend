@@ -111,14 +111,14 @@ class _NoteScreenState extends State<NoteScreen> {
       Map<String, dynamic> response;
       if (widget.notebookId != null) {
         // Update existing notebook
-        response = await NotebookService.updateNotebook(
+        response = await JournalService.updateNotebook(
           widget.notebookId!,
           notebookData,
           _authToken!,
         );
       } else {
         // Create new notebook
-        response = await NotebookService.createNotebook(
+        response = await JournalService.createNotebook(
           notebookData,
           _authToken!,
         );
