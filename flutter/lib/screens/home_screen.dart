@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'note_screen.dart';
-import '../services/journal_service.dart';
+import '../services/notebook_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchNotebooks(String userId, String token) async {
     try {
-      final response = await JournalService.getAllNotebooks(userId, token);
+      final response = await NotebookService.getAllNotebooks(userId, token);
 
       if (response['success']) {
         setState(() {

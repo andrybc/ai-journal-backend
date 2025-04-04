@@ -31,6 +31,7 @@ class _NoteScreenState extends State<NoteScreen> {
   late final TextEditingController _editingController;
   late final TextEditingController _titleController;
   String? _authToken;
+  String? _userId;
 
   // Custom extension set with emoji support
   final _markdownExtensionSet = md.ExtensionSet(
@@ -54,10 +55,22 @@ class _NoteScreenState extends State<NoteScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
+      final userId = prefs.getString('user_id');
 
-      if (token != null) {
+      setState(() {
+        _authToken = token;
+        _userId = userId;
+      });
+
+      if (token == null) {
         setState(() {
-          _authToken = token;
+          _errorMessage = 'Authentication token not found';
+        });
+      }
+
+      if (userId == null) {
+        setState(() {
+          _errorMessage = 'User ID not found';
         });
       }
     } catch (e) {
@@ -75,6 +88,13 @@ class _NoteScreenState extends State<NoteScreen> {
       return;
     }
 
+    if (_userId == null) {
+      setState(() {
+        _errorMessage = 'User ID not available';
+      });
+      return;
+    }
+
     setState(() {
       _isSaving = true;
       _errorMessage = null;
@@ -85,19 +105,20 @@ class _NoteScreenState extends State<NoteScreen> {
       final notebookData = {
         'title': _titleController.text,
         'content': _editingController.text,
+        'userId': _userId, // Include userId in the request
       };
 
       Map<String, dynamic> response;
       if (widget.notebookId != null) {
         // Update existing notebook
-        response = await JournalService.updateNotebook(
+        response = await NotebookService.updateNotebook(
           widget.notebookId!,
           notebookData,
           _authToken!,
         );
       } else {
         // Create new notebook
-        response = await JournalService.createNotebook(
+        response = await NotebookService.createNotebook(
           notebookData,
           _authToken!,
         );

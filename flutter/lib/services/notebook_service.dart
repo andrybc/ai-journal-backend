@@ -3,13 +3,13 @@ import 'package:http/http.dart' as http;
 import 'api_base.dart';
 
 /// Service responsible for journal/notebook-related API calls
-class JournalService {
+class NotebookService {
   /// Create a new notebook
   static Future<Map<String, dynamic>> createNotebook(
     Map<String, dynamic> notebookData,
     String token,
   ) async {
-    final url = Uri.parse('${ApiBase.baseUrl}/journal/create-notebook');
+    final url = Uri.parse('${ApiBase.baseUrl}/notebook/create-notebook');
     final response = await http.post(
       url,
       headers: ApiBase.getHeaders(token),
@@ -29,7 +29,7 @@ class JournalService {
     String token,
   ) async {
     final url = Uri.parse(
-      '${ApiBase.baseUrl}/journal/update-notebook/$notebookId',
+      '${ApiBase.baseUrl}/notebook/update-notebook/$notebookId',
     );
     final response = await http.put(
       url,
@@ -49,7 +49,7 @@ class JournalService {
     String token,
   ) async {
     final url = Uri.parse(
-      '${ApiBase.baseUrl}/journal/delete-notebook/$notebookId',
+      '${ApiBase.baseUrl}/notebook/delete-notebook/$notebookId',
     );
     final response = await http.delete(url, headers: ApiBase.getHeaders(token));
 
@@ -65,7 +65,7 @@ class JournalService {
     String token,
   ) async {
     final url = Uri.parse(
-      '${ApiBase.baseUrl}/journal/read-notebook/$notebookId',
+      '${ApiBase.baseUrl}/notebook/read-notebook/$notebookId',
     );
     final response = await http.get(url, headers: ApiBase.getHeaders(token));
 
@@ -81,7 +81,7 @@ class JournalService {
     String token,
   ) async {
     final url = Uri.parse(
-      '${ApiBase.baseUrl}/journal/search?q=${Uri.encodeComponent(query)}',
+      '${ApiBase.baseUrl}/notebook/search?q=${Uri.encodeComponent(query)}',
     );
     final response = await http.get(url, headers: ApiBase.getHeaders(token));
 
@@ -93,7 +93,7 @@ class JournalService {
     String userId,
     String token,
   ) async {
-    final url = Uri.parse('${ApiBase.baseUrl}/journal/all/$userId');
+    final url = Uri.parse('${ApiBase.baseUrl}/notebook/all/$userId');
     final response = await http.get(url, headers: ApiBase.getHeaders(token));
 
     return ApiBase.handleResponse(
@@ -108,7 +108,7 @@ class JournalService {
     String notebookId,
     String token,
   ) async {
-    final url = Uri.parse('${ApiBase.baseUrl}/journal/$userId/$notebookId');
+    final url = Uri.parse('${ApiBase.baseUrl}/notebook/$userId/$notebookId');
     final response = await http.get(url, headers: ApiBase.getHeaders(token));
 
     return ApiBase.handleResponse(response, errorMessage: 'Notebook not found');
