@@ -26,7 +26,10 @@ class ApiService {
           throw Exception("Missing 'profiles' key in API response.");
         }
 
-        final data = responseData["profiles"];
+        final data =
+            (responseData["profiles"] as List)
+                .map((profile) => Map<String, dynamic>.from(profile))
+                .toList();
         return {"success": true, "profiles": data};
       } else {
         final errorMessage = jsonDecode(
@@ -62,7 +65,7 @@ class ApiService {
         }
 
         print(responseData["message"]);
-        final data = responseData["profile"];
+        final data = Map<String, dynamic>.from(responseData["profile"]);
         return {"success": true, "profile": data};
       } else {
         final errorMessage = jsonDecode(
