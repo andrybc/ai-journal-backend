@@ -11,58 +11,29 @@ type Props = {
   page: string; // Identifies the current page ("Notes" or "Summary")
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   getSelectedItem: (id: number) => void; // A function to handle selecting an item from the list.
+  displayList: { id: string; name: string }[]; // Shared display list
+  setDisplayList: React.Dispatch<
+    React.SetStateAction<{ id: string; name: string }[]>
+  >;
 };
 
-const SideNav: React.FC<Props> = ({ page, closeNav, getSelectedItem }) => {
+const SideNav: React.FC<Props> = ({
+  page,
+  closeNav,
+  getSelectedItem,
+  displayList,
+  setDisplayList,
+}) => {
   const [search, setSearch] = useState<string>(""); // Search Input
-  const [displayList, setDisplayList] = useState<
+  /*const [displayList, setDisplayList] = useState<
     { name: string; id: string }[]
-  >([]); // List of Notes/Relationships to display in SideNav
+  >([]);*/ // List of Notes/Relationships to display in SideNav
   const [selectedId, setSelectedId] = useState<string | null>(null); // Store ID of Notes/Relationships
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
 
   const userID = localStorage.getItem("userId");
-
-  const getAllJournals = async () => {
-    if (userID === null) {
-      console.error("User ID is not available in local storage.");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
-        );
-      }
-      const data = await response.json();
-
-      setDisplayList(
-        data.notebooks.map((notebook: { _id: string; title: string }) => ({
-          id: notebook._id,
-          name: notebook.title,
-        }))
-      );
-
-      console.log(data.message);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while fetching the journals.");
-    }
-  };
 
   const viewJournal = async (id: string) => {
     if (userID === null) {
@@ -99,7 +70,7 @@ const SideNav: React.FC<Props> = ({ page, closeNav, getSelectedItem }) => {
       console.error("Error:", error);
       alert("An error occurred while fetching the journals.");
     }
-    getAllJournals();
+    //getAllJournals();
   };
 
   const searchJournal = async (query: string) => {
@@ -107,34 +78,56 @@ const SideNav: React.FC<Props> = ({ page, closeNav, getSelectedItem }) => {
       console.error("User ID is missing.");
       return;
     }
+
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
-        {
-          method: "GET",
-        }
-      );
+      let response;
+
+      if (query.trim() === "") {
+        // If the search query is empty, fetch all journals
+        response = await fetch(
+          `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else {
+        // Otherwise, perform a search
+        response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
+          {
+            method: "GET",
+          }
+        );
+      }
 
       if (!response.ok) {
-        const errorMessage = await response.json();
+        const errorText = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while searching for journal"
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
       const data = await response.json();
+      setDisplayList(
+        data.notebooks.map((notebook: { _id: string; title: string }) => ({
+          id: notebook._id,
+          name: notebook.title,
+        }))
+      );
       console.log(data.message);
-      setDisplayList(data.notebooks);
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
+      alert("An error occurred while fetching the journals.");
     }
   };
 
   useEffect(() => {
     searchJournal("");
-    //getAllJournals();
   }, []);
 
   useEffect(() => {
@@ -232,13 +225,13 @@ const SideNav: React.FC<Props> = ({ page, closeNav, getSelectedItem }) => {
               setSearch(event.target.value);
               searchJournal(event.target.value);
             }}
-            placeholder={"Search " + page}
+            placeholder={"Search Note"}
           />
 
           <div className="grow flex flex-col gap-1 overflow-auto mx-3.5">
-            {displayList.map((item) => (
+            {displayList.map((item, index) => (
               <button
-                key={item.id}
+                key={index}
                 className={`text-left px-4 py-2 rounded-xl truncate shrink-0 ${
                   selectedId === item.id ? "bg-gray-300" : "hover:bg-gray-200"
                 }`}

@@ -14,6 +14,9 @@ const Notes = () => {
     content?: string;
     [key: string]: string | number | boolean | undefined;
   } | null>(null);
+  const [displayList, setDisplayList] = useState<
+    { id: string; name: string }[]
+  >([]);
 
   const userID = localStorage.getItem("userId");
 
@@ -101,6 +104,7 @@ const Notes = () => {
         alert("An error occurred while saving the note.");
       }
     }
+    getAllJournals();
   }; //END OF HANDLESAVE--------------------------------------------------------------------
 
   //HANDLE UPDATE--------------------------------------------------------------------------
@@ -198,6 +202,7 @@ const Notes = () => {
         alert("An error occurred while saving the note.");
       }
     }
+    getAllJournals();
   }; //END OF HANDLE UPDATE--------------------------------------------------------------------------
 
   //HANDLE DELETE---------------------------------------------------------------------------
@@ -263,8 +268,48 @@ const Notes = () => {
     }
 
     createNewNote();
+    getAllJournals();
   };
   //END OF HANDLE DELETE--------------------------------------------------------------------------
+
+  const getAllJournals = async () => {
+    if (userID === null) {
+      console.error("User ID is not available in local storage.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
+        );
+      }
+      const data = await response.json();
+
+      setDisplayList(
+        data.notebooks.map((notebook: { _id: string; title: string }) => ({
+          id: notebook._id,
+          name: notebook.title,
+        }))
+      );
+
+      console.log(data.message);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while fetching the journals.");
+    }
+  };
 
   return (
     <div className="flex h-dvh overflow-hidden">
@@ -273,6 +318,8 @@ const Notes = () => {
           getSelectedItem={getSelectedNotes}
           page="Notes"
           closeNav={setSideNavOpen}
+          displayList={displayList}
+          setDisplayList={setDisplayList}
         />
       )}
 
