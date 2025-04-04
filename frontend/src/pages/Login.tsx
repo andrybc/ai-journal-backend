@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import Navbar from "../components/Navbar";
 import EyeOpenIcon from "../assets/icons/eye-open.svg";
@@ -28,13 +28,13 @@ const Login = () => {
             username,
             password,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
