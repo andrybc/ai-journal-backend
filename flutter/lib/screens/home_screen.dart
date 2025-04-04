@@ -1,28 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'note_screen.dart';
+import '../services/journal_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample entries (replace with real data later)
-    final List<Map<String, String>> journalEntries = [
-      {
-        "title": "A Day in Tokyo",
-        "preview": "Explored Shibuya and found the coziest ramen spot...",
-        "content":
-            "# A Day in Tokyo\n\nExplored Shibuya and found the coziest ramen spot. The chef was very friendly and recommended their special tonkotsu ramen which was amazing! :heart_eyes:\n\nAfter lunch, I visited the famous Shibuya crossing and took some photos. The energy of the city is incredible.",
-      },
-      {
-        "title": "Thoughts on Creativity",
-        "preview":
-            "Today I reflected on the role of solitude in creative work...",
-        "content":
-            "# Thoughts on Creativity\n\nToday I reflected on the role of solitude in creative work. Many great artists and writers throughout history have emphasized how important it is to have quiet, uninterrupted time for deep thinking and creation.\n\n## Key insights:\n* Distraction is the enemy of depth\n* Regular solitude creates space for new ideas\n* Balancing collaboration and solo work is crucial",
-      },
-    ];
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  List<Map<String, dynamic>> notebooks = [];
+  bool isLoading = true;
+  String? errorMessage;
+  String? userId;
+  String? authToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      final id = prefs.getString('user_id');
+
+      if (token != null && id != null) {
+        setState(() {
+          authToken = token;
+          userId = id;
+        });
+        _fetchNotebooks(id, token);
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Please log in again';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Error loading user data: $e';
+      });
+    }
+  }
+
+  Future<void> _fetchNotebooks(String userId, String token) async {
+    try {
+      final response = await JournalService.getAllNotebooks(userId, token);
+
+      if (response['success']) {
+        setState(() {
+          notebooks = List<Map<String, dynamic>>.from(response['data']);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = response['error'] ?? 'Failed to fetch notebooks';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Network error: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Journal Organizer"),
@@ -32,7 +83,16 @@ class HomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child:
-            journalEntries.isEmpty
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : errorMessage != null
+                ? Center(
+                  child: Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                )
+                : notebooks.isEmpty
                 ? const Center(
                   child: Text(
                     "No journal entries yet.\nStart writing!",
@@ -41,10 +101,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 )
                 : ListView.separated(
-                  itemCount: journalEntries.length,
+                  itemCount: notebooks.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
-                    final entry = journalEntries[index];
+                    final notebook = notebooks[index];
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -52,11 +112,11 @@ class HomeScreen extends StatelessWidget {
                       elevation: 4,
                       child: ListTile(
                         title: Text(
-                          entry['title']!,
+                          notebook['title'] ?? 'Untitled',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
-                          entry['preview']!,
+                          notebook['previewText'] ?? 'No preview available',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -66,11 +126,18 @@ class HomeScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder:
                                   (context) => NoteScreen(
-                                    title: entry['title']!,
-                                    content: entry['content']!,
+                                    title: notebook['title'] ?? 'Untitled',
+                                    content: notebook['content'] ?? '',
+                                    notebookId:
+                                        notebook['id'], // Pass the notebook ID
                                   ),
                             ),
-                          );
+                          ).then((_) {
+                            // Refresh notebooks when returning from the note screen
+                            if (userId != null && authToken != null) {
+                              _fetchNotebooks(userId!, authToken!);
+                            }
+                          });
                         },
                       ),
                     );
@@ -79,7 +146,22 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Navigate to create journal screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => const NoteScreen(
+                    title: 'New Entry',
+                    content: '',
+                    // No notebookId means we're creating a new notebook
+                  ),
+            ),
+          ).then((_) {
+            // Refresh notebooks when returning from creating a new entry
+            if (userId != null && authToken != null) {
+              _fetchNotebooks(userId!, authToken!);
+            }
+          });
         },
         backgroundColor: Colors.deepPurple,
         tooltip: "New Entry",
