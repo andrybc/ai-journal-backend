@@ -97,7 +97,7 @@ class _RelationshipPageState extends State<RelationshipPage> {
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: Colors.black),
+          child: Container(height: 0.5, color: Colors.white),
         ),
       ),
 
@@ -115,6 +115,10 @@ class _RelationshipPageState extends State<RelationshipPage> {
                     SvgPicture.asset(
                       "icons/ghost-icon.svg",
                       semanticsLabel: "Ghost Icon",
+                      colorFilter: ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                       width: 75,
                       height: 75,
                       placeholderBuilder:

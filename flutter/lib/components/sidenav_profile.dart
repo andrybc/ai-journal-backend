@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import "../services/profile_service.dart";
+import "../screens/home_screen.dart";
 
 class SideNavProfile extends StatefulWidget {
   final String? userId;
   final Function(String) onProfileSelected;
-  final String selectedProfileId;
+  final String? selectedProfileId;
   final String? token;
 
   const SideNavProfile({
@@ -82,7 +83,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.black, width: 0.5),
+                bottom: BorderSide(color: Colors.white, width: 0.5),
               ),
             ),
             child: Row(
@@ -103,6 +104,10 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     semanticsLabel: "Close Nav Icon",
                     width: 25,
                     height: 25,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     placeholderBuilder:
                         (context) => SizedBox(
                           width: 25,
@@ -122,13 +127,20 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
                   },
                   icon: SvgPicture.asset(
                     "icons/notes-page-icon.svg",
                     semanticsLabel: "Notes Page Icon",
                     width: 25,
                     height: 25,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     placeholderBuilder:
                         (context) => SizedBox(
                           width: 25,
@@ -155,6 +167,10 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     semanticsLabel: "People Relationship Icon",
                     width: 25,
                     height: 25,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     placeholderBuilder:
                         (context) => SizedBox(
                           width: 25,
@@ -178,7 +194,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                 searchProfilesFunct(value);
               },
               cursorHeight: 24,
-              cursorColor: Colors.black,
+              cursorColor: Colors.white,
               cursorWidth: 1,
               style: TextStyle(fontSize: 16, height: 1.5),
               decoration: InputDecoration(
@@ -191,11 +207,11 @@ class _SideNavProfileState extends State<SideNavProfile> {
                 hintStyle: TextStyle(fontSize: 16, height: 1.5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.black, width: 0.5),
+                  borderSide: BorderSide(color: Colors.white, width: 0.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.black, width: 0.5),
+                  borderSide: BorderSide(color: Colors.white, width: 0.5),
                 ),
               ),
             ),
@@ -239,7 +255,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                         "${profiles[index]["profileTitle"]}",
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 16,
                           height: 1.5,
                         ),
@@ -257,7 +273,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.black, width: 0.5)),
+              border: Border(top: BorderSide(color: Colors.white, width: 0.5)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -265,7 +281,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1),
+                    border: Border.all(color: Colors.white, width: 1),
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -273,6 +289,10 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     semanticsLabel: "User Contact Icon",
                     width: 30,
                     height: 30,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     placeholderBuilder:
                         (context) => SizedBox(
                           width: 32,
@@ -309,6 +329,10 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     semanticsLabel: "Logout Icon",
                     width: 25,
                     height: 25,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     placeholderBuilder:
                         (context) => SizedBox(
                           width: 25,
