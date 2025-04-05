@@ -113,7 +113,7 @@ class _RelationshipPageState extends State<RelationshipPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
-                      "icons/ghost-icon.svg",
+                      "assets/icons/ghost-icon.svg",
                       semanticsLabel: "Ghost Icon",
                       colorFilter: ColorFilter.mode(
                         Colors.white,

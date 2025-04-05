@@ -27,11 +27,60 @@ class _SideNavProfileState extends State<SideNavProfile> {
   late String? token;
   List<Map<String, dynamic>> profiles = [];
 
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (userId == null || token == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showSnackBar(context, "Authentication token or User ID not found.");
+      });
+    } else {
+      searchProfilesFunct("");
+    }
+  }
+
   void showSnackBar(BuildContext context, String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      // );
+
+      final overLay = Overlay.of(context);
+      final overLayComponent = OverlayEntry(
+        builder: (context) {
+          return Positioned(
+            bottom: 20,
+            right: 10,
+            left: 10,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(0, 0, 0, 0.9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        },
       );
+
+      overLay.insert(overLayComponent);
+
+      Future.delayed(Duration(seconds: 3), () {
+        overLayComponent.remove();
+      });
     }
   }
 
@@ -63,12 +112,6 @@ class _SideNavProfileState extends State<SideNavProfile> {
 
     userId = widget.userId;
     token = widget.token;
-    if (userId == null || token == null) {
-      showSnackBar(context, "Authentication token or User ID not found.");
-      return;
-    }
-
-    searchProfilesFunct("");
   }
 
   @override
@@ -100,7 +143,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     Navigator.pop(context);
                   },
                   icon: SvgPicture.asset(
-                    "icons/close-nav-icon.svg",
+                    "assets/icons/close-nav-icon.svg",
                     semanticsLabel: "Close Nav Icon",
                     width: 25,
                     height: 25,
@@ -133,7 +176,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     );
                   },
                   icon: SvgPicture.asset(
-                    "icons/notes-page-icon.svg",
+                    "assets/icons/notes-page-icon.svg",
                     semanticsLabel: "Notes Page Icon",
                     width: 25,
                     height: 25,
@@ -163,7 +206,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     Navigator.pop(context);
                   },
                   icon: SvgPicture.asset(
-                    "icons/people-relationship-icon.svg",
+                    "assets/icons/people-relationship-icon.svg",
                     semanticsLabel: "People Relationship Icon",
                     width: 25,
                     height: 25,
@@ -285,7 +328,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
-                    "icons/contact-icon.svg",
+                    "assets/icons/contact-icon.svg",
                     semanticsLabel: "User Contact Icon",
                     width: 30,
                     height: 30,
@@ -325,7 +368,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     Navigator.pop(context);
                   },
                   icon: SvgPicture.asset(
-                    "icons/logout-icon.svg",
+                    "assets/icons/logout-icon.svg",
                     semanticsLabel: "Logout Icon",
                     width: 25,
                     height: 25,
