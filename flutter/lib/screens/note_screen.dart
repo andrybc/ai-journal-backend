@@ -22,10 +22,9 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
-  bool _isSelectable = false;
-  bool _useMarkdownBody = false;
   bool _isEditMode = false;
   bool _isSaving = false;
+  bool _isLoading = false;
   String? _errorMessage;
   String? _successMessage;
   late final TextEditingController _editingController;
@@ -73,9 +72,58 @@ class _NoteScreenState extends State<NoteScreen> {
           _errorMessage = 'User ID not found';
         });
       }
+
+      // If this is an existing notebook, fetch its content
+      if (widget.notebookId != null && token != null) {
+        _fetchNotebookContent(widget.notebookId!, token);
+      }
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to load authentication: $e';
+      });
+    }
+  }
+
+  Future<void> _fetchNotebookContent(String notebookId, String token) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await JournalService.readNotebook(notebookId, token);
+
+      if (response['success']) {
+        final data = response['data'];
+
+        // Extract notebook content based on the actual structure
+        if (data is Map<String, dynamic> && data.containsKey('notebook')) {
+          final notebook = data['notebook'];
+          if (notebook is Map<String, dynamic>) {
+            // Update content and title from notebook data
+            setState(() {
+              _editingController.text = notebook['content']?.toString() ?? '';
+              _titleController.text =
+                  notebook['title']?.toString() ?? widget.title;
+            });
+          }
+        } else {
+          setState(() {
+            _errorMessage = 'Unexpected notebook data format';
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = response['error'] ?? 'Failed to fetch notebook';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -165,36 +213,17 @@ class _NoteScreenState extends State<NoteScreen> {
                 )
                 : Text(_titleController.text),
         actions: [
-          if (!_isEditMode) // Only show switches in view mode
-            Switch(
-              value: _isSelectable,
-              onChanged: (value) {
-                setState(() {
-                  _isSelectable = value;
-                });
-              },
-            ),
-          if (!_isEditMode) // Only show switches in view mode
-            Switch(
-              value: _useMarkdownBody,
-              onChanged: (value) {
-                setState(() {
-                  _useMarkdownBody = value;
-                });
-              },
-            ),
-          if (_isEditMode) // Save button when in edit mode
-            IconButton(
-              onPressed: _isSaving ? null : _saveNotebook,
-              icon:
-                  _isSaving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.save),
-            ),
+          IconButton(
+            onPressed: _isSaving ? null : _saveNotebook,
+            icon:
+                _isSaving
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Icon(Icons.save),
+          ),
         ],
       ),
       body: Padding(
@@ -218,24 +247,11 @@ class _NoteScreenState extends State<NoteScreen> {
                   style: const TextStyle(color: Colors.green),
                 ),
               ),
-            if (!_isEditMode) // Only show this row in view mode
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Selectable: ${_isSelectable ? 'Yes' : 'No'}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(
-                    'Using: ${_useMarkdownBody ? 'MarkdownBody' : 'Markdown'}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              ),
-            if (!_isEditMode) const SizedBox(height: 16),
             Expanded(
               child:
-                  _isEditMode
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _isEditMode
                       ? TextField(
                         controller: _editingController,
                         maxLines: null,
@@ -247,7 +263,7 @@ class _NoteScreenState extends State<NoteScreen> {
                       )
                       : Markdown(
                         data: _editingController.text,
-                        selectable: _isSelectable,
+                        selectable: true,
                         extensionSet: _markdownExtensionSet,
                         onTapText: () {
                           try {
