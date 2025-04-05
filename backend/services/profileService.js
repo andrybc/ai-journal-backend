@@ -1,32 +1,52 @@
 const Profile = require("../models/summary");
 const Notebook = require("../models/notebook");
-const openaiService = require("./openaiService.cjs");
+const openaiService = require("./openaiService");
 
 function formatProfileContent(data) {
-  return `Name: ${data.name}
-Nickname: ${data.nickname || "N/A"}
-Birthday: ${data.birthday || "N/A"}
-Age: ${data.age || "N/A"}
-Occupation: ${data.occupation || "N/A"}
-Location: ${data.location || "N/A"}
-Education: ${data.education || "N/A"}
-Interests: ${data.interests?.join(", ") || "N/A"}
-Hobbies: ${data.hobbies?.join(", ") || "N/A"}
-Skills: ${data.skills?.join(", ") || "N/A"}
-Experience: ${data.experience || "N/A"}
-Personality Traits: ${data.personalityTraits?.join(", ") || "N/A"}
-Goals: ${data.goals || "N/A"}
-Challenges: ${data.challenges || "N/A"}
-Background: ${data.background || "N/A"}
-Affiliations: ${data.affiliations?.join(", ") || "N/A"}
-Favorite Books: ${data.favoriteBooks?.join(", ") || "N/A"}
-Favorite Movies: ${data.favoriteMovies?.join(", ") || "N/A"}
-Favorite Music: ${data.favoriteMusic?.join(", ") || "N/A"}
-Achievements: ${data.achievements?.join(", ") || "N/A"}
-Family: ${data.family || "N/A"}
-Relationship Status: ${data.relationshipStatus || "N/A"}
-Memorable Quotes: ${data.memorableQuotes?.join("\n- ") || "N/A"}
-Additional Notes: ${data.additionalNotes || "N/A"}`;
+  const formatField = (value) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      value === "null"
+    ) {
+      return "N/A";
+    }
+    return String(value);
+  };
+
+  const formatArray = (arr) =>
+    Array.isArray(arr) && arr.length > 0 ? arr.join(", ") : "N/A";
+
+  const formatQuotes = (arr) =>
+    Array.isArray(arr) && arr.filter((v) => v && v !== "null").length > 0
+      ? "- " + arr.filter((v) => v && v !== "null").join("\n- ")
+      : "N/A";
+
+  return `Name: ${formatField(data.name)}
+Nickname: ${formatField(data.nickname)}
+Birthday: ${formatField(data.birthday)}
+Age: ${formatField(data.age)}
+Occupation: ${formatField(data.occupation)}
+Location: ${formatField(data.location)}
+Education: ${formatField(data.education)}
+Interests: ${formatArray(data.interests)}
+Hobbies: ${formatArray(data.hobbies)}
+Skills: ${formatArray(data.skills)}
+Experience: ${formatField(data.experience)}
+Personality Traits: ${formatArray(data.personalityTraits)}
+Goals: ${formatField(data.goals)}
+Challenges: ${formatField(data.challenges)}
+Background: ${formatField(data.background)}
+Affiliations: ${formatArray(data.affiliations)}
+Favorite Books: ${formatArray(data.favoriteBooks)}
+Favorite Movies: ${formatArray(data.favoriteMovies)}
+Favorite Music: ${formatArray(data.favoriteMusic)}
+Achievements: ${formatArray(data.achievements)}
+Family: ${formatField(data.family)}
+Relationship Status: ${formatField(data.relationshipStatus)}
+Memorable Quotes: ${formatQuotes(data.memorableQuotes)}
+Additional Notes: ${formatField(data.additionalNotes)}`;
 }
 
 exports.updateProfilesForNotebook = async (notebook, operation) => {
