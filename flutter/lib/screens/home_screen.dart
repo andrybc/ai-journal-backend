@@ -54,10 +54,24 @@ class _HomeScreenState extends State<HomeScreen> {
       final response = await JournalService.getAllNotebooks(userId, token);
 
       if (response['success']) {
-        setState(() {
-          notebooks = List<Map<String, dynamic>>.from(response['data']);
-          isLoading = false;
-        });
+        final data = response['data'];
+
+        // Access the notebooks array from the response
+        if (data is Map<String, dynamic> && data.containsKey('notebooks')) {
+          final notebooksList = List<Map<String, dynamic>>.from(
+            data['notebooks'],
+          );
+
+          setState(() {
+            notebooks = notebooksList;
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            errorMessage = 'Unexpected API response format';
+            isLoading = false;
+          });
+        }
       } else {
         setState(() {
           errorMessage = response['error'] ?? 'Failed to fetch notebooks';
@@ -105,6 +119,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final notebook = notebooks[index];
+                    final createdTime =
+                        notebook['timeCreated'] != null
+                            ? DateTime.parse(notebook['timeCreated'].toString())
+                            : null;
+                    final formattedDate =
+                        createdTime != null
+                            ? "${createdTime.year}-${createdTime.month.toString().padLeft(2, '0')}-${createdTime.day.toString().padLeft(2, '0')}"
+                            : "No date";
+
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -116,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
-                          notebook['previewText'] ?? 'No preview available',
+                          formattedDate,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -129,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     title: notebook['title'] ?? 'Untitled',
                                     content: notebook['content'] ?? '',
                                     notebookId:
-                                        notebook['id'], // Pass the notebook ID
+                                        notebook['_id'], // Use _id instead of id
                                   ),
                             ),
                           ).then((_) {
