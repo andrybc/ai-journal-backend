@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'note_screen.dart';
 import '../services/journal_service.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import "profile_screen.dart";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -93,6 +95,32 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("Journal Organizer"),
         backgroundColor: Colors.deepPurple,
         centerTitle: true,
+        leading: IconButton(
+          style: IconButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RelationshipPage()),
+            );
+          },
+          icon: SvgPicture.asset(
+            "assets/icons/people-relationship-icon.svg",
+            semanticsLabel: "People Relationship Icon",
+            width: 25,
+            height: 25,
+            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            placeholderBuilder:
+                (context) => SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: CircularProgressIndicator(),
+                ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
