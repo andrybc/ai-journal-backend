@@ -189,6 +189,85 @@ class _NoteScreenState extends State<NoteScreen> {
     }
   }
 
+  Future<void> _deleteNotebook() async {
+    if (_authToken == null) {
+      setState(() {
+        _errorMessage = 'Not authenticated';
+      });
+      return;
+    }
+
+    if (widget.notebookId == null) {
+      setState(() {
+        _errorMessage = 'Cannot delete an unsaved notebook';
+      });
+      return;
+    }
+
+    // Show confirmation dialog
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this notebook? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete != true) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true; // Reuse the loading state
+      _errorMessage = null;
+      _successMessage = null;
+    });
+
+    try {
+      final response = await JournalService.deleteNotebook(
+        widget.notebookId!,
+        _authToken!,
+      );
+
+      if (response['success']) {
+        // Show temporary success message and navigate back
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notebook deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Navigate back to previous screen
+        if (mounted) {
+          Navigator.of(context).pop(true); // Pop with result to refresh previous screen
+        }
+      } else {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = response['error'] ?? 'Failed to delete notebook';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isSaving = false;
+        _errorMessage = 'Network error: $e';
+      });
+    }
+  }
+
   @override
   void dispose() {
     _editingController.dispose();
@@ -213,6 +292,20 @@ class _NoteScreenState extends State<NoteScreen> {
                 )
                 : Text(_titleController.text),
         actions: [
+          // Delete button
+          if (widget.notebookId != null) // Only show delete for existing notebooks
+            IconButton(
+              onPressed: _isSaving ? null : _deleteNotebook,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.delete, color: Colors.red),
+              tooltip: 'Delete notebook',
+            ),
+          // Save button
           IconButton(
             onPressed: _isSaving ? null : _saveNotebook,
             icon:
@@ -223,6 +316,7 @@ class _NoteScreenState extends State<NoteScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                     : const Icon(Icons.save),
+            tooltip: 'Save notebook',
           ),
         ],
       ),
