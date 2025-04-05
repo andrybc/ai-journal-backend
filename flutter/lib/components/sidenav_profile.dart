@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import "../services/api_service.dart";
+import "../services/profile_service.dart";
 
 class SideNavProfile extends StatefulWidget {
-  final String userId;
-  final Function(int) onProfileSelected;
-  final int selectedProfileId;
+  final String? userId;
+  final Function(String) onProfileSelected;
+  final String selectedProfileId;
+  final String? token;
 
   const SideNavProfile({
     required this.userId,
     required this.onProfileSelected,
     required this.selectedProfileId,
-    Key? key,
-  }) : super(key: key);
+    required this.token,
+    super.key,
+  });
 
   @override
   State<SideNavProfile> createState() => _SideNavProfileState();
@@ -20,28 +22,51 @@ class SideNavProfile extends StatefulWidget {
 
 class _SideNavProfileState extends State<SideNavProfile> {
   final TextEditingController _searchController = TextEditingController();
-  late String userId;
-
+  late String? userId;
+  late String? token;
   List<Map<String, dynamic>> profiles = [];
 
+  void showSnackBar(BuildContext context, String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      );
+    }
+  }
+
   void searchProfilesFunct(String query) async {
-    final response = await ApiService().searchProfiles(query, userId);
+    if (token == null || userId == null) {
+      showSnackBar(context, "Authentication token or User ID not found.");
+      return;
+    }
+
+    final response = await ProfileService.searchProfiles(
+      query,
+      token!,
+      userId!,
+    );
 
     if (response["success"]) {
+      final profileList = response["data"]["profiles"];
       setState(() {
-        profiles = response["profiles"];
+        profiles = List<Map<String, dynamic>>.from(profileList ?? []);
       });
-    } else {
-      print(response["errorMessage"]);
+    } else if (mounted) {
+      showSnackBar(context, response["error"] ?? "Failed to search profiles");
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     userId = widget.userId;
+    token = widget.token;
+    if (userId == null || token == null) {
+      showSnackBar(context, "Authentication token or User ID not found.");
+      return;
+    }
+
     searchProfilesFunct("");
   }
 

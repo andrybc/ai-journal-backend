@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import "../services/api_service.dart";
 import "../components/sidenav_profile.dart";
+import 'package:shared_preferences/shared_preferences.dart';
+import "../services/profile_service.dart";
 
 class RelationshipPage extends StatefulWidget {
   const RelationshipPage({super.key});
@@ -11,24 +12,68 @@ class RelationshipPage extends StatefulWidget {
 }
 
 class _RelationshipPageState extends State<RelationshipPage> {
-  Map<String, dynamic> selectedRelationship = {
-    "profileTitle": "John Doe",
-    "_id": 1,
-    "profileContent":
-        "John Doe is a name that has long been associated with anonymity, mystery, and adaptability. Used widely in legal, medical, and fictional contexts, John Doe can represent an unidentified individual, a person seeking to keep their identity secret, or even a symbol of the everyday, average person. Over time, the name has evolved beyond its practical applications and taken on a cultural significance, appearing in literature, film, and media as an archetype of the unknown or forgotten man. In legal and medical settings, John Doe (or Jane Doe for females) is a placeholder used when an individual's real name is unknown or cannot be disclosed. This practice dates back centuries and is still commonly employed today in court cases, autopsies, and police investigations. Whether it is an unidentified body, a witness who wishes to remain anonymous, or a defendant whose identity is unknown, the name John Doe serves as a neutral stand-in, allowing proceedings to move forward without revealing sensitive or unavailable information. Beyond legal and administrative use, John Doe has taken on a broader cultural and symbolic role. In fiction, he is often depicted as an everyman character—someone without distinguishing traits or a unique identity, representing the common person in society. At the same time, John Doe can also be used to portray someone shrouded in mystery, an individual with a hidden past, a secret identity, or even a person who has been erased from public records. In crime dramas, thrillers, and conspiracy narratives, the name is frequently attached to characters who either do not remember their past or are deliberately concealed from the world. In the realm of psychological and philosophical discussions, John Doe serves as a symbol of the faceless masses, the countless individuals who go unnoticed in the grand scheme of history. His identity—or lack thereof—raises questions about individuality, anonymity, and the significance of a name. It also touches on themes of existentialism, as a person labeled John Doe may struggle with their own sense of self, especially if the name is imposed upon them due to circumstances beyond their control. Despite his anonymity, John Doe is paradoxically well-known. The name is instantly recognizable and understood across different cultures and contexts. Whether he is the victim of a crime, a witness seeking protection, or a protagonist in a gripping mystery, John Doe remains one of the most famous unknown figures in history. His identity may be uncertain, but his presence is undeniably significant.",
-  };
+  Map<String, dynamic> selectedRelationship = {};
+  String? _authToken;
+  String? _userId;
 
-  final String userId = "67f0162886e4016aee74ed9f";
+  void showSnackBar(BuildContext context, String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      );
+    }
+  }
 
-  void getProfilesFunct(int profileId) async {
-    final response = await ApiService().getProfile(profileId, userId);
+  Future<void> _loadAuthToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      final userId = prefs.getString('user_id');
+
+      setState(() {
+        _authToken = token;
+        _userId = userId;
+      });
+
+      if (token == null && mounted) {
+        showSnackBar(context, "Authentication token not found");
+      }
+
+      if (userId == null && mounted) {
+        showSnackBar(context, "User ID not found");
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Failed to load authentication: $e');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAuthToken();
+  }
+
+  void getProfilesFunct(String profileId) async {
+    if (_authToken == null || _userId == null) {
+      showSnackBar(context, "Authentication token or User ID not found.");
+      return;
+    }
+
+    final response = await ProfileService.getProfileById(
+      _userId!,
+      profileId,
+      _authToken!,
+    );
 
     if (response["success"]) {
+      final relationshipObject = response["data"]["profile"];
       setState(() {
-        selectedRelationship = response["profile"];
+        selectedRelationship = Map<String, dynamic>.from(relationshipObject);
       });
-    } else {
-      print(response["errorMessage"]);
+    } else if (mounted) {
+      showSnackBar(context, response["error"] ?? "Failed to load profile");
     }
   }
 
@@ -129,9 +174,10 @@ class _RelationshipPageState extends State<RelationshipPage> {
 
       // SideNav bar
       drawer: SideNavProfile(
-        userId: userId,
+        userId: _userId,
         onProfileSelected: (profileId) => getProfilesFunct(profileId),
         selectedProfileId: selectedRelationship["_id"],
+        token: _authToken,
       ),
     );
   }
