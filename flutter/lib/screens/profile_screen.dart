@@ -18,9 +18,45 @@ class _RelationshipPageState extends State<RelationshipPage> {
 
   void showSnackBar(BuildContext context, String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+      // );
+
+      final overLay = Overlay.of(context);
+      final overLayComponent = OverlayEntry(
+        builder: (context) {
+          return Positioned(
+            bottom: 20,
+            right: 10,
+            left: 10,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(0, 0, 0, 0.9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        },
       );
+
+      overLay.insert(overLayComponent);
+
+      Future.delayed(Duration(seconds: 3), () {
+        overLayComponent.remove();
+      });
     }
   }
 
@@ -35,12 +71,8 @@ class _RelationshipPageState extends State<RelationshipPage> {
         _userId = userId;
       });
 
-      if (token == null && mounted) {
-        showSnackBar(context, "Authentication token not found");
-      }
-
-      if (userId == null && mounted) {
-        showSnackBar(context, "User ID not found");
+      if ((token == null || userId == null) && mounted) {
+        showSnackBar(context, "Authentication token or UserId not found");
       }
     } catch (e) {
       if (mounted) {
@@ -182,6 +214,7 @@ class _RelationshipPageState extends State<RelationshipPage> {
         onProfileSelected: (profileId) => getProfilesFunct(profileId),
         selectedProfileId: selectedRelationship["_id"],
         token: _authToken,
+        showSnackBar: showSnackBar,
       ),
     );
   }

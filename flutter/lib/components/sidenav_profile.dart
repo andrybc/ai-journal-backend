@@ -8,12 +8,14 @@ class SideNavProfile extends StatefulWidget {
   final Function(String) onProfileSelected;
   final String? selectedProfileId;
   final String? token;
+  final Function(BuildContext context, String message) showSnackBar;
 
   const SideNavProfile({
     required this.userId,
     required this.onProfileSelected,
     required this.selectedProfileId,
     required this.token,
+    required this.showSnackBar,
     super.key,
   });
 
@@ -33,60 +35,22 @@ class _SideNavProfileState extends State<SideNavProfile> {
 
     if (userId == null || token == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showSnackBar(context, "Authentication token or User ID not found.");
+        widget.showSnackBar(
+          context,
+          "Authentication token or User ID not found.",
+        );
       });
     } else {
       searchProfilesFunct("");
     }
   }
 
-  void showSnackBar(BuildContext context, String message) {
-    if (mounted) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text(message), duration: Duration(seconds: 3)),
-      // );
-
-      final overLay = Overlay.of(context);
-      final overLayComponent = OverlayEntry(
-        builder: (context) {
-          return Positioned(
-            bottom: 20,
-            right: 10,
-            left: 10,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.9),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          );
-        },
-      );
-
-      overLay.insert(overLayComponent);
-
-      Future.delayed(Duration(seconds: 3), () {
-        overLayComponent.remove();
-      });
-    }
-  }
-
   void searchProfilesFunct(String query) async {
     if (token == null || userId == null) {
-      showSnackBar(context, "Authentication token or User ID not found.");
+      widget.showSnackBar(
+        context,
+        "Authentication token or User ID not found.",
+      );
       return;
     }
 
@@ -102,7 +66,10 @@ class _SideNavProfileState extends State<SideNavProfile> {
         profiles = List<Map<String, dynamic>>.from(profileList ?? []);
       });
     } else if (mounted) {
-      showSnackBar(context, response["error"] ?? "Failed to search profiles");
+      widget.showSnackBar(
+        context,
+        response["error"] ?? "Failed to search profiles",
+      );
     }
   }
 
