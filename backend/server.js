@@ -15,7 +15,7 @@ app.use(cors());
 // Connect to MongoDB using your connection string from .env
 const mongoURI = process.env.MONGO_URI;
 mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoURI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -31,7 +31,7 @@ app.get("/api/test", (req, res) => {
 });
 
 const PORT = process.env.PORT;
-app.listen(PORT, "localhost", () =>
+app.listen(PORT, "0.0.0.0", () =>
   console.log(`Server running on port ${PORT}`),
 );
 

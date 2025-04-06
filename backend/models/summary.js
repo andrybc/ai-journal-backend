@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
-// Define the summary (profile) schema
 const profileSchema = new mongoose.Schema({
-  title: {
+  profileTitle: {
     type: String,
     required: true,
     trim: true,
   },
-  content: {
+  profileContent: {
     type: String,
     required: true,
     trim: true,
