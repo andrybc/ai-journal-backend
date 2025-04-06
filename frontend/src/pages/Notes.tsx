@@ -42,13 +42,13 @@ const Notes = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -114,13 +114,13 @@ const Notes = () => {
             content: selectedNote.content,
             userId: userID,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -154,13 +154,13 @@ const Notes = () => {
             title: selectedNote.title,
             content: selectedNote.content,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -191,13 +191,13 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNote?._id,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -265,7 +265,7 @@ const Notes = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 //use onChange along with React.ChangeEvent to modify the title
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, title: e.target.value } : prev
+                  prev ? { ...prev, title: e.target.value } : prev,
                 );
               }}
             />
@@ -280,7 +280,7 @@ const Notes = () => {
               }}
               onChange={(value) => {
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, content: value || "" } : prev
+                  prev ? { ...prev, content: value || "" } : prev,
                 );
               }}
             />
@@ -302,7 +302,7 @@ const Notes = () => {
                             ...prev,
                             ...notebook,
                           }
-                        : prev
+                        : prev,
                     );
                     setPreviewMode("preview");
                     await refreshNavBar();
