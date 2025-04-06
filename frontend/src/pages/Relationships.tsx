@@ -29,7 +29,7 @@ const Relationships = () => {
     } else {
       setErrorMessage("UserID, Username, or AuthToken not found.");
       console.error(
-        "UserID, Username, or AuthToken not found in local storage."
+        "UserID, Username, or AuthToken not found in local storage.",
       );
       navigate("/login");
     }

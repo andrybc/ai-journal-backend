@@ -67,7 +67,7 @@ const SideNav: React.FC<Props> = ({
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -79,7 +79,7 @@ const SideNav: React.FC<Props> = ({
 
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while searching for profiles"
+          errorMessage.error || "Unexpected error while searching for profiles",
         );
       }
 
@@ -90,7 +90,7 @@ const SideNav: React.FC<Props> = ({
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "An error occured while searching profiles"
+          : "An error occured while searching profiles",
       );
       console.error(error);
     }
@@ -110,7 +110,7 @@ const SideNav: React.FC<Props> = ({
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -122,7 +122,7 @@ const SideNav: React.FC<Props> = ({
 
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while retrieving profile"
+          errorMessage.error || "Unexpected error while retrieving profile",
         );
       }
 
@@ -139,7 +139,7 @@ const SideNav: React.FC<Props> = ({
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "An error occured while retrieving profiles"
+          : "An error occured while retrieving profiles",
       );
       console.error(error);
     }
