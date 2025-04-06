@@ -44,7 +44,7 @@ const Login = () => {
       localStorage.setItem("username", username);
 
       localStorage.setItem("token", data.token);
-      navigate("/");
+      navigate("/notes");
     } catch (error) {
       console.error("Login error:", (error as Error).message);
       const errorMsg = (error as Error).message;
