@@ -42,30 +42,15 @@ const SideNav = ({
     }
 
     try {
-      let response;
-
-      if (query.trim() === "") {
-        // If the search query is empty, fetch all journals
-        response = await fetch(
-          `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } else {
-        // Otherwise, perform a search
-        response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
-          {
-            method: "GET",
-          }
-        );
-      }
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.json();

@@ -1,7 +1,6 @@
 import SideNav from "../components/SideNavNote"; //import the SideNav component
 import { useEffect, useState } from "react"; //import some hooks
-import SimpleMDE from "react-simplemde-editor"; //import SimpleMDE text editor
-import "easymde/dist/easymde.min.css"; //import SimpleMDE styles
+import MDEditor, { PreviewType } from "@uiw/react-md-editor";
 
 //icons
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
@@ -10,15 +9,17 @@ import DeleteNoteIcon from "../assets/icons/delete-note-icon.svg";
 
 const Notes = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true); //state to control SideNav visibility
+  const [previewMode, setPreviewMode] = useState<PreviewType>("preview");
   const [selectedNote, setSelectedNote] = useState<{
     //state to manipulate such selected note
     title: string;
     content: string;
-    existingNoteFlag: number; //0 if it's a new note, 1 if it's an existing note
-    updateFlag: number; //0 if it's a new note, 1 if it's an existing note
     notebookId: string; //optional notebook ID
-    updateDelete: number; //0 if it's a new note, 1 if it's an existing note
-  } | null>(null);
+  }>({
+    title: "",
+    content: "",
+    notebookId: "",
+  });
 
   //function to either retrieve the selected note or create a new one (SideNav)
   const getSelectedNote = async (id: string) => {
@@ -60,21 +61,21 @@ const Notes = () => {
   useEffect(() => {
     //display a new note when the page loads
     createNewNote();
+    if (selectedNote.content === "") {
+      setPreviewMode("edit");
+    }
   }, []);
 
   const createNewNote = () => {
     setSelectedNote({
       title: "Untitled Note",
-      existingNoteFlag: 0,
       content: "",
-      updateFlag: 0,
-      updateDelete: 0,
       notebookId: "",
     });
   };
 
   //HANDLE SAVE----------------------------------------------------------------
-  const handleSave = async () => {
+  const createNotebook = async () => {
     const userID = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
     // if (!token) {
@@ -86,204 +87,113 @@ const Notes = () => {
       return;
     }
 
-    if (selectedNote?.existingNoteFlag === 0) {
-      //establish in order to use "selectedNotes"
-      try {
-        //start the API call
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/journal/create-notebook`, //call "create-notebook" API
-          {
-            method: "POST", //use POST method
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, //use the token from localStorage
-            },
-            body: JSON.stringify({
-              title: selectedNote.title,
-              content: selectedNote.content,
-              userId: userID,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
-          );
+    //establish in order to use "selectedNotes"
+    try {
+      //start the API call
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/create-notebook`, //call "create-notebook" API
+        {
+          method: "POST", //use POST method
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, //use the token from localStorage
+          },
+          body: JSON.stringify({
+            title: selectedNote.title,
+            content: selectedNote.content,
+            userId: userID,
+          }),
         }
-        const data = await response.json();
-        console.log(data.message);
-        console.log(data.notebook);
+      );
 
-        setSelectedNote((prev) =>
-          prev
-            ? {
-                ...prev,
-                existingNoteFlag: 1,
-                notebookId: data.notebook._id, //store the notebook ID
-                updateFlag: 0, //create a new indicator to help with the update manipulation
-                updateDelete: 0, //create a new indicator to help with the delete manipulation
-              }
-            : null
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
       }
+      const data = await response.json();
+      console.log(data.message);
+      console.log(data.notebook);
+
+      return data.notebook;
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while saving the note.");
     }
   }; //END OF HANDLESAVE--------------------------------------------------------------------
 
   //HANDLE UPDATE--------------------------------------------------------------------------
-  const handleUpdate = async () => {
+  const updateNotebook = async () => {
     const token = localStorage.getItem("token");
-    //before calling the API, set the content with the latest additions from the text editor
-    if (selectedNote?.updateFlag === 0) {
-      //this means that I am updating an note I JUST created
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/journal/update-notebook/${
-            //caall "update-notebook" API
-            selectedNote?.notebookId
-          }`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(selectedNote),
-          }
-        );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
-          );
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/update-notebook/${
+          //caall "update-notebook" API
+          selectedNote.notebookId
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: selectedNote.title,
+            content: selectedNote.content,
+          }),
         }
-        const data = await response.json();
-        console.log(data.message);
-        console.log(data.notebook);
+      );
 
-        setSelectedNote((prev) =>
-          prev
-            ? {
-                ...prev,
-                updateFlag: 1, //update the updateFlag to 1
-              }
-            : null
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
       }
-    } else {
-      //when flag is 1, it means that I am updating an existing note (helpful when selecting one from the SideNav)
-      try {
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/journal/update-notebook/${localStorage.getItem("notebookId")}`, //use localStorage to get the notebookId
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(selectedNote),
-          }
-        );
+      const data = await response.json();
+      console.log(data.message);
+      console.log(data.notebook);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
-          );
-        }
-        const data = await response.json();
-        console.log(data.message);
-        console.log(data.notebook);
-
-        setSelectedNote((prev) =>
-          prev
-            ? {
-                ...prev,
-                updateDelete: 1, //update the updateDelete flag to 1
-              }
-            : null
-        );
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
-      }
+      return data.notebook;
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while saving the note. Error: " + error);
     }
   }; //END OF HANDLE UPDATE--------------------------------------------------------------------------
 
   //HANDLE DELETE---------------------------------------------------------------------------
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    if (selectedNote?.updateDelete === 0) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
-            selectedNote?.notebookId
-          }`, // Use the notebookId from selectedNotes to delete the specific note
-          {
-            method: "DELETE", // Use DELETE method
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              notebookId: selectedNote?.notebookId,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
-          );
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
+          selectedNote.notebookId
+        }`, // Use the notebookId from selectedNotes to delete the specific note
+        {
+          method: "DELETE", // Use DELETE method
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            notebookId: selectedNote?.notebookId,
+          }),
         }
-        const data = await response.json();
-        console.log(data.message);
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
-      }
-    } else {
-      //when the updateDelete flag is 1, it means that I am deleting an existing note (helpful when selecting one from the SideNav)
-      try {
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/journal/delete-notebook/${localStorage.getItem("notebookId")}`, //use localStorage to get the notebookId
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              notebookId: localStorage.getItem("notebookId"), //same notebookId from localStorage
-            }),
-          }
-        );
+      );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Server error ${response.status}: ${errorText || "No details"}`
-          );
-        }
-        const data = await response.json();
-        console.log(data.message);
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while saving the note.");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Server error ${response.status}: ${errorText || "No details"}`
+        );
       }
+      const data = await response.json();
+      console.log(data.message);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while saving the note.");
     }
   };
   //END OF HANDLE DELETE--------------------------------------------------------------------------
@@ -304,7 +214,7 @@ const Notes = () => {
       )}
 
       <div //main content area
-        className={`flex flex-col h-full grow sm:overflow-y-auto ${
+        className={`flex flex-col w-full h-full sm:overflow-y-auto ${
           sideNavOpen && "overflow-y-hidden"
         }`}
       >
@@ -330,12 +240,10 @@ const Notes = () => {
 
         {selectedNote ? ( //condition so "selectedNotes" can be manipulated
           <div
-            className={`px-10 ${
+            className={`px-8 ${
               //padding for the main content area
-              sideNavOpen ? "sm:px-10" : "sm:px-14"
-            } md:px-14 py-8 ${
-              sideNavOpen ? "sm:py-8" : "sm:py-12"
-            } md:py-12 flex flex-col gap-5 max-w-4xl mx-auto`}
+              sideNavOpen ? "sm:px-10 sm:py-8" : "sm:px-14 sm:py-12"
+            } md:px-14 py-8 md:py-12 flex flex-col gap-5 max-w-4xl mx-auto h-full w-full`}
           >
             <input //input field for the note title
               type="text"
@@ -345,38 +253,23 @@ const Notes = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 //use onChange along with React.ChangeEvent to modify the title
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, title: e.target.value } : null
+                  prev ? { ...prev, title: e.target.value } : prev
                 );
               }}
             />
 
-            <SimpleMDE //text editor
-              value={selectedNote.content} //use the content from selectedNotes
-              onChange={(value: string) => {
-                setSelectedNote((prev) =>
-                  prev ? { ...prev, content: value } : prev
-                );
+            <MDEditor //text editor
+              value={selectedNote.content || " "} //use the content from selectedNotes
+              height="80%"
+              minHeight={300}
+              preview={previewMode}
+              onClick={() => {
+                setPreviewMode("edit");
               }}
-              options={{
-                spellChecker: false,
-                placeholder: "Write your notes here...", //placeholder text
-                toolbar: [
-                  //get rid of unnecessary tools
-                  "bold",
-                  "|",
-                  "italic",
-                  "|",
-                  "heading",
-                  "|",
-                  "quote",
-                  "|",
-                  "unordered-list",
-                  "|",
-                  "ordered-list",
-                  "|",
-                  "preview",
-                  "|",
-                ],
+              onChange={(value) => {
+                setSelectedNote((prev) =>
+                  prev ? { ...prev, content: value || "" } : prev
+                );
               }}
             />
             <div className="relative">
@@ -385,11 +278,22 @@ const Notes = () => {
                   className={`p-1 rounded-lg cursor-pointer hover:bg-gray-200 ${
                     !selectedNote.content ? "opacity-50 cursor-not-allowed" : ""
                   }`}
-                  onClick={
-                    selectedNote?.existingNoteFlag === 0 //depending on flag, we save it or update it
-                      ? handleSave
-                      : handleUpdate
-                  }
+                  onClick={async () => {
+                    const notebook =
+                      selectedNote.notebookId === ""
+                        ? await createNotebook()
+                        : await updateNotebook();
+
+                    setSelectedNote((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            ...notebook,
+                          }
+                        : prev
+                    );
+                    setPreviewMode("preview");
+                  }}
                   disabled={
                     //disable the button if the title is empty
                     selectedNote?.title === "" || selectedNote?.content === ""
