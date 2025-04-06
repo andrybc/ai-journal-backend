@@ -28,13 +28,13 @@ const Login = () => {
             username,
             password,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
@@ -43,7 +43,7 @@ const Login = () => {
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("username", username);
 
-      //localStorage.setItem('token', data.token);
+      localStorage.setItem("token", data.token);
       navigate("/");
     } catch (error) {
       console.error("Login error:", (error as Error).message);
