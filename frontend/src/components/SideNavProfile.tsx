@@ -13,7 +13,7 @@ type Props = {
   authToken: string;
   setSelectedRelationship: React.Dispatch<
     React.SetStateAction<{
-      [key: string]: string | number | boolean | string[];
+      [key: string]: unknown;
       profileTitle: string;
       _id: string;
       profileContent: string[];

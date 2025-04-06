@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import ghostIcon from "../assets/icons/ghost-icon.svg";
 import { useNavigate } from "react-router";
+import closeErrorDialog from "../assets/icons/Xmark.svg";
 
 const Relationships = () => {
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true);
@@ -10,7 +11,7 @@ const Relationships = () => {
     profileTitle: string;
     _id: string;
     profileContent: string[];
-    [key: string]: string | number | boolean | string[];
+    [key: string]: unknown;
   } | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
@@ -63,22 +64,11 @@ const Relationships = () => {
             className=" hover:bg-amber-500 rounded-md cursor-pointer p-1"
             onClick={() => setErrorMessage("")}
           >
-            <svg width="12" height="12">
-              <line
-                x1="0"
-                y1="0"
-                x2="12"
-                y2="12"
-                style={{ stroke: "white", strokeWidth: "2" }}
-              />
-              <line
-                x1="0"
-                y1="12"
-                x2="12"
-                y2="0"
-                style={{ stroke: "white", strokeWidth: "2" }}
-              />
-            </svg>
+            <img
+              src={closeErrorDialog}
+              alt="Close Error Dialog Icon"
+              className="w-5 h-5 invert brightness-0"
+            />
           </button>
         </div>
       )}
