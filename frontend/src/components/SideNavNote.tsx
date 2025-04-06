@@ -10,21 +10,21 @@ import addNoteIcon from "../assets/icons/add-new-note-icon.svg";
 type Props = {
   page: string; // Identifies the current page ("Notes" or "Summary")
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
-  getSelectedItem: (id: number) => void; // A function to handle selecting an item from the list.
-  displayList: { notebookId: string; notebookTitle: string }[]; // Shared display list
-  setDisplayList: React.Dispatch<
-    React.SetStateAction<{ notebookId: string; notebookTitle: string }[]>
-  >;
+  createNewNote: () => void; // A function to create a new note.
+  getSelectedNote: (id: string) => void; // A function to handle selecting an item from the list.
 };
 
-const SideNav: React.FC<Props> = ({
+const SideNav = ({
   page,
   closeNav,
-  getSelectedItem,
-  displayList,
-  setDisplayList,
-}) => {
+  getSelectedNote: getSelectedNote,
+  createNewNote,
+}: Props) => {
   const [search, setSearch] = useState<string>(""); // Search Input
+  const [displayList, setDisplayList] = useState<
+    { notebookId: string; notebookTitle: string }[]
+  >([]); // List of Notes/Relationships to display in SideNav
+
   /*const [displayList, setDisplayList] = useState<
     { name: string; id: string }[]
   >([]);*/ // List of Notes/Relationships to display in SideNav
@@ -34,44 +34,6 @@ const SideNav: React.FC<Props> = ({
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
 
   const userID = localStorage.getItem("userId");
-
-  const viewJournal = async (id: string) => {
-    if (userID === null) {
-      console.error("User ID is not available in local storage.");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/journal/read-notebook/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
-        );
-      }
-      const data = await response.json();
-
-      localStorage.setItem("journalTitle", data.notebook.title);
-      localStorage.setItem("journalContent", data.notebook.content);
-      localStorage.setItem("notebookId", data.notebook._id);
-
-      console.log(data.message);
-      console.log(data.notebook);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while fetching the journals.");
-    }
-    //getAllJournals();
-  };
 
   const searchJournal = async (query: string) => {
     if (!userID) {
@@ -178,7 +140,7 @@ const SideNav: React.FC<Props> = ({
             {page === "Notes" && (
               <button
                 className={`p-1.5 rounded-lg cursor-pointer ${"hover:bg-gray-200"}`}
-                onClick={() => getSelectedItem(-1)}
+                onClick={() => createNewNote()}
               >
                 <img
                   className="w-[25px] h-[25px]"
@@ -238,11 +200,8 @@ const SideNav: React.FC<Props> = ({
                     : "hover:bg-gray-200"
                 }`}
                 onClick={async () => {
-                  await viewJournal(item.notebookId);
-                  const updatedNotebookId = localStorage.getItem("notebookId");
-                  setSelectedId(updatedNotebookId);
-                  getSelectedItem(1);
-
+                  getSelectedNote(item.notebookId);
+                  setSelectedId(item.notebookId);
                   if (window.innerWidth < 640) {
                     closeNav(false);
                   }
@@ -294,7 +253,7 @@ const SideNav: React.FC<Props> = ({
               alt="User Contact Icon"
             />
             <span className="text-lg truncate">
-              User Name That is extremely long yep. It is long.
+              {localStorage.getItem("userName") || "User Name"}
             </span>
           </button>
         </div>
