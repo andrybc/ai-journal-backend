@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Navbar from "./components/Navbar"; // Adjust path
+import Navbar from "../components/Navbar"; // Adjust path
 import { useNavigate } from "react-router";
 
 const ResetPassword = () => {
