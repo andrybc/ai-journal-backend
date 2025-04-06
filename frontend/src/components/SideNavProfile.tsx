@@ -35,7 +35,7 @@ const SideNav: React.FC<Props> = ({
     {
       profileTitle: string;
       _id: string;
-      [key: string]: string | number | boolean;
+      [key: string]: string | number | boolean | string[];
     }[]
   >([]); // List of Notes/Relationships to display in SideNav
   const [selectedId, setSelectedId] = useState<string | null>(null); // Store ID of Notes/Relationships
@@ -89,8 +89,8 @@ const SideNav: React.FC<Props> = ({
     } catch (error) {
       setErrorMessage(
         error instanceof Error
-          ? error.message
-          : "An error occured while searching profiles",
+          ? `Failed to search profiles: ${error.message}`
+          : "An error occurred while searching profiles",
       );
       console.error(error);
     }
@@ -138,8 +138,8 @@ const SideNav: React.FC<Props> = ({
     } catch (error) {
       setErrorMessage(
         error instanceof Error
-          ? error.message
-          : "An error occured while retrieving profiles",
+          ? `Failed to retrieve profile: ${error.message}`
+          : "An error occurred while retrieving profiles",
       );
       console.error(error);
     }

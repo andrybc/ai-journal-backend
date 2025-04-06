@@ -35,6 +35,14 @@ const Relationships = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+    }
+  }, [errorMessage]);
+
   return (
     <div className="flex h-dvh overflow-hidden relative">
       {sideNavOpen && userId !== null && (
