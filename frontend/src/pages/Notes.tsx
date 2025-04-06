@@ -6,19 +6,23 @@ import MDEditor, { PreviewType } from "@uiw/react-md-editor";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SaveNoteIcon from "../assets/icons/save-note-icon.svg";
 import DeleteNoteIcon from "../assets/icons/delete-note-icon.svg";
+import searchJournal from "../utils/searchJournal";
 
 const Notes = () => {
+  const [displayList, setDisplayList] = useState<
+    { _id: string; title: string }[]
+  >([]); // List of Notes/Relationships to display in SideNav
   const [sideNavOpen, setSideNavOpen] = useState<boolean>(true); //state to control SideNav visibility
   const [previewMode, setPreviewMode] = useState<PreviewType>("preview");
   const [selectedNote, setSelectedNote] = useState<{
     //state to manipulate such selected note
     title: string;
     content: string;
-    notebookId: string; //optional notebook ID
+    _id: string; //optional notebook ID
   }>({
     title: "",
     content: "",
-    notebookId: "",
+    _id: "",
   });
 
   //function to either retrieve the selected note or create a new one (SideNav)
@@ -58,9 +62,16 @@ const Notes = () => {
     }
   };
 
+  const refreshNavBar = async () => {
+    const result = await searchJournal("");
+    console.log("searchJournal result", result);
+    setDisplayList(result || []); //set the displayList to the result of the searchJournal function
+  };
+
   useEffect(() => {
     //display a new note when the page loads
     createNewNote();
+    refreshNavBar();
     if (selectedNote.content === "") {
       setPreviewMode("edit");
     }
@@ -70,7 +81,7 @@ const Notes = () => {
     setSelectedNote({
       title: "Untitled Note",
       content: "",
-      notebookId: "",
+      _id: "",
     });
   };
 
@@ -131,7 +142,7 @@ const Notes = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/journal/update-notebook/${
           //caall "update-notebook" API
-          selectedNote.notebookId
+          selectedNote._id
         }`,
         {
           method: "PUT",
@@ -169,7 +180,7 @@ const Notes = () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/journal/delete-notebook/${
-          selectedNote.notebookId
+          selectedNote._id
         }`, // Use the notebookId from selectedNotes to delete the specific note
         {
           method: "DELETE", // Use DELETE method
@@ -178,7 +189,7 @@ const Notes = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            notebookId: selectedNote?.notebookId,
+            notebookId: selectedNote?._id,
           }),
         }
       );
@@ -206,6 +217,7 @@ const Notes = () => {
     <div className="flex h-dvh overflow-hidden">
       {sideNavOpen && ( //if the SideNav is set to open, display it
         <SideNav
+          displayList={displayList} //pass the displayList to the SideNav component
           createNewNote={createNewNote}
           getSelectedNote={getSelectedNote}
           page="Notes"
@@ -280,7 +292,7 @@ const Notes = () => {
                   }`}
                   onClick={async () => {
                     const notebook =
-                      selectedNote.notebookId === ""
+                      selectedNote._id === ""
                         ? await createNotebook()
                         : await updateNotebook();
 
@@ -293,6 +305,7 @@ const Notes = () => {
                         : prev
                     );
                     setPreviewMode("preview");
+                    await refreshNavBar();
                   }}
                   disabled={
                     //disable the button if the title is empty
@@ -308,9 +321,10 @@ const Notes = () => {
 
                 <button //Delete Button
                   className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
-                  onClick={() => {
+                  onClick={async () => {
                     handleDelete();
                     createNewNote();
+                    await refreshNavBar();
                   }}
                 >
                   <img

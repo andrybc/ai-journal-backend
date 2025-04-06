@@ -6,12 +6,14 @@ import relationshipIcon from "../assets/icons/people-relationship-icon.svg";
 import contactIcon from "../assets/icons/contact-icon.svg";
 import logoutIcon from "../assets/icons/logout-icon.svg";
 import addNoteIcon from "../assets/icons/add-new-note-icon.svg";
+import searchJournal from "../utils/searchJournal"; // Function to search journal entries
 
 type Props = {
   page: string; // Identifies the current page ("Notes" or "Summary")
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   createNewNote: () => void; // A function to create a new note.
   getSelectedNote: (id: string) => void; // A function to handle selecting an item from the list.
+  displayList: { _id: string; title: string }[]; // List of notes/relationships to display in the side navigation.
 };
 
 const SideNav = ({
@@ -19,11 +21,9 @@ const SideNav = ({
   closeNav,
   getSelectedNote: getSelectedNote,
   createNewNote,
+  displayList,
 }: Props) => {
   const [search, setSearch] = useState<string>(""); // Search Input
-  const [displayList, setDisplayList] = useState<
-    { notebookId: string; notebookTitle: string }[]
-  >([]); // List of Notes/Relationships to display in SideNav
 
   /*const [displayList, setDisplayList] = useState<
     { name: string; id: string }[]
@@ -32,50 +32,6 @@ const SideNav = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
-
-  const userID = localStorage.getItem("userId");
-
-  const searchJournal = async (query: string) => {
-    if (!userID) {
-      console.error("User ID is missing.");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/journal/all/${userID}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.json();
-        throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
-        );
-      }
-
-      const data = await response.json();
-      setDisplayList(
-        data.notebooks.map((notebook: { _id: string; title: string }) => ({
-          id: notebook._id,
-          name: notebook.title,
-        }))
-      );
-      console.log(data.message);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while fetching the journals.");
-    }
-  };
-
-  useEffect(() => {
-    searchJournal("");
-  }, []);
 
   useEffect(() => {
     const removeUserDropdown = (event: MouseEvent): void => {
@@ -180,19 +136,17 @@ const SideNav = ({
               <button
                 key={index}
                 className={`text-left px-4 py-2 rounded-xl truncate shrink-0 ${
-                  selectedId === item.notebookId
-                    ? "bg-gray-300"
-                    : "hover:bg-gray-200"
+                  selectedId === item._id ? "bg-gray-300" : "hover:bg-gray-200"
                 }`}
                 onClick={async () => {
-                  getSelectedNote(item.notebookId);
-                  setSelectedId(item.notebookId);
+                  getSelectedNote(item._id);
+                  setSelectedId(item._id);
                   if (window.innerWidth < 640) {
                     closeNav(false);
                   }
                 }}
               >
-                {item.notebookTitle}
+                {item.title}
               </button>
             ))}
           </div>
