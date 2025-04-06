@@ -11,9 +11,9 @@ type Props = {
   page: string; // Identifies the current page ("Notes" or "Summary")
   closeNav: React.Dispatch<React.SetStateAction<boolean>>;
   getSelectedItem: (id: number) => void; // A function to handle selecting an item from the list.
-  displayList: { id: string; name: string }[]; // Shared display list
+  displayList: { notebookId: string; notebookTitle: string }[]; // Shared display list
   setDisplayList: React.Dispatch<
-    React.SetStateAction<{ id: string; name: string }[]>
+    React.SetStateAction<{ notebookId: string; notebookTitle: string }[]>
   >;
 };
 
@@ -49,13 +49,13 @@ const SideNav: React.FC<Props> = ({
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -91,7 +91,7 @@ const SideNav: React.FC<Props> = ({
             headers: {
               "Content-Type": "application/json",
             },
-          },
+          }
         );
       } else {
         // Otherwise, perform a search
@@ -101,14 +101,14 @@ const SideNav: React.FC<Props> = ({
           }/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
           {
             method: "GET",
-          },
+          }
         );
       }
 
       if (!response.ok) {
         const errorText = await response.json();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
 
@@ -117,7 +117,7 @@ const SideNav: React.FC<Props> = ({
         data.notebooks.map((notebook: { _id: string; title: string }) => ({
           id: notebook._id,
           name: notebook.title,
-        })),
+        }))
       );
       console.log(data.message);
     } catch (error) {
@@ -233,10 +233,12 @@ const SideNav: React.FC<Props> = ({
               <button
                 key={index}
                 className={`text-left px-4 py-2 rounded-xl truncate shrink-0 ${
-                  selectedId === item.id ? "bg-gray-300" : "hover:bg-gray-200"
+                  selectedId === item.notebookId
+                    ? "bg-gray-300"
+                    : "hover:bg-gray-200"
                 }`}
                 onClick={async () => {
-                  await viewJournal(item.id);
+                  await viewJournal(item.notebookId);
                   const updatedNotebookId = localStorage.getItem("notebookId");
                   setSelectedId(updatedNotebookId);
                   getSelectedItem(1);
@@ -246,7 +248,7 @@ const SideNav: React.FC<Props> = ({
                   }
                 }}
               >
-                {item.name}
+                {item.notebookTitle}
               </button>
             ))}
           </div>
