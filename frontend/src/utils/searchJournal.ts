@@ -1,9 +1,14 @@
+import { useNavigate } from "react-router";
+
+
 const searchJournal = async (query: string) => {
   const userID = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
   if (!userID || !token) {
     console.error("User ID or Auth Token is missing.");
-    return;
+    navigate("/login");
+    return null;
   }
 
   try {
@@ -27,6 +32,8 @@ const searchJournal = async (query: string) => {
 
     const data = await response.json();
     console.log(data.message);
+
+
     return data.notebooks;
   } catch (error) {
     console.error("Error:", error);

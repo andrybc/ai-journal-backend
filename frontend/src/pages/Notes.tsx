@@ -28,12 +28,22 @@ const Notes = () => {
   });
   const navigate = useNavigate(); //useNavigate hook to navigate between pages
 
+  const handleAuthError = (response: Response) => {
+    if (response.status === 403 || response.status === 401) {
+      console.error("Session expired. Please log in again");
+      handleLogout();
+      navigate("/login");
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     const userID = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
     if (!userID && !token) {
       console.error(
-        "UserID, Username, or AuthToken not found in local storage.",
+        "UserID, Username, or AuthToken not found in local storage."
       );
       navigate("/login");
     }
@@ -58,18 +68,15 @@ const Notes = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (!response.ok) {
-        if (response.status === 403 || response.status === 401) {
-          console.error("Session expired. Please log in again");
-          handleLogout();
-          return;
-        }
+        if (handleAuthError(response)) return;
+
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -135,19 +142,15 @@ const Notes = () => {
             content: selectedNote.content,
             userId: userID,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
-        if (response.status === 403 || response.status === 401) {
-          console.error("Session expired. Please log in again");
-          handleLogout();
-          return;
-        }
+        if (handleAuthError(response)) return;
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -181,19 +184,15 @@ const Notes = () => {
             title: selectedNote.title,
             content: selectedNote.content,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
-        if (response.status === 403 || response.status === 401) {
-          console.error("Session expired. Please log in again");
-          handleLogout();
-          return;
-        }
+        if (handleAuthError(response)) return;
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -224,19 +223,15 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNote?._id,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
-        if (response.status === 403 || response.status === 401) {
-          console.error("Session expired. Please log in again");
-          handleLogout();
-          return;
-        }
+        if (handleAuthError(response)) return;
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -301,7 +296,7 @@ const Notes = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 //use onChange along with React.ChangeEvent to modify the title
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, title: e.target.value } : prev,
+                  prev ? { ...prev, title: e.target.value } : prev
                 );
               }}
             />
@@ -316,7 +311,7 @@ const Notes = () => {
               }}
               onChange={(value) => {
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, content: value || "" } : prev,
+                  prev ? { ...prev, content: value || "" } : prev
                 );
               }}
               style={{
@@ -351,7 +346,7 @@ const Notes = () => {
                             ...prev,
                             ...notebook,
                           }
-                        : prev,
+                        : prev
                     );
                     setPreviewMode("preview");
                     await refreshNavBar();
