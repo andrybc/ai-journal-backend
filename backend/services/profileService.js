@@ -49,37 +49,22 @@ Memorable Quotes: ${formatQuotes(data.memorableQuotes)}
 Additional Notes: ${formatField(data.additionalNotes)}`;
 }
 
-exports.updateProfilesForNotebook = async (notebook, operation) => {
-  if (operation === "create" || operation === "update") {
-    const namesArray = await openaiService.extractTags(notebook.content);
-    notebook.tags = Array.isArray(namesArray) ? namesArray : [];
-    await notebook.save();
+exports.deleteProfile = async (notebook) => {
+  const profiles = await Profile.find({ notebookIDs: notebook._id });
+  for (const profile of profiles) {
+    profile.notebookIDs = profile.notebookIDs.filter(
+      (id) => id.toString() !== notebook._id.toString(),
+    );
 
-    for (const name of notebook.tags) {
-      let profile = await Profile.findOne({
-        profileTitle: name,
-        userId: notebook.userId,
-      });
-
-      if (profile) {
-        if (!profile.notebookIDs.includes(notebook._id)) {
-          profile.notebookIDs.push(notebook._id);
-        }
-      } else {
-        profile = new Profile({
-          profileTitle: name,
-          userId: notebook.userId,
-          notebookIDs: [notebook._id],
-        });
-      }
-
+    if (profile.notebookIDs.length === 0) {
+      await Profile.findByIdAndDelete(profile._id);
+    } else {
       const notebooks = await Notebook.find({
         _id: { $in: profile.notebookIDs },
       });
       const notebookContents = notebooks.map((n) => n.content);
-
       const profileData = await openaiService.createProfile(
-        name,
+        profile.profileTitle,
         notebookContents,
       );
       if (profileData) {
@@ -89,31 +74,46 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
       profile.timeUpdated = Date.now();
       await profile.save();
     }
-  } else if (operation === "delete") {
-    const profiles = await Profile.find({ notebookIDs: notebook._id });
-    for (const profile of profiles) {
-      profile.notebookIDs = profile.notebookIDs.filter(
-        (id) => id.toString() !== notebook._id.toString(),
-      );
+  }
+};
 
-      if (profile.notebookIDs.length === 0) {
-        await Profile.findByIdAndDelete(profile._id);
-      } else {
-        const notebooks = await Notebook.find({
-          _id: { $in: profile.notebookIDs },
-        });
-        const notebookContents = notebooks.map((n) => n.content);
-        const profileData = await openaiService.createProfile(
-          profile.profileTitle,
-          notebookContents,
-        );
-        if (profileData) {
-          profile.profileTitle = profileData.name || profile.profileTitle;
-          profile.profileContent = formatProfileContent(profileData);
-        }
-        profile.timeUpdated = Date.now();
-        await profile.save();
+exports.synchronizeProfilesWithNotebook = async (notebook) => {
+  const namesArray = await openaiService.extractTags(notebook.content);
+  notebook.tags = Array.isArray(namesArray) ? namesArray : [];
+  await notebook.save();
+
+  for (const name of notebook.tags) {
+    let profile = await Profile.findOne({
+      profileTitle: name,
+      userId: notebook.userId,
+    });
+
+    if (profile) {
+      if (!profile.notebookIDs.includes(notebook._id)) {
+        profile.notebookIDs.push(notebook._id);
       }
+    } else {
+      profile = new Profile({
+        profileTitle: name,
+        userId: notebook.userId,
+        notebookIDs: [notebook._id],
+      });
     }
+
+    const notebooks = await Notebook.find({
+      _id: { $in: profile.notebookIDs },
+    });
+    const notebookContents = notebooks.map((n) => n.content);
+
+    const profileData = await openaiService.createProfile(
+      name,
+      notebookContents,
+    );
+    if (profileData) {
+      profile.profileTitle = profileData.name || profile.profileTitle;
+      profile.profileContent = formatProfileContent(profileData);
+    }
+    profile.timeUpdated = Date.now();
+    await profile.save();
   }
 };

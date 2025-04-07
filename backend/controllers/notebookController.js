@@ -15,7 +15,7 @@ exports.createNotebook = async (req, res) => {
     await newNotebook.save();
 
     // Run the tag extraction and update/create profiles based on this notebook.
-    await profileService.updateProfilesForNotebook(newNotebook, "create");
+    await profileService.synchronizeProfilesWithNotebook(newNotebook);
 
     res.status(200).json({
       message: "Notebook created successfully",
@@ -37,12 +37,13 @@ exports.updateNotebook = async (req, res) => {
       { title, content, tags: [] },
       { new: true },
     );
+
     if (!updatedNotebook) {
       return res.status(404).json({ error: "Notebook not found" });
     }
 
     // Re-extract tags and update associated profiles.
-    await profileService.updateProfilesForNotebook(updatedNotebook, "update");
+    await profileService.synchronizeProfilesWithNotebook(updatedNotebook);
 
     res.status(200).json({
       message: "Notebook updated successfully",
@@ -67,7 +68,7 @@ exports.deleteNotebook = async (req, res) => {
     await Notebook.findByIdAndDelete(notebookId);
 
     // Update profiles to rebuild them without this notebook.
-    await profileService.updateProfilesForNotebook(notebook, "delete");
+    await profileService.deleteProfile(notebook);
 
     res.status(200).json({ message: "Notebook successfully deleted" });
   } catch (error) {
