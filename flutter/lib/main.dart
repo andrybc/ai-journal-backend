@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// Define a flag that can be set during build
+const bool isProduction = bool.fromEnvironment('dart.vm.product');
+
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  // Load the appropriate .env file based on environment
+  await dotenv.load(fileName: isProduction ? ".env.prod" : ".env");
   runApp(const JournalApp());
 }
 

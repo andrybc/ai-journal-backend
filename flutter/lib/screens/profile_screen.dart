@@ -108,16 +108,33 @@ class _RelationshipPageState extends State<RelationshipPage> {
       body:
           selectedRelationship.isEmpty
               // Nothing Selected
-              ? AppUI.emptyState(
-                icon: "assets/icons/ghost-icon.svg",
-                title: "No Profile Selected",
-                subtitle:
-                    'Select a profile from the sidebar or create a new one',
-                onActionPressed: () {
-                  // Action to create new profile
-                  // Add implementation here when needed
-                },
-                actionText: "Create New Profile",
+              ? Container(
+                padding: const EdgeInsets.all(32),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgAssetIcon(
+                      asset: "assets/icons/ghost-icon.svg",
+                      size: 75,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "No Profile Selected",
+                      textAlign: TextAlign.center,
+                      style: AppTextStyle.h3,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Select a profile from the sidebar",
+                      textAlign: TextAlign.center,
+                      style: AppTextStyle.bodySmall,
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               )
               // Profile is Selected
               : SingleChildScrollView(
