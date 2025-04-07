@@ -100,7 +100,7 @@ const SignUp = () => {
                 {error}
               </p>
             ))}
-            
+
             {successMessage && (
               <p className="text-sm font-bold text-neutral-100 text-center">
                 {successMessage}
