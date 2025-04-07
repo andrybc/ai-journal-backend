@@ -140,9 +140,7 @@ const SignUp = () => {
                 !password ||
                   password !== confirmPassword ||
                   password.length < 8 ||
-                  !passwordRegex.test(
-                    password,
-                  )
+                  !passwordRegex.test(password)
               )
                 ? "border-red-600"
                 : "border-neutral-500"
@@ -162,9 +160,7 @@ const SignUp = () => {
                 !confirmPassword ||
                   password !== confirmPassword ||
                   confirmPassword.length < 8 ||
-                  !passwordRegex.test(
-                    confirmPassword,
-                  )
+                  !passwordRegex.test(confirmPassword)
               )
                 ? "border-red-600"
                 : "border-neutral-500"
