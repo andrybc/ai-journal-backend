@@ -306,7 +306,7 @@ const Notes = () => {
             />
 
             <MDEditor //text editor
-              value={selectedNote.content || ""} //use the content from selectedNotes
+              value={selectedNote.content || " "} //use the content from selectedNotes
               height="80%"
               minHeight={300}
               preview={previewMode}
