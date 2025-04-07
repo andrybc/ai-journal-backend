@@ -45,7 +45,7 @@ const Notes = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -56,7 +56,7 @@ const Notes = () => {
         }
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -122,7 +122,7 @@ const Notes = () => {
             content: selectedNote.content,
             userId: userID,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -134,7 +134,7 @@ const Notes = () => {
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -168,7 +168,7 @@ const Notes = () => {
             title: selectedNote.title,
             content: selectedNote.content,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -180,7 +180,7 @@ const Notes = () => {
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -211,7 +211,7 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNote?._id,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -223,7 +223,7 @@ const Notes = () => {
 
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`
+          `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
       const data = await response.json();
@@ -249,12 +249,12 @@ const Notes = () => {
       )}
 
       <div //main content area
-        className={`flex flex-col w-full h-full sm:overflow-y-auto ${
+        className={`flex flex-col w-full h-full sm:overflow-y-auto bg-neutral-700 ${
           sideNavOpen && "overflow-y-hidden"
         }`}
       >
         <div //header area
-          className={`px-2.5 py-2.5 flex items-center border-b ${
+          className={`px-2.5 py-2.5 flex items-center border-b bg-neutral-800${
             sideNavOpen && "sm:hidden"
           }`}
         >
@@ -263,12 +263,12 @@ const Notes = () => {
             onClick={() => setSideNavOpen(true)}
           >
             <img //icon to open/close the SideNav
-              className="w-[25px] h-[25px] rotate-180"
+              className="w-[25px] h-[25px] rotate-180 brightness-0"
               src={closeSideNav}
               alt="Open Navbar Icon"
             />
           </button>
-          <span className="grow text-center ml-[-33px] font-semibold text-lg">
+          <span className="grow text-center ml-[-33px] font-semibold text-lg text-neutral-50">
             Notes
           </span>
         </div>
@@ -283,12 +283,12 @@ const Notes = () => {
             <input //input field for the note title
               type="text"
               placeholder="Enter Title Here..." //placeholder text
-              className="text-4xl font-semibold font-montserrat"
+              className="text-4xl font-semibold font-montserrat text-neutral-50"
               value={selectedNote.title || ""} //use the title from selectedNotes
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 //use onChange along with React.ChangeEvent to modify the title
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, title: e.target.value } : prev
+                  prev ? { ...prev, title: e.target.value } : prev,
                 );
               }}
             />
@@ -298,12 +298,13 @@ const Notes = () => {
               height="80%"
               minHeight={300}
               preview={previewMode}
+              className="w-md-editor-dark"
               onClick={() => {
                 setPreviewMode("edit");
               }}
               onChange={(value) => {
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, content: value || "" } : prev
+                  prev ? { ...prev, content: value || "" } : prev,
                 );
               }}
             />
@@ -325,7 +326,7 @@ const Notes = () => {
                             ...prev,
                             ...notebook,
                           }
-                        : prev
+                        : prev,
                     );
                     setPreviewMode("preview");
                     await refreshNavBar();

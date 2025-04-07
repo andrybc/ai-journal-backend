@@ -30,6 +30,12 @@ const SideNav = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
   const navModal = useRef<HTMLDivElement>(null); // Nav Black Part
+  const navigate = useNavigate();
+
+  const onLogout = () => {
+    handleLogout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const removeUserDropdown = (event: MouseEvent): void => {
@@ -159,7 +165,7 @@ const SideNav = ({
             >
               <button
                 className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-neutral-500 rounded-xl cursor-pointer"
-                onClick={handleLogout}
+                onClick={onLogout}
               >
                 <img
                   className="w-[20px] h-[20px] invert brightness-0"
