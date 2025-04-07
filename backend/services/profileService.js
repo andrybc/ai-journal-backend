@@ -58,8 +58,10 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
     const updatedProfiles = new Set();
 
     for (const name of notebook.tags) {
+      console.log("Processing name:", name);
       const normalized = name.trim().toLowerCase();
       if (updatedProfiles.has(normalized)) {
+        console.log("Skipping duplicate profile:", normalized);
         continue;
       }
       updatedProfiles.add(normalized);

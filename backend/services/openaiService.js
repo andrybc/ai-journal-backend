@@ -43,7 +43,7 @@ async function extractTags(journalContent) {
     },
     {
       role: "user",
-      content: `Extract only the main subject(s) — the primary person or people being described in detail — from the following text. Ignore passing mentions of others. Return only a valid JSON array of names. Example: ["Mary", "John"]. If no main subjects are found, return []. Text: "${journalContent}"`,
+      content: `Extract the names of people from the following text. Do not return nicknames or alias, which can be inferred from the text. Return only a valid JSON array of names. Example: ["Mary", "John"]. If no main subjects are found, return []. Text: "${journalContent}"`,
     },
   ];
 
