@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'signup_screen.dart';
 import '../services/auth_service.dart';
 import 'note_screen.dart';
+import '../styles/index.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -93,8 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!response['success']) {
         setState(() {
           _error =
-              response['error'] ??
-              'Login failed. Please check your credentials.';
+              response['error'] ?? 'Login failed. Please check your credentials.';
           _isLoading = false;
         });
         return;
@@ -175,10 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Extract user ID - JWT tokens typically have user ID as 'id', 'sub', or 'user_id'
       final userId =
-          decodedData['id'] ??
-          decodedData['sub'] ??
-          decodedData['userId'] ??
-          'unknown_user';
+          decodedData['id'] ?? decodedData['sub'] ?? decodedData['userId'] ?? 'unknown_user';
 
       return userId.toString();
     } catch (e) {
@@ -192,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      // Use system color scheme instead of hardcoded colors
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -210,32 +206,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         // App title with modern typography
                         Text(
                           "Journal Organizer",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Montserrat",
-                          ),
+                          style: AppTextStyle.h1,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 36),
 
                         // Error message
                         if (_error != null)
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: colorScheme.errorContainer,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _error!,
-                              style: TextStyle(
-                                color: colorScheme.onErrorContainer,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                          AppUI.messageCard(
+                            context: context,
+                            message: _error,
+                            isError: true,
                           ),
 
                         // Username field with improved styling and validation
@@ -262,9 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           onFieldSubmitted: (_) {
-                            FocusScope.of(
-                              context,
-                            ).requestFocus(_passwordFocusNode);
+                            FocusScope.of(context).requestFocus(_passwordFocusNode);
                           },
                         ),
                         const SizedBox(height: 16),
@@ -283,13 +262,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             filled: true,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _showPassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                semanticLabel:
-                                    _showPassword
-                                        ? 'Hide password'
-                                        : 'Show password',
+                                _showPassword ? Icons.visibility : Icons.visibility_off,
+                                semanticLabel: _showPassword ? 'Hide password' : 'Show password',
                               ),
                               onPressed: () {
                                 setState(() {
@@ -316,13 +290,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Forgot password functionality will be implemented soon',
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
+                              AppUI.showSnackBar(
+                                context,
+                                'Forgot password functionality will be implemented soon',
                               );
                             },
                             child: const Text("Forgot Password?"),
@@ -340,16 +310,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child:
-                              _isLoading
-                                  ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                    ),
-                                  )
-                                  : const Text("Login"),
+                          child: _isLoading
+                              ? AppUI.loadingIndicator()
+                              : const Text("Login"),
                         ),
                         const SizedBox(height: 20),
 
@@ -357,15 +320,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an account?"),
+                            Text(
+                              "Don't have an account?",
+                              style: AppTextStyle.bodySmall,
+                            ),
                             TextButton(
-                              onPressed:
-                                  () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const SignupScreen(),
-                                    ),
-                                  ),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SignupScreen(),
+                                ),
+                              ),
                               child: const Text("Sign up"),
                             ),
                           ],

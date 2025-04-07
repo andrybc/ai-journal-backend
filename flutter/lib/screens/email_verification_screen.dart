@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart'; // Updated import to use AuthService specifically
+import '../services/auth_service.dart';
+import '../styles/index.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -45,37 +46,73 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
-      appBar: AppBar(title: const Text("Verify Email")),
+      appBar: AppBar(
+        title: Text("Verify Email", style: AppTextStyle.appBarTitle),
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Verify Your Email", style: TextStyle(fontSize: 22)),
-            const SizedBox(height: 12),
-            Text("A verification email has been sent to ${widget.email}"),
-            const SizedBox(height: 20),
-            TextField(
-              controller: codeController,
-              decoration: const InputDecoration(
-                labelText: 'Enter Verification Code',
-              ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Verify Your Email",
+                  style: AppTextStyle.h2,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                
+                Text(
+                  "A verification email has been sent to ${widget.email}",
+                  style: AppTextStyle.body,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 36),
+                
+                TextField(
+                  controller: codeController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Verification Code',
+                    prefixIcon: const Icon(Icons.key),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                if (error != null || success)
+                  AppUI.messageCard(
+                    context: context,
+                    message: success ? "Email verified successfully!" : error,
+                    isError: !success,
+                  ),
+                  
+                const SizedBox(height: 32),
+                
+                FilledButton(
+                  onPressed: verifyCode,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontSize: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text("Verify Email"),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            if (error != null)
-              Text(error!, style: const TextStyle(color: Colors.red)),
-            if (success)
-              const Text(
-                "Email verified successfully!",
-                style: TextStyle(color: Colors.green),
-              ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: verifyCode,
-              child: const Text("Verify Email"),
-            ),
-          ],
+          ),
         ),
       ),
     );

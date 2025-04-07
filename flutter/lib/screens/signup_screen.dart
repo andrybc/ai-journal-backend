@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart'; // Updated import to use AuthService specifically
+import '../services/auth_service.dart';
+import '../styles/index.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -78,142 +79,159 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Text(
-                  "Journal Organizer",
-                  style: TextStyle(fontSize: 28, color: Colors.white),
-                ),
-                const SizedBox(height: 30),
-                if (errorMessage != null)
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                   Text(
-                    errorMessage!,
-                    style: const TextStyle(color: Colors.red),
+                    "Journal Organizer",
+                    style: AppTextStyle.h1,
+                    textAlign: TextAlign.center,
                   ),
-                if (successMessage != null)
-                  Text(
-                    successMessage!,
-                    style: const TextStyle(color: Colors.green),
-                  ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: emailController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 36),
+
+                  // Error message
+                  if (errorMessage != null)
+                    AppUI.messageCard(
+                      context: context,
+                      message: errorMessage,
+                      isError: true,
                     ),
-                    errorText:
-                        isSubmitted &&
-                                !RegExp(
-                                  r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
-                                ).hasMatch(emailController.text.trim())
-                            ? 'Please enter a valid email address'
-                            : null,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: usernameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+
+                  // Success message
+                  if (successMessage != null)
+                    AppUI.messageCard(
+                      context: context,
+                      message: successMessage,
+                      isError: false,
                     ),
-                    errorText:
-                        isSubmitted && usernameController.text.isEmpty
-                            ? 'Username cannot be empty'
-                            : null,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: passwordController,
-                  obscureText: !showPassword,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        showPassword ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.white70,
+
+                  const SizedBox(height: 10),
+
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: const Icon(Icons.email),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          showPassword = !showPassword;
-                        });
-                      },
+                      errorText:
+                          isSubmitted &&
+                                  !RegExp(
+                                    r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                                  ).hasMatch(emailController.text.trim())
+                              ? 'Please enter a valid email address'
+                              : null,
                     ),
-                    errorText:
-                        isSubmitted && passwordController.text.isEmpty
-                            ? 'Password cannot be empty'
-                            : null,
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: confirmPasswordController,
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      prefixIcon: const Icon(Icons.person),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      errorText:
+                          isSubmitted && usernameController.text.isEmpty
+                              ? 'Username cannot be empty'
+                              : null,
                     ),
-                    errorText:
-                        isSubmitted &&
-                                confirmPasswordController.text !=
-                                    passwordController.text
-                            ? 'Passwords do not match'
-                            : null,
                   ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isSubmitted = true;
-                    });
-                    handleSignup();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[800],
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: passwordController,
+                    obscureText: !showPassword,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          showPassword ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            showPassword = !showPassword;
+                          });
+                        },
+                      ),
+                      errorText:
+                          isSubmitted && passwordController.text.isEmpty
+                              ? 'Password cannot be empty'
+                              : null,
+                    ),
                   ),
-                  child: const Text("Register"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    "Already have an account? Login",
-                    style: TextStyle(color: Colors.white),
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      errorText:
+                          isSubmitted &&
+                                  confirmPasswordController.text !=
+                                      passwordController.text
+                              ? 'Passwords do not match'
+                              : null,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 32),
+
+                  FilledButton(
+                    onPressed: handleSignup,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontSize: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("Register"),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an account?",
+                        style: AppTextStyle.bodySmall,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Login"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
