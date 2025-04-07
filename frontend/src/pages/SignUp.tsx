@@ -11,7 +11,7 @@ const SignUp = () => {
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
   const navigate = useNavigate();
   const handleRegister = async () => {
     setIsSubmitted(true);
@@ -28,9 +28,21 @@ const SignUp = () => {
       errors.push("Please enter a valid email address");
     }
 
+    //const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
+    if (!passwordRegex.test(password)) {
+      errors.push("Password must meet the following:");
+      errors.push("• At least 8 characters");
+      errors.push("• 1 number");
+      errors.push("• 1 special character (e.g., !@#$%^&*)");
+      errors.push("• 1 uppercase letter");
+    }
+
     if (errors.length > 0) {
       setErrorMessages(errors);
       setSuccessMessage(""); // Clear success message if errors exist
+      setTimeout(() => {
+        setErrorMessages([]);
+      }, 10000);
       return;
     }
 
@@ -82,7 +94,7 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
         {(errorMessages.length > 0 || successMessage) && (
-          <div className="mb-4 text-center">
+          <div className="mb-4 text-justify">
             {errorMessages.map((error, index) => (
               <p key={index} className="text-sm text-red-600">
                 {error}
@@ -123,7 +135,13 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!password || password !== confirmPassword)
+              isSubmitted &&
+              (
+                !password ||
+                  password !== confirmPassword ||
+                  password.length < 8 ||
+                  !passwordRegex.test(password)
+              )
                 ? "border-red-600"
                 : "border-neutral-500"
             }`}
@@ -137,7 +155,13 @@ const SignUp = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
             className={`w-full px-3 py-2 border rounded-md bg-neutral-800 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
-              isSubmitted && (!confirmPassword || password !== confirmPassword)
+              isSubmitted &&
+              (
+                !confirmPassword ||
+                  password !== confirmPassword ||
+                  confirmPassword.length < 8 ||
+                  !passwordRegex.test(confirmPassword)
+              )
                 ? "border-red-600"
                 : "border-neutral-500"
             }`}
