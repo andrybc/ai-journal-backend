@@ -41,7 +41,10 @@ class UserService {
     final url = Uri.parse('${ApiBase.baseUrl}/users/$userId');
     final response = await http.get(url, headers: ApiBase.getHeaders(token));
 
-    return ApiBase.handleResponse(response, errorMessage: 'User not found');
+    return ApiBase.handleResponse(
+      response,
+      errorMessage: 'Failed to fetch user details',
+    );
   }
 
   /// Get a user ID by username

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import "../components/sidenav.dart";
 import 'package:shared_preferences/shared_preferences.dart';
 import "../services/profile_service.dart";
+import "../screens/note_screen.dart";
+import '../styles/index.dart';
 
 class RelationshipPage extends StatefulWidget {
   const RelationshipPage({super.key});
@@ -18,45 +19,7 @@ class _RelationshipPageState extends State<RelationshipPage> {
 
   void showSnackBar(BuildContext context, String message) {
     if (mounted) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text(message), duration: Duration(seconds: 3)),
-      // );
-
-      final overLay = Overlay.of(context);
-      final overLayComponent = OverlayEntry(
-        builder: (context) {
-          return Positioned(
-            bottom: 20,
-            right: 10,
-            left: 10,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.9),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          );
-        },
-      );
-
-      overLay.insert(overLayComponent);
-
-      Future.delayed(Duration(seconds: 3), () {
-        overLayComponent.remove();
-      });
+      AppUI.showSnackBar(context, message);
     }
   }
 
@@ -109,76 +72,58 @@ class _RelationshipPageState extends State<RelationshipPage> {
     }
   }
 
+  // Profile-specific search function
+  Future<Map<String, dynamic>> _searchProfiles(
+    String query,
+    String token,
+    String userId,
+  ) async {
+    return ProfileService.searchProfiles(query, token, userId);
+  }
+
+  // Profile-specific title extractor
+  String _extractProfileTitle(Map<String, dynamic> profile) {
+    return profile["profileTitle"] ?? "Untitled";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      drawerScrimColor: Color.fromRGBO(0, 0, 0, 0.75),
+      drawerScrimColor: Colors.black.withOpacity(0.75),
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
 
       // This is the navbar at the top
       appBar: AppBar(
-        title: Text(
-          'Relationship',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1.05,
-            height: 1.75 / 1.125,
-          ),
-        ),
+        title: Text('Relationship', style: AppTextStyle.appBarTitle),
         toolbarHeight: 53.5,
         centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: Colors.white),
-        ),
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 2,
       ),
 
       // The display for the selectedProfile
       body:
           selectedRelationship.isEmpty
               // Nothing Selected
-              ? Container(
-                padding: const EdgeInsets.all(32),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/ghost-icon.svg",
-                      semanticsLabel: "Ghost Icon",
-                      colorFilter: ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                      width: 75,
-                      height: 75,
-                      placeholderBuilder:
-                          (context) => Container(
-                            padding: EdgeInsets.all(15),
-                            child: CircularProgressIndicator(),
-                          ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      "No Profile Selected",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 24,
-                        height: 1.3333,
-                        fontFamily: "Montserrat",
-                        fontFamilyFallback: ["sans-serif"],
-                      ),
-                    ),
-                  ],
-                ),
+              ? AppUI.emptyState(
+                icon: "assets/icons/ghost-icon.svg",
+                title: "No Profile Selected",
+                subtitle:
+                    'Select a profile from the sidebar or create a new one',
+                onActionPressed: () {
+                  // Action to create new profile
+                  // Add implementation here when needed
+                },
+                actionText: "Create New Profile",
               )
               // Profile is Selected
               : SingleChildScrollView(
                 child: Center(
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: 900),
+                    constraints: const BoxConstraints(maxWidth: 900),
                     alignment: Alignment.topLeft,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 40,
@@ -189,18 +134,12 @@ class _RelationshipPageState extends State<RelationshipPage> {
                       children: [
                         Text(
                           "${selectedRelationship["profileTitle"]}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 36,
-                            height: 1.1111,
-                            fontFamily: "Montserrat",
-                            fontFamilyFallback: ["sans-serif"],
-                          ),
+                          style: AppTextStyle.h1,
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Text(
                           "${selectedRelationship["profileContent"]}",
-                          style: TextStyle(fontSize: 18, height: 1.6),
+                          style: AppTextStyle.body,
                         ),
                       ],
                     ),
@@ -208,13 +147,35 @@ class _RelationshipPageState extends State<RelationshipPage> {
                 ),
               ),
 
-      // SideNav bar
-      drawer: SideNavProfile(
+      // Use the dynamic SideNav with profile-specific functions and callbacks
+      drawer: SideNav(
         userId: _userId,
-        onProfileSelected: (profileId) => getProfilesFunct(profileId),
-        selectedProfileId: selectedRelationship["_id"],
+        selectedItemId: selectedRelationship["_id"],
         token: _authToken,
         showSnackBar: showSnackBar,
+        searchFunction: _searchProfiles,
+        titleExtractor: _extractProfileTitle,
+        searchPlaceholder: "Search Profiles",
+        dataKey: "profiles",
+        onItemSelected: getProfilesFunct,
+        isNotesActive: false,
+        isPeopleActive: true,
+        onNotesPageSelected: () {
+          // Navigate to note screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const NoteScreen()),
+          );
+        },
+        onPeoplePageSelected: () {
+          // Already on people page, just close drawer
+          Navigator.pop(context);
+        },
+        onItemTap: (context, profileId) {
+          // Load profile data and close,
+          getProfilesFunct(profileId);
+          Navigator.pop(context);
+        },
       ),
     );
   }

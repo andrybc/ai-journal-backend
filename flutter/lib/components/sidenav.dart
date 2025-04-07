@@ -1,39 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import "../services/profile_service.dart";
-import "../screens/home_screen.dart";
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/user_service.dart';
 
-class SideNavProfile extends StatefulWidget {
+class SideNav extends StatefulWidget {
   final String? userId;
-  final Function(String) onProfileSelected;
-  final String? selectedProfileId;
+  final String? selectedItemId;
   final String? token;
   final Function(BuildContext context, String message) showSnackBar;
 
-  const SideNavProfile({
+  // Service functions and customization properties
+  final Future<Map<String, dynamic>> Function(String, String, String)
+  searchFunction;
+  final String Function(Map<String, dynamic>) titleExtractor;
+  final String searchPlaceholder;
+  final String
+  dataKey; // The key to extract data from response (e.g. "profiles" or "notebooks")
+
+  // Navigation callbacks
+  final Function(String) onItemSelected; // Callback when an item is selected
+  final VoidCallback
+  onNotesPageSelected; // Callback when notes page button is tapped
+  final VoidCallback
+  onPeoplePageSelected; // Callback when people page button is tapped
+  final bool isNotesActive; // Whether notes view is active (for highlighting)
+  final bool isPeopleActive; // Whether people view is active (for highlighting)
+  final Function(BuildContext, String)
+  onItemTap; // Callback when an item is tapped (for navigation)
+
+  const SideNav({
     required this.userId,
-    required this.onProfileSelected,
-    required this.selectedProfileId,
+    required this.selectedItemId,
     required this.token,
     required this.showSnackBar,
+    required this.searchFunction,
+    required this.titleExtractor,
+    required this.searchPlaceholder,
+    required this.dataKey,
+    required this.onItemSelected,
+    required this.onNotesPageSelected,
+    required this.onPeoplePageSelected,
+    required this.isNotesActive,
+    required this.isPeopleActive,
+    required this.onItemTap,
     super.key,
   });
 
   @override
-  State<SideNavProfile> createState() => _SideNavProfileState();
+  State<SideNav> createState() => _SideNavState();
 }
 
-class _SideNavProfileState extends State<SideNavProfile> {
+class _SideNavState extends State<SideNav> {
   final TextEditingController _searchController = TextEditingController();
-  late String? userId;
-  late String? token;
-  List<Map<String, dynamic>> profiles = [];
+  List<Map<String, dynamic>> items = [];
+  String? _displayUsername;
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (userId == null || token == null) {
+    if (widget.userId == null || widget.token == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.showSnackBar(
           context,
@@ -41,12 +67,53 @@ class _SideNavProfileState extends State<SideNavProfile> {
         );
       });
     } else {
-      searchProfilesFunct("");
+      searchItems("");
+      print("calling _fetchUsername()");
+      _fetchUsername();
     }
   }
 
-  void searchProfilesFunct(String query) async {
-    if (token == null || userId == null) {
+  Future<void> _fetchUsername() async {
+    if (widget.userId == null || widget.token == null) return;
+
+    try {
+      final response = await UserService.getUserById(
+        widget.userId!,
+        widget.token!,
+      );
+
+      if (response["success"] && response["data"] != null) {
+        print("data : ${response["data"]}");
+        setState(() {
+          _displayUsername = response["data"]["username"];
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching username: $e');
+    }
+  }
+
+  // Handle logout - clear SharedPreferences and navigate to login screen
+  Future<void> _handleLogout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (!mounted) return;
+
+      // Show success message
+      widget.showSnackBar(context, 'Logged out successfully');
+
+      // Navigate to login screen
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      widget.showSnackBar(context, 'Error logging out: $e');
+    }
+  }
+
+  void searchItems(String query) async {
+    if (widget.userId == null || widget.token == null) {
       widget.showSnackBar(
         context,
         "Authentication token or User ID not found.",
@@ -54,304 +121,225 @@ class _SideNavProfileState extends State<SideNavProfile> {
       return;
     }
 
-    final response = await ProfileService.searchProfiles(
-      query,
-      token!,
-      userId!,
-    );
-
-    if (response["success"]) {
-      final profileList = response["data"]["profiles"];
-      setState(() {
-        profiles = List<Map<String, dynamic>>.from(profileList ?? []);
-      });
-    } else if (mounted) {
-      widget.showSnackBar(
-        context,
-        response["error"] ?? "Failed to search profiles",
+    try {
+      // Use the provided search function
+      print("userId: ${widget.userId}");
+      print("token: ${widget.token}");
+      final response = await widget.searchFunction(
+        query,
+        widget.token!,
+        widget.userId!,
       );
+
+      if (response["success"]) {
+        // Use the provided data key to extract items
+        final itemList = response["data"][widget.dataKey];
+        setState(() {
+          items = List<Map<String, dynamic>>.from(itemList ?? []);
+        });
+      } else if (mounted) {
+        widget.showSnackBar(
+          context,
+          response["error"] ?? "Failed to search items",
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.showSnackBar(context, "Error searching: $e");
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-
-    userId = widget.userId;
-    token = widget.token;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Drawer(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      width: 300,
       child: Column(
         children: [
           // Top Navigation part
           Container(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.white, width: 0.5),
-              ),
-            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Close Nav Icon
                 IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   icon: SvgPicture.asset(
                     "assets/icons/close-nav-icon.svg",
                     semanticsLabel: "Close Nav Icon",
-                    width: 25,
-                    height: 25,
+                    width: 24,
+                    height: 24,
                     colorFilter: ColorFilter.mode(
-                      Colors.white,
+                      theme.iconTheme.color ?? Colors.white,
                       BlendMode.srcIn,
                     ),
                     placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
+                        (context) => const SizedBox(
+                          width: 24,
+                          height: 24,
                           child: CircularProgressIndicator(),
                         ),
                   ),
                 ),
 
-                Spacer(),
+                const Spacer(),
 
                 //Notes Page Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    indicatorColor: theme.colorScheme.secondaryContainer,
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/notes-page-icon.svg",
-                    semanticsLabel: "Notes Page Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                  child: IconButton(
+                    isSelected: widget.isNotesActive,
+                    onPressed: widget.onNotesPageSelected,
+                    icon: SvgPicture.asset(
+                      "assets/icons/notes-page-icon.svg",
+                      semanticsLabel: "Notes Page Icon",
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.iconTheme.color ?? Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      placeholderBuilder:
+                          (context) => const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(),
+                          ),
                     ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
                   ),
                 ),
 
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
 
                 // People Page Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    indicatorColor: theme.colorScheme.secondaryContainer,
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/people-relationship-icon.svg",
-                    semanticsLabel: "People Relationship Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                  child: IconButton(
+                    isSelected: widget.isPeopleActive,
+                    onPressed: widget.onPeoplePageSelected,
+                    icon: SvgPicture.asset(
+                      "assets/icons/people-relationship-icon.svg",
+                      semanticsLabel: "People Relationship Icon",
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.iconTheme.color ?? Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      placeholderBuilder:
+                          (context) => const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(),
+                          ),
                     ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
                   ),
                 ),
               ],
             ),
           ),
 
-          SizedBox(height: 14),
-
           // Search Bar
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SearchBar(
               controller: _searchController,
               onChanged: (value) {
-                searchProfilesFunct(value);
+                searchItems(value);
               },
-              cursorHeight: 24,
-              cursorColor: Colors.white,
-              cursorWidth: 1,
-              style: TextStyle(fontSize: 16, height: 1.5),
-              decoration: InputDecoration(
-                constraints: BoxConstraints(maxHeight: 40),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 10,
-                ),
-                hintText: "Search Profiles",
-                hintStyle: TextStyle(fontSize: 16, height: 1.5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white, width: 0.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white, width: 0.5),
-                ),
+              hintText: widget.searchPlaceholder,
+              padding: WidgetStateProperty.all<EdgeInsets>(
+                const EdgeInsets.symmetric(horizontal: 16),
               ),
+              leading: const Icon(Icons.search),
             ),
           ),
 
-          SizedBox(height: 14),
-
-          // List of Profiles
+          // List of Items (Profiles or Notebooks)
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 14),
-              itemCount: profiles.length,
+              padding: EdgeInsets.zero,
+              itemCount: items.length,
               itemBuilder: (context, index) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 4),
+                final isSelected = widget.selectedItemId == items[index]["_id"];
 
-                  //Individual Profile
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.all(0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor:
-                          widget.selectedProfileId == profiles[index]["_id"]
-                              ? Color.fromRGBO(209, 213, 219, 1)
-                              : Colors.transparent,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        widget.onProfileSelected(profiles[index]["_id"]);
-                        Navigator.pop(context);
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        "${profiles[index]["profileTitle"]}",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
+                return ListTile(
+                  selected: isSelected,
+                  title: Text(
+                    widget.titleExtractor(items[index]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  onTap: () {
+                    // Call onItemSelected with the ID
+                    widget.onItemSelected(items[index]["_id"]);
+
+                    // Call onItemTap with context and ID for navigation
+                    widget.onItemTap(context, items[index]["_id"]);
+                  },
                 );
               },
             ),
           ),
 
-          SizedBox(height: 14),
-
           // User Options Section
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.white, width: 0.5)),
+          const Divider(height: 1),
+
+          ListTile(
+            leading: CircleAvatar(
+              child: SvgPicture.asset(
+                "assets/icons/contact-icon.svg",
+                semanticsLabel: "User Contact Icon",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.iconTheme.color ?? Colors.white,
+                  BlendMode.srcIn,
+                ),
+                placeholderBuilder:
+                    (context) => const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(),
+                    ),
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    "assets/icons/contact-icon.svg",
-                    semanticsLabel: "User Contact Icon",
-                    width: 30,
-                    height: 30,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: CircularProgressIndicator(),
-                        ),
-                  ),
+            title: Text(
+              _displayUsername ?? "User Name",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: IconButton(
+              onPressed: _handleLogout,
+              icon: SvgPicture.asset(
+                "assets/icons/logout-icon.svg",
+                semanticsLabel: "Logout Icon",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.iconTheme.color ?? Colors.white,
+                  BlendMode.srcIn,
                 ),
-                SizedBox(width: 12),
-
-                Expanded(
-                  child: Text(
-                    "User Name",
-                    style: TextStyle(fontSize: 18, height: 1.75 / 1.125),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-
-                SizedBox(width: 12),
-
-                // Logout Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                placeholderBuilder:
+                    (context) => const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/logout-icon.svg",
-                    semanticsLabel: "Logout Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
