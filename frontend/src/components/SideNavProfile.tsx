@@ -67,7 +67,7 @@ const SideNav: React.FC<Props> = ({
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        },
+        }
       );
 
       if (!response.ok) {
@@ -79,7 +79,7 @@ const SideNav: React.FC<Props> = ({
 
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while searching for profiles",
+          errorMessage.error || "Unexpected error while searching for profiles"
         );
       }
 
@@ -90,7 +90,7 @@ const SideNav: React.FC<Props> = ({
       setErrorMessage(
         error instanceof Error
           ? `Failed to search profiles: ${error.message}`
-          : "An error occurred while searching profiles",
+          : "An error occurred while searching profiles"
       );
       console.error(error);
     }
@@ -110,7 +110,7 @@ const SideNav: React.FC<Props> = ({
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        },
+        }
       );
 
       if (!response.ok) {
@@ -122,7 +122,7 @@ const SideNav: React.FC<Props> = ({
 
         const errorMessage = await response.json();
         throw new Error(
-          errorMessage.error || "Unexpected error while retrieving profile",
+          errorMessage.error || "Unexpected error while retrieving profile"
         );
       }
 
@@ -139,7 +139,7 @@ const SideNav: React.FC<Props> = ({
       setErrorMessage(
         error instanceof Error
           ? `Failed to retrieve profile: ${error.message}`
-          : "An error occurred while retrieving profiles",
+          : "An error occurred while retrieving profiles"
       );
       console.error(error);
     }
@@ -264,7 +264,7 @@ const SideNav: React.FC<Props> = ({
           {userDropdownOpen && (
             <div
               ref={userDropdown}
-              className="z-10 w-[calc(100%-16px)] absolute left-1.5 -translate-x-1/2 bottom-full mb-2 rounded-xl border-[0.5px] border-neutral-50 flex flex-col bg-neutral-600"
+              className="z-10 w-[calc(100%-16px)] absolute left-1.5 bottom-full mb-2 rounded-xl border-[0.5px] border-neutral-50 flex flex-col bg-neutral-600"
             >
               <button
                 className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-neutral-500 rounded-xl cursor-pointer justify-start"
