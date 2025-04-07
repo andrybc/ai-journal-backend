@@ -20,7 +20,8 @@
     "build:flutter": "cd flutter && flutter build apk",
     "flutter:clean": "cd flutter && flutter clean",
     "flutter:test": "cd flutter && flutter test",
-    "format": "biome format . --write"
+    "format": "biome format . --write",
+    "test": "npm run test --workspace=frontend"
   },
   "keywords": [],
   "author": "",
