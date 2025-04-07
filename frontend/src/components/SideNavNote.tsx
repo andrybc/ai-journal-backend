@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import notesPage from "../assets/icons/notes-page-icon.svg";
 import relationshipIcon from "../assets/icons/people-relationship-icon.svg";
@@ -7,6 +7,7 @@ import contactIcon from "../assets/icons/contact-icon.svg";
 import logoutIcon from "../assets/icons/logout-icon.svg";
 import addNoteIcon from "../assets/icons/add-new-note-icon.svg";
 import searchJournal from "../utils/searchJournal"; // Function to search journal entries
+import handleLogout from "../utils/handleLogout"; // Function to handle logout
 
 type Props = {
   page: string; // Identifies the current page ("Notes" or "Summary")
@@ -25,9 +26,6 @@ const SideNav = ({
 }: Props) => {
   const [search, setSearch] = useState<string>(""); // Search Input
 
-  /*const [displayList, setDisplayList] = useState<
-    { name: string; id: string }[]
-  >([]);*/ // List of Notes/Relationships to display in SideNav
   const [selectedId, setSelectedId] = useState<string | null>(null); // Store ID of Notes/Relationships
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false); // User Dropdown State
   const userDropdown = useRef<HTMLDivElement>(null); // User Dropdown Ref
@@ -157,25 +155,20 @@ const SideNav = ({
           {userDropdownOpen && (
             <div
               ref={userDropdown}
-              className="z-10 w-[calc(100%-16px)] absolute left-1/2 -translate-x-1/2 bottom-full mb-2 rounded-xl border-[0.5px] flex flex-col bg-gray-200"
+              className="z-10 w-[calc(100%-16px)] absolute left-1/2 -translate-x-1/2 bottom-full mb-2 rounded-xl border-[0.5px] border-neutral-50 flex flex-col bg-neutral-600"
             >
-              <Link to="/user-profile">
-                <button className="w-full flex border-b items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-tl-xl rounded-tr-xl cursor-pointer">
-                  <img
-                    className="w-[20px] h-[20px]"
-                    src={contactIcon}
-                    alt="User Profile Icon"
-                  />
-                  <span className="whitespace-nowrap">User Profile</span>
-                </button>
-              </Link>
-              <button className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-gray-300 rounded-bl-xl rounded-br-xl cursor-pointer">
+              <button
+                className="w-full flex items-center gap-2 py-2.5 px-5 hover:bg-neutral-500 rounded-xl cursor-pointer"
+                onClick={handleLogout}
+              >
                 <img
-                  className="w-[20px] h-[20x]"
+                  className="w-[20px] h-[20px] invert brightness-0"
                   src={logoutIcon}
                   alt="Logout Icon"
                 />
-                <span className="whitespace-nowrap">Logout</span>
+                <span className="whitespace-nowrap text-neutral-50">
+                  Logout
+                </span>
               </button>
             </div>
           )}
@@ -192,7 +185,7 @@ const SideNav = ({
               alt="User Contact Icon"
             />
             <span className="text-lg truncate">
-              {localStorage.getItem("userName") || "User Name"}
+              {localStorage.getItem("username") || "User Name"}
             </span>
           </button>
         </div>

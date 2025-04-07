@@ -7,6 +7,7 @@ import closeSideNav from "../assets/icons/close-nav-icon.svg";
 import SaveNoteIcon from "../assets/icons/save-note-icon.svg";
 import DeleteNoteIcon from "../assets/icons/delete-note-icon.svg";
 import searchJournal from "../utils/searchJournal";
+import handleLogout from "../utils/handleLogout";
 
 const Notes = () => {
   const [displayList, setDisplayList] = useState<
@@ -28,6 +29,7 @@ const Notes = () => {
   //function to either retrieve the selected note or create a new one (SideNav)
   const getSelectedNote = async (id: string) => {
     const userID = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
 
     if (userID === null) {
       console.error("User ID is not available in local storage.");
@@ -41,14 +43,20 @@ const Notes = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (!response.ok) {
+        if (response.status === 403 || response.status === 401) {
+          console.error("Session expired. Please log in again");
+          handleLogout();
+          return;
+        }
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -114,13 +122,19 @@ const Notes = () => {
             content: selectedNote.content,
             userId: userID,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
+        if (response.status === 403 || response.status === 401) {
+          console.error("Session expired. Please log in again");
+          handleLogout();
+          return;
+        }
+
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -154,13 +168,19 @@ const Notes = () => {
             title: selectedNote.title,
             content: selectedNote.content,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
+        if (response.status === 403 || response.status === 401) {
+          console.error("Session expired. Please log in again");
+          handleLogout();
+          return;
+        }
+
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -191,13 +211,19 @@ const Notes = () => {
           body: JSON.stringify({
             notebookId: selectedNote?._id,
           }),
-        },
+        }
       );
 
       if (!response.ok) {
+        if (response.status === 403 || response.status === 401) {
+          console.error("Session expired. Please log in again");
+          handleLogout();
+          return;
+        }
+
         const errorText = await response.text();
         throw new Error(
-          `Server error ${response.status}: ${errorText || "No details"}`,
+          `Server error ${response.status}: ${errorText || "No details"}`
         );
       }
       const data = await response.json();
@@ -209,12 +235,9 @@ const Notes = () => {
   };
   //END OF HANDLE DELETE--------------------------------------------------------------------------
 
-  //START OF GET ALL JOURNALS---------------------------------------------------------------------
-  //END OF GET ALL JOURNALS---------------------------------------------------------------------
-
   //return the components created
   return (
-    <div className="flex h-dvh overflow-hidden">
+    <div className="flex h-dvh overflow-hidden relative">
       {sideNavOpen && ( //if the SideNav is set to open, display it
         <SideNav
           displayList={displayList} //pass the displayList to the SideNav component
@@ -265,7 +288,7 @@ const Notes = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 //use onChange along with React.ChangeEvent to modify the title
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, title: e.target.value } : prev,
+                  prev ? { ...prev, title: e.target.value } : prev
                 );
               }}
             />
@@ -280,7 +303,7 @@ const Notes = () => {
               }}
               onChange={(value) => {
                 setSelectedNote((prev) =>
-                  prev ? { ...prev, content: value || "" } : prev,
+                  prev ? { ...prev, content: value || "" } : prev
                 );
               }}
             />
@@ -302,7 +325,7 @@ const Notes = () => {
                             ...prev,
                             ...notebook,
                           }
-                        : prev,
+                        : prev
                     );
                     setPreviewMode("preview");
                     await refreshNavBar();
@@ -322,7 +345,7 @@ const Notes = () => {
                 <button //Delete Button
                   className="p-1 rounded-lg hover:bg-gray-200 cursor-pointer"
                   onClick={async () => {
-                    handleDelete();
+                    await handleDelete();
                     createNewNote();
                     await refreshNavBar();
                   }}

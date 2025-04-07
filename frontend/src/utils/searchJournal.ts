@@ -1,17 +1,19 @@
 const searchJournal = async (query: string) => {
   const userID = localStorage.getItem("userId");
-  if (!userID) {
-    console.error("User ID is missing.");
-    return null;
+  const token = localStorage.getItem("token");
+  if (!userID || !token) {
+    console.error("User ID or Auth Token is missing.");
+    return;
   }
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/journal/search?userId=${userID}&query=${query}`,
+      `${import.meta.env.VITE_API_URL}/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
       },
     );
