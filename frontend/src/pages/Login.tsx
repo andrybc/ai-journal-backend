@@ -109,7 +109,7 @@ const Login = () => {
               src={EyeClosedIcon}
               width="15"
               height="15"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer invert brightness-0"
               onClick={() => setShowPassword(!showPassword)}
               alt="Hide password"
             />
