@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router";
 
-
 const searchJournal = async (query: string) => {
   const userID = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
@@ -32,7 +31,6 @@ const searchJournal = async (query: string) => {
 
     const data = await response.json();
     console.log(data.message);
-
 
     return data.notebooks;
   } catch (error) {
