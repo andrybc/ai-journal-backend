@@ -42,7 +42,11 @@ exports.register = async (req, res) => {
     // Use the new verification email template
     const emailContent = verificationEmailTemplate(verificationLink);
 
-    await sendEmail(newUser.email, "Verify Your Journal Organizer Account", emailContent);
+    await sendEmail(
+      newUser.email,
+      "Verify Your Journal Organizer Account",
+      emailContent,
+    );
     res.status(201).json({
       message:
         "User registered successfully. Please check email for verification.",
@@ -115,7 +119,11 @@ exports.forgotPassword = async (req, res) => {
     // Use the new password reset email template
     const resetContent = resetPasswordEmailTemplate(resetLink);
 
-    await sendEmail(user.email, "Reset Your Journal Organizer Password", resetContent);
+    await sendEmail(
+      user.email,
+      "Reset Your Journal Organizer Password",
+      resetContent,
+    );
 
     // In production, send this token via email to the user
     res.json({ message: "Password reset email sent." });
