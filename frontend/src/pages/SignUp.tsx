@@ -11,7 +11,7 @@ const SignUp = () => {
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
   const navigate = useNavigate();
   const handleRegister = async () => {
     setIsSubmitted(true);
@@ -28,7 +28,7 @@ const SignUp = () => {
       errors.push("Please enter a valid email address");
     }
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
+    //const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
     if (!passwordRegex.test(password)) {
       errors.push("Password must meet the following:");
       errors.push("• At least 8 characters");
@@ -140,7 +140,7 @@ const SignUp = () => {
                 !password ||
                   password !== confirmPassword ||
                   password.length < 8 ||
-                  /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
+                  !passwordRegex.test(
                     password,
                   )
               )
@@ -162,7 +162,7 @@ const SignUp = () => {
                 !confirmPassword ||
                   password !== confirmPassword ||
                   confirmPassword.length < 8 ||
-                  /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
+                  !passwordRegex.test(
                     confirmPassword,
                   )
               )
