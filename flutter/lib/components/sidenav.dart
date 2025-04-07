@@ -277,6 +277,7 @@ class _SideNavState extends State<SideNav> {
                 final isSelected = widget.selectedItemId == items[index]["_id"];
 
                 return ListTile(
+                  key: ValueKey(items[index]["_id"]),
                   selected: isSelected,
                   title: Text(
                     widget.titleExtractor(items[index]),
