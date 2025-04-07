@@ -33,6 +33,7 @@ class _NoteScreenState extends State<NoteScreen> {
   String? _authToken;
   String? _userId;
   bool _noNoteSelected = false;
+  String? _notebookId; // Add this to track the notebook ID in state
   final FocusNode _contentFocusNode = FocusNode();
   final FocusNode _titleFocusNode = FocusNode();
 
@@ -41,6 +42,8 @@ class _NoteScreenState extends State<NoteScreen> {
     super.initState();
     _editingController = TextEditingController(text: widget.content);
     _titleController = TextEditingController(text: widget.title);
+    _notebookId =
+        widget.notebookId; // Initialize the state variable with widget property
     _noNoteSelected =
         widget.notebookId == null &&
         widget.title.isEmpty &&
@@ -145,6 +148,7 @@ class _NoteScreenState extends State<NoteScreen> {
     });
 
     try {
+      print("helloooo");
       final notebookData = {
         'title': _titleController.text,
         'content': _editingController.text,
@@ -152,9 +156,9 @@ class _NoteScreenState extends State<NoteScreen> {
       };
 
       Map<String, dynamic> response;
-      if (widget.notebookId != null) {
+      if (_notebookId != null) {
         response = await JournalService.updateNotebook(
-          widget.notebookId!,
+          _notebookId!,
           notebookData,
           _authToken!,
         );
@@ -164,6 +168,7 @@ class _NoteScreenState extends State<NoteScreen> {
           _authToken!,
         );
       }
+      print("response: $response");
 
       setState(() {
         _isSaving = false;
@@ -179,10 +184,14 @@ class _NoteScreenState extends State<NoteScreen> {
               duration: const Duration(seconds: 2),
             ),
           );
+
+          _notebookId = response['data']['notebook']['_id'];
         } else {
           _errorMessage = response['error'] ?? 'Failed to save notebook';
         }
       });
+      print("yeet");
+      print(_notebookId);
     } catch (e) {
       setState(() {
         _isSaving = false;
@@ -199,7 +208,7 @@ class _NoteScreenState extends State<NoteScreen> {
       return;
     }
 
-    if (widget.notebookId == null) {
+    if (_notebookId == null) {
       setState(() {
         _errorMessage = 'Cannot delete an unsaved notebook';
       });
@@ -241,7 +250,7 @@ class _NoteScreenState extends State<NoteScreen> {
 
     try {
       final response = await JournalService.deleteNotebook(
-        widget.notebookId!,
+        _notebookId!,
         _authToken!,
       );
 
@@ -255,7 +264,11 @@ class _NoteScreenState extends State<NoteScreen> {
         );
 
         if (mounted) {
-          Navigator.of(context).pop(true);
+          // Navigate to a new note screen instead of just popping the current screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const NoteScreen()),
+          );
         }
       } else {
         setState(() {
