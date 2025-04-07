@@ -164,6 +164,7 @@ class _SideNavState extends State<SideNav> {
         children: [
           // Top Navigation part
           Container(
+            margin: const EdgeInsets.only(top: 20),
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
