@@ -3,7 +3,7 @@ const searchJournal = async (query: string) => {
   const token = localStorage.getItem("token");
   if (!userID || !token) {
     console.error("User ID or Auth Token is missing.");
-    window.location.href = '/login';
+    window.location.href = "/login";
     return null;
   }
 

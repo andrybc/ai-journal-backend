@@ -129,6 +129,7 @@ const Notes = () => {
     //establish in order to use "selectedNotes"
     try {
       //start the API call
+      console.log("Creating notebook...");
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/journal/create-notebook`, //call "create-notebook" API
         {
@@ -144,6 +145,7 @@ const Notes = () => {
           }),
         },
       );
+      console.log("second base");
 
       if (!response.ok) {
         if (handleAuthError(response)) return;
@@ -153,7 +155,9 @@ const Notes = () => {
           `Server error ${response.status}: ${errorText || "No details"}`,
         );
       }
+
       const data = await response.json();
+
       console.log(data.message);
       console.log(data.notebook);
 
