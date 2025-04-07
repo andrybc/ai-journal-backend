@@ -43,7 +43,7 @@ async function extractTags(journalContent) {
     },
     {
       role: "user",
-      content: `Extract all important names (people) from the following text. Return only a valid JSON array. Example: ["Mary", "John", "Alice"]. If no names are found, return []. Text: "${journalContent}"`,
+      content: `Extract only the main subject(s) — the primary person or people being described in detail — from the following text. Ignore passing mentions of others. Return only a valid JSON array of names. Example: ["Mary", "John"]. If no main subjects are found, return []. Text: "${journalContent}"`,
     },
   ];
 
@@ -65,6 +65,7 @@ async function extractTags(journalContent) {
   }
 }
 
+
 function buildProfilePrompt(name, notebookContents) {
   const combinedNotes = notebookContents.join("\n\n");
   return [
@@ -76,42 +77,44 @@ function buildProfilePrompt(name, notebookContents) {
     {
       role: "user",
       content: `
-        We have a person named "${name}".
-        Use the following notes to generate a detailed profile.
-        Return valid JSON with the following fields:
-          - name (string)
-          - nickname (string or null)
-          - birthday (ISO date string or null)
-          - age (number or null)
-          - occupation (string or null)
-          - location (string or null)
-          - education (string or null)
-          - interests (array of strings)
-          - hobbies (array of strings)
-          - skills (array of strings)
-          - experience (string or null)
-          - personalityTraits (array of strings)
-          - goals (string or null)
-          - challenges (string or null)
-          - background (string or null)
-          - affiliations (array of strings)
-          - favoriteBooks (array of strings)
-          - favoriteMovies (array of strings)
-          - favoriteMusic (array of strings)
-          - achievements (array of strings)
-          - family (string or null)
-          - relationshipStatus (string or null)
-          - memorableQuotes (array of strings)
-          - additionalNotes (string or null)
-        
-        For any field that cannot be determined, set it to null (or an empty array for arrays). Do not include any extra text.
-        
-        NOTES:
-        ${combinedNotes}
+We have a person named "${name}".
+Use ONLY the content in the notes to generate a detailed profile for ${name} and about them only. The content may include information about other people, but you must extract information just about ${name}. Do not guess or assume anything not explicitly mentioned in the notes.
+
+Return valid JSON with the following fields:
+  - name (string)
+  - nickname (string or null)
+  - birthday (ISO date string or null)
+  - age (number or null)
+  - occupation (string or null)
+  - location (string or null)
+  - education (string or null)
+  - interests (array of strings)
+  - hobbies (array of strings)
+  - skills (array of strings)
+  - experience (string or null)
+  - personalityTraits (array of strings)
+  - goals (string or null)
+  - challenges (string or null)
+  - background (string or null)
+  - affiliations (array of strings)
+  - favoriteBooks (array of strings)
+  - favoriteMovies (array of strings)
+  - favoriteMusic (array of strings)
+  - achievements (array of strings)
+  - family (string or null)
+  - relationshipStatus (string or null)
+  - memorableQuotes (array of strings)
+  - additionalNotes (string or null)
+
+For any field that cannot be determined, set it to null (or an empty array for arrays). Do not include any extra text.
+
+NOTES:
+${combinedNotes}
       `,
     },
   ];
 }
+
 
 async function createProfile(name, notebookContents) {
   const messages = buildProfilePrompt(name, notebookContents);

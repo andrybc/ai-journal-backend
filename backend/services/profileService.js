@@ -55,19 +55,27 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
     notebook.tags = Array.isArray(namesArray) ? namesArray : [];
     await notebook.save();
 
+    const updatedProfiles = new Set();
+
     for (const name of notebook.tags) {
+      const normalized = name.trim().toLowerCase();
+      if (updatedProfiles.has(normalized)) {
+        continue;
+      }
+      updatedProfiles.add(normalized);
+
       let profile = await Profile.findOne({
-        profileTitle: name,
+        profileTitle: { $regex: new RegExp(`^${normalized}$`, "i") },
         userId: notebook.userId,
       });
 
       if (profile) {
-        if (!profile.notebookIDs.includes(notebook._id)) {
+        if (!profile.notebookIDs.some(id => id.toString() === notebook._id.toString())) {
           profile.notebookIDs.push(notebook._id);
         }
       } else {
         profile = new Profile({
-          profileTitle: name,
+          profileTitle: name.trim(),
           userId: notebook.userId,
           notebookIDs: [notebook._id],
         });
@@ -83,7 +91,7 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
         notebookContents,
       );
       if (profileData) {
-        profile.profileTitle = profileData.name || profile.profileTitle;
+        profile.profileTitle = profileData.name?.trim() || profile.profileTitle;
         profile.profileContent = formatProfileContent(profileData);
       }
       profile.timeUpdated = Date.now();
@@ -108,7 +116,7 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
           notebookContents,
         );
         if (profileData) {
-          profile.profileTitle = profileData.name || profile.profileTitle;
+          profile.profileTitle = profileData.name?.trim() || profile.profileTitle;
           profile.profileContent = formatProfileContent(profileData);
         }
         profile.timeUpdated = Date.now();
