@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'signup_screen.dart';
-import '../services/auth_service.dart'; // Updated import to use AuthService specifically
-import 'note_screen.dart'; // Import your home screen
+import '../services/auth_service.dart';
+import 'note_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,17 +13,28 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool showPassword = false;
-  String? error;
-  bool isLoading = false;
-  bool isSubmitted = false;
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _usernameFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  bool _showPassword = false;
+  String? _error;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _usernameFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
 
   // Check for existing auth token and redirect if found
   Future<void> checkExistingLogin() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
@@ -31,8 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = prefs.getString('auth_token');
 
       if (token != null && token.isNotEmpty) {
-        print('Found existing auth token, redirecting to home');
-
         // Small delay for better UX
         await Future.delayed(const Duration(milliseconds: 500));
 
@@ -43,11 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      print('Error checking existing login: $e');
+      debugPrint('Error checking existing login: $e');
     } finally {
       if (mounted) {
         setState(() {
-          isLoading = false;
+          _isLoading = false;
         });
       }
     }
@@ -60,41 +69,68 @@ class _LoginScreenState extends State<LoginScreen> {
     checkExistingLogin();
   }
 
-  void handleLogin() async {
+  Future<void> handleLogin() async {
+    // Clear any previous errors
     setState(() {
-      isSubmitted = true;
-      error = null;
-      isLoading = true;
+      _error = null;
     });
 
-    final username = usernameController.text.trim();
-    final password = passwordController.text;
-
-    if (username.isEmpty || password.isEmpty) {
-      setState(() {
-        error = 'Please fill in all fields';
-        isLoading = false;
-      });
+    // Validate form
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 
-    final response = await AuthService.login(username, password);
+    setState(() {
+      _isLoading = true;
+    });
 
-    setState(() => isLoading = false);
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
 
-    if (!response['success']) {
+    try {
+      final response = await AuthService.login(username, password);
+
+      if (!response['success']) {
+        setState(() {
+          _error =
+              response['error'] ??
+              'Login failed. Please check your credentials.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Save authentication data to SharedPreferences
+      await _saveAuthData(response);
+
+      if (!mounted) return;
+
+      // Show success feedback before navigating
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Login successful!'),
+          backgroundColor: Colors.green.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const NoteScreen()),
+      );
+    } catch (e) {
       setState(() {
-        error = response['error'] ?? 'Login failed.';
+        _error = 'Network error: Unable to connect to the server';
+        _isLoading = false;
       });
-      return;
+      debugPrint('Error during login: $e');
     }
+  }
 
-    // Save authentication data to SharedPreferences
+  Future<void> _saveAuthData(Map<String, dynamic> response) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userData = response['data'];
-
-      // Get the token - this is present in the response
       final token = userData['token'];
 
       if (token != null) {
@@ -106,23 +142,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Save the extracted user ID
         await prefs.setString('user_id', userId);
-
-        print('Auth data saved successfully: Token and extracted userId');
       } else {
-        print('Warning: Missing token in login response');
-        print('Response data structure: ${userData.keys.toList()}');
+        debugPrint('Warning: Missing token in login response');
       }
     } catch (e) {
-      print('Error saving auth data: $e');
+      debugPrint('Error saving auth data: $e');
       // Continue anyway since we have the data in memory for this session
     }
-
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const NoteScreen()),
-    );
   }
 
   // Helper method to extract user ID from JWT token
@@ -131,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // JWT format: header.payload.signature
       final parts = token.split('.');
       if (parts.length != 3) {
-        print('Invalid JWT token format');
+        debugPrint('Invalid JWT token format');
         return 'unknown_user';
       }
 
@@ -153,125 +179,202 @@ class _LoginScreenState extends State<LoginScreen> {
           decodedData['sub'] ??
           decodedData['userId'] ??
           'unknown_user';
-      print('Extracted user ID from token: $userId');
+
       return userId.toString();
     } catch (e) {
-      print('Error extracting user ID from token: $e');
+      debugPrint('Error extracting user ID from token: $e');
       return 'unknown_user';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Text(
-                  "Journal Organizer",
-                  style: TextStyle(fontSize: 28, color: Colors.white),
-                ),
-                const SizedBox(height: 30),
-                if (error != null)
-                  Text(error!, style: const TextStyle(color: Colors.red)),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: usernameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Username or Email',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    errorText:
-                        isSubmitted && usernameController.text.trim().isEmpty
-                            ? 'Please enter your username or email'
-                            : null,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: passwordController,
-                  obscureText: !showPassword,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.grey[850],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        showPassword ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.white70,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          showPassword = !showPassword;
-                        });
-                      },
-                    ),
-                    errorText:
-                        isSubmitted && passwordController.text.isEmpty
-                            ? 'Please enter your password'
-                            : null,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Forgot password functionality will be implemented soon',
+      // Use system color scheme instead of hardcoded colors
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Center(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Form(
+                  key: _formKey,
+                  child: AutofillGroup(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // App title with modern typography
+                        Text(
+                          "Journal Organizer",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Montserrat",
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 36),
+
+                        // Error message
+                        if (_error != null)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: colorScheme.errorContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _error!,
+                              style: TextStyle(
+                                color: colorScheme.onErrorContainer,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+
+                        // Username field with improved styling and validation
+                        TextFormField(
+                          controller: _usernameController,
+                          focusNode: _usernameFocusNode,
+                          decoration: InputDecoration(
+                            labelText: 'Username or Email',
+                            prefixIcon: const Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                          ),
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [
+                            AutofillHints.username,
+                            AutofillHints.email,
+                          ],
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your username or email';
+                            }
+                            return null;
+                          },
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(_passwordFocusNode);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Password field with improved styling and visibility toggle
+                        TextFormField(
+                          controller: _passwordController,
+                          focusNode: _passwordFocusNode,
+                          obscureText: !_showPassword,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                semanticLabel:
+                                    _showPassword
+                                        ? 'Hide password'
+                                        : 'Show password',
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                            ),
+                          ),
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            return null;
+                          },
+                          onFieldSubmitted: (_) {
+                            handleLogin();
+                          },
+                        ),
+
+                        // Forgot password button
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Forgot password functionality will be implemented soon',
+                                  ),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            child: const Text("Forgot Password?"),
                           ),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      "Forgot Password?",
-                      style: TextStyle(color: Colors.white70),
+                        const SizedBox(height: 24),
+
+                        // Login button with loading state
+                        FilledButton(
+                          onPressed: _isLoading ? null : handleLogin,
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            textStyle: const TextStyle(fontSize: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                  : const Text("Login"),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Sign up button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Don't have an account?"),
+                            TextButton(
+                              onPressed:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const SignupScreen(),
+                                    ),
+                                  ),
+                              child: const Text("Sign up"),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          isSubmitted = true;
-                        });
-                        handleLogin();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[800],
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                      ),
-                      child: const Text("Login"),
-                    ),
-                TextButton(
-                  onPressed:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SignupScreen()),
-                      ),
-                  child: const Text(
-                    "Don't have an account? Sign up",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

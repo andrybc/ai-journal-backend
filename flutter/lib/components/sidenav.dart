@@ -113,277 +113,191 @@ class _SideNavState extends State<SideNav> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Drawer(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      width: 300,
       child: Column(
         children: [
           // Top Navigation part
           Container(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.white, width: 0.5),
-              ),
-            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Close Nav Icon
                 IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   icon: SvgPicture.asset(
                     "assets/icons/close-nav-icon.svg",
                     semanticsLabel: "Close Nav Icon",
-                    width: 25,
-                    height: 25,
+                    width: 24,
+                    height: 24,
                     colorFilter: ColorFilter.mode(
-                      Colors.white,
+                      theme.iconTheme.color ?? Colors.white,
                       BlendMode.srcIn,
                     ),
                     placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
+                        (context) => const SizedBox(
+                          width: 24,
+                          height: 24,
                           child: CircularProgressIndicator(),
                         ),
                   ),
                 ),
 
-                Spacer(),
+                const Spacer(),
 
                 //Notes Page Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor:
-                        widget.isNotesActive
-                            ? Colors.white.withOpacity(0.2)
-                            : Colors.transparent,
+                NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    indicatorColor: theme.colorScheme.secondaryContainer,
                   ),
-                  onPressed: widget.onNotesPageSelected,
-                  icon: SvgPicture.asset(
-                    "assets/icons/notes-page-icon.svg",
-                    semanticsLabel: "Notes Page Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                  child: IconButton(
+                    isSelected: widget.isNotesActive,
+                    onPressed: widget.onNotesPageSelected,
+                    icon: SvgPicture.asset(
+                      "assets/icons/notes-page-icon.svg",
+                      semanticsLabel: "Notes Page Icon",
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.iconTheme.color ?? Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      placeholderBuilder:
+                          (context) => const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(),
+                          ),
                     ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
                   ),
                 ),
 
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
 
                 // People Page Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor:
-                        widget.isPeopleActive
-                            ? Colors.white.withOpacity(0.2)
-                            : Colors.transparent,
+                NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    indicatorColor: theme.colorScheme.secondaryContainer,
                   ),
-                  onPressed: widget.onPeoplePageSelected,
-                  icon: SvgPicture.asset(
-                    "assets/icons/people-relationship-icon.svg",
-                    semanticsLabel: "People Relationship Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                  child: IconButton(
+                    isSelected: widget.isPeopleActive,
+                    onPressed: widget.onPeoplePageSelected,
+                    icon: SvgPicture.asset(
+                      "assets/icons/people-relationship-icon.svg",
+                      semanticsLabel: "People Relationship Icon",
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.iconTheme.color ?? Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      placeholderBuilder:
+                          (context) => const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(),
+                          ),
                     ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
                   ),
                 ),
               ],
             ),
           ),
 
-          SizedBox(height: 14),
-
           // Search Bar
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SearchBar(
               controller: _searchController,
               onChanged: (value) {
                 searchItems(value);
               },
-              cursorHeight: 24,
-              cursorColor: Colors.white,
-              cursorWidth: 1,
-              style: TextStyle(fontSize: 16, height: 1.5),
-              decoration: InputDecoration(
-                constraints: BoxConstraints(maxHeight: 40),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 10,
-                ),
-                hintText: widget.searchPlaceholder,
-                hintStyle: TextStyle(fontSize: 16, height: 1.5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white, width: 0.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white, width: 0.5),
-                ),
+              hintText: widget.searchPlaceholder,
+              padding: WidgetStateProperty.all<EdgeInsets>(
+                const EdgeInsets.symmetric(horizontal: 16),
               ),
+              leading: const Icon(Icons.search),
             ),
           ),
-
-          SizedBox(height: 14),
 
           // List of Items (Profiles or Notebooks)
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 14),
+              padding: EdgeInsets.zero,
               itemCount: items.length,
               itemBuilder: (context, index) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 4),
+                final isSelected = widget.selectedItemId == items[index]["_id"];
 
-                  //Individual Item
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.all(0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor:
-                          widget.selectedItemId == items[index]["_id"]
-                              ? Color.fromRGBO(209, 213, 219, 1)
-                              : Colors.transparent,
-                    ),
-                    onPressed: () {
-                      // Call onItemSelected with the ID
-                      widget.onItemSelected(items[index]["_id"]);
-
-                      // Call onItemTap with context and ID for navigation
-                      widget.onItemTap(context, items[index]["_id"]);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        widget.titleExtractor(items[index]),
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
+                return ListTile(
+                  selected: isSelected,
+                  title: Text(
+                    widget.titleExtractor(items[index]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  onTap: () {
+                    // Call onItemSelected with the ID
+                    widget.onItemSelected(items[index]["_id"]);
+
+                    // Call onItemTap with context and ID for navigation
+                    widget.onItemTap(context, items[index]["_id"]);
+                  },
                 );
               },
             ),
           ),
 
-          SizedBox(height: 14),
-
           // User Options Section
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.white, width: 0.5)),
+          const Divider(height: 1),
+
+          ListTile(
+            leading: CircleAvatar(
+              child: SvgPicture.asset(
+                "assets/icons/contact-icon.svg",
+                semanticsLabel: "User Contact Icon",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.iconTheme.color ?? Colors.white,
+                  BlendMode.srcIn,
+                ),
+                placeholderBuilder:
+                    (context) => const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(),
+                    ),
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    "assets/icons/contact-icon.svg",
-                    semanticsLabel: "User Contact Icon",
-                    width: 30,
-                    height: 30,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: CircularProgressIndicator(),
-                        ),
-                  ),
+            title: const Text(
+              "User Name",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: SvgPicture.asset(
+                "assets/icons/logout-icon.svg",
+                semanticsLabel: "Logout Icon",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.iconTheme.color ?? Colors.white,
+                  BlendMode.srcIn,
                 ),
-                SizedBox(width: 12),
-
-                Expanded(
-                  child: Text(
-                    "User Name",
-                    style: TextStyle(fontSize: 18, height: 1.75 / 1.125),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-
-                SizedBox(width: 12),
-
-                // Logout Button
-                IconButton(
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                placeholderBuilder:
+                    (context) => const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/logout-icon.svg",
-                    semanticsLabel: "Logout Icon",
-                    width: 25,
-                    height: 25,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
-                    placeholderBuilder:
-                        (context) => SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(),
-                        ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],

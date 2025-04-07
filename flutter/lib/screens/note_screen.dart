@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../services/journal_service.dart';
 import '../components/sidenav.dart';
 import '../screens/profile_screen.dart';
@@ -16,8 +17,7 @@ class NoteScreen extends StatefulWidget {
 
   final String title;
   final String content;
-  final String?
-  notebookId; // Added notebookId to support editing existing notebooks
+  final String? notebookId;
 
   @override
   State<NoteScreen> createState() => _NoteScreenState();
@@ -34,6 +34,8 @@ class _NoteScreenState extends State<NoteScreen> {
   String? _authToken;
   String? _userId;
   bool _noNoteSelected = false;
+  final FocusNode _contentFocusNode = FocusNode();
+  final FocusNode _titleFocusNode = FocusNode();
 
   // Custom extension set with emoji support
   final _markdownExtensionSet = md.ExtensionSet(
@@ -184,6 +186,16 @@ class _NoteScreenState extends State<NoteScreen> {
         if (response['success']) {
           _successMessage = 'Notebook saved successfully';
           _isEditMode = false;
+
+          // Show a snackbar for better feedback
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Notebook saved successfully'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green.shade700,
+              duration: const Duration(seconds: 2),
+            ),
+          );
         } else {
           _errorMessage = response['error'] ?? 'Failed to save notebook';
         }
@@ -225,9 +237,10 @@ class _NoteScreenState extends State<NoteScreen> {
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
-            TextButton(
+            FilledButton.tonal(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              style: FilledButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -253,9 +266,10 @@ class _NoteScreenState extends State<NoteScreen> {
       if (response['success']) {
         // Show temporary success message and navigate back
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Notebook deleted successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Notebook deleted successfully'),
+            backgroundColor: Colors.green.shade700,
+            behavior: SnackBarBehavior.floating,
           ),
         );
 
@@ -289,7 +303,12 @@ class _NoteScreenState extends State<NoteScreen> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.black87,
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 
@@ -311,19 +330,37 @@ class _NoteScreenState extends State<NoteScreen> {
   void dispose() {
     _editingController.dispose();
     _titleController.dispose();
+    _contentFocusNode.dispose();
+    _titleFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      drawerScrimColor: Colors.black.withOpacity(0.75),
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 2,
+        centerTitle: true,
+        toolbarHeight: 53.5,
         title:
             _isEditMode
                 ? TextField(
                   controller: _titleController,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  focusNode: _titleFocusNode,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    letterSpacing: 1.05,
+                    height: 1.75 / 1.125,
+                    fontFamily: "Montserrat",
+                    fontFamilyFallback: ["sans-serif"],
+                  ),
                   decoration: const InputDecoration(
                     hintText: 'Enter title',
                     border: InputBorder.none,
@@ -331,6 +368,14 @@ class _NoteScreenState extends State<NoteScreen> {
                 )
                 : Text(
                   _noNoteSelected ? 'No Note Selected' : _titleController.text,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    letterSpacing: 1.05,
+                    height: 1.75 / 1.125,
+                    fontFamily: "Montserrat",
+                    fontFamilyFallback: ["sans-serif"],
+                  ),
                 ),
         actions: [
           // Delete button
@@ -345,7 +390,7 @@ class _NoteScreenState extends State<NoteScreen> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                      : const Icon(Icons.delete, color: Colors.red),
+                      : const Icon(Icons.delete),
               tooltip: 'Delete notebook',
             ),
           // Save button
@@ -397,116 +442,236 @@ class _NoteScreenState extends State<NoteScreen> {
           );
         },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child:
-            _noNoteSelected
-                ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.note_alt_outlined,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'No note selected',
-                        style: TextStyle(fontSize: 20, color: Colors.grey),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Select a note from the sidebar or create a new one',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-                : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body:
+          _noNoteSelected
+              ? Container(
+                padding: const EdgeInsets.all(32),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    if (_errorMessage != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                    SvgPicture.asset(
+                      "assets/icons/ghost-icon.svg",
+                      semanticsLabel: "No notes available",
+                      colorFilter: ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      width: 75,
+                      height: 75,
+                      placeholderBuilder:
+                          (context) => Container(
+                            padding: const EdgeInsets.all(15),
+                            child: const CircularProgressIndicator(),
+                          ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "No Note Selected",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 24,
+                        height: 1.3333,
+                        fontFamily: "Montserrat",
+                        fontFamilyFallback: const ["sans-serif"],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Select a note from the sidebar or create a new one',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, height: 1.5),
+                    ),
+                    const SizedBox(height: 30),
+                    FilledButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _noNoteSelected = false;
+                          _isEditMode = true;
+                          _titleController.text = 'New Note';
+                          _editingController.text = '';
+                          // Focus on title after creating new note
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(_titleFocusNode);
+                          });
+                        });
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Create New Note"),
+                    ),
+                  ],
+                ),
+              )
+              : SafeArea(
+                child: Column(
+                  children: [
+                    // Message area for success/error
+                    if (_errorMessage != null || _successMessage != null)
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.all(8),
+                        child: Card(
+                          color:
+                              _errorMessage != null
+                                  ? colorScheme.errorContainer
+                                  : colorScheme.primaryContainer,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Text(
+                              _errorMessage ?? _successMessage ?? '',
+                              style: TextStyle(
+                                color:
+                                    _errorMessage != null
+                                        ? colorScheme.onErrorContainer
+                                        : colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    if (_successMessage != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          _successMessage!,
-                          style: const TextStyle(color: Colors.green),
-                        ),
-                      ),
+
+                    // Main content
                     Expanded(
                       child:
                           _isLoading
                               ? const Center(child: CircularProgressIndicator())
-                              : _isEditMode
-                              ? TextField(
-                                controller: _editingController,
-                                maxLines: null,
-                                expands: true,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Edit your markdown here',
+                              : SingleChildScrollView(
+                                child: Center(
+                                  child: Container(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 900,
+                                    ),
+                                    alignment: Alignment.topLeft,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 40,
+                                      vertical: 32,
+                                    ),
+                                    child:
+                                        _isEditMode
+                                            ? TextField(
+                                              controller: _editingController,
+                                              focusNode: _contentFocusNode,
+                                              maxLines: null,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                height: 1.6,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                hintText:
+                                                    'Edit your markdown here',
+                                                contentPadding:
+                                                    const EdgeInsets.all(16),
+                                              ),
+                                            )
+                                            : MarkdownBody(
+                                              data: _editingController.text,
+                                              selectable: true,
+                                              styleSheet: MarkdownStyleSheet(
+                                                p: const TextStyle(
+                                                  fontSize: 18,
+                                                  height: 1.6,
+                                                ),
+                                                h1: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 32,
+                                                  height: 1.2,
+                                                  fontFamily: "Montserrat",
+                                                  fontFamilyFallback: [
+                                                    "sans-serif",
+                                                  ],
+                                                ),
+                                                h2: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 28,
+                                                  height: 1.3,
+                                                  fontFamily: "Montserrat",
+                                                  fontFamilyFallback: [
+                                                    "sans-serif",
+                                                  ],
+                                                ),
+                                                h3: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 24,
+                                                  height: 1.3,
+                                                  fontFamily: "Montserrat",
+                                                  fontFamilyFallback: [
+                                                    "sans-serif",
+                                                  ],
+                                                ),
+                                                blockquote: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  color:
+                                                      colorScheme
+                                                          .onSurfaceVariant,
+                                                ),
+                                                code: TextStyle(
+                                                  backgroundColor:
+                                                      colorScheme
+                                                          .surfaceContainerHighest,
+                                                  color: colorScheme.primary,
+                                                  fontFamily: 'monospace',
+                                                ),
+                                                codeblockDecoration: BoxDecoration(
+                                                  color:
+                                                      colorScheme
+                                                          .surfaceContainerHighest,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              extensionSet:
+                                                  _markdownExtensionSet,
+                                            ),
+                                  ),
                                 ),
-                              )
-                              : Markdown(
-                                data: _editingController.text,
-                                selectable: true,
-                                extensionSet: _markdownExtensionSet,
-                                onTapText: () {
-                                  try {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Text tapped'),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    // Handle the error, e.g., show an error message
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Error: ${e.toString()}'),
-                                      ),
-                                    );
-                                  }
-                                },
                               ),
                     ),
                   ],
                 ),
-      ),
-      floatingActionButton:
-          !_noNoteSelected
-              ? FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    _isEditMode = !_isEditMode;
-                    // Clear messages when toggling edit mode
-                    _errorMessage = null;
-                    _successMessage = null;
-                  });
-                },
-                tooltip: _isEditMode ? 'View' : 'Edit',
-                child: Icon(_isEditMode ? Icons.visibility : Icons.edit),
-              )
-              : FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    _noNoteSelected = false;
-                    _isEditMode = true;
-                    _titleController.text = 'New Note';
-                    _editingController.text = '';
-                  });
-                },
-                tooltip: 'Create New Note',
-                child: Icon(Icons.add),
               ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            if (_noNoteSelected) {
+              _noNoteSelected = false;
+              _isEditMode = true;
+              _titleController.text = 'New Note';
+              _editingController.text = '';
+            } else {
+              _isEditMode = !_isEditMode;
+              // Clear messages when toggling edit mode
+              _errorMessage = null;
+              _successMessage = null;
+            }
+
+            // Request focus on the appropriate field when entering edit mode
+            if (_isEditMode) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                FocusScope.of(context).requestFocus(_contentFocusNode);
+              });
+            }
+          });
+        },
+        tooltip:
+            _noNoteSelected
+                ? 'Create New Note'
+                : (_isEditMode ? 'View' : 'Edit'),
+        child: Icon(
+          _noNoteSelected
+              ? Icons.add
+              : (_isEditMode ? Icons.visibility : Icons.edit),
+        ),
+      ),
+      // Add floating action button position for better usability
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
