@@ -79,11 +79,16 @@ class JournalService {
   static Future<Map<String, dynamic>> searchNotebooks(
     String query,
     String token,
+    String userId,
   ) async {
-    final url = Uri.parse(
-      '${ApiBase.baseUrl}/journal/search?q=${Uri.encodeComponent(query)}',
-    );
-    final response = await http.get(url, headers: ApiBase.getHeaders(token));
+    // Build URL with both query and userId parameters
+    final queryParams = {'query': query, 'userId': userId};
+
+    final uri = Uri.parse(
+      '${ApiBase.baseUrl}/journal/search',
+    ).replace(queryParameters: queryParams);
+
+    final response = await http.get(uri, headers: ApiBase.getHeaders(token));
 
     return ApiBase.handleResponse(response, errorMessage: 'Search failed');
   }
