@@ -106,7 +106,8 @@ class JournalApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginScreen(),
+      initialRoute: '/',
+      routes: {'/': (context) => const LoginScreen()},
     );
   }
 }

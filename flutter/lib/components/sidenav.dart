@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/user_service.dart';
 
 class SideNav extends StatefulWidget {
   final String? userId;
@@ -51,6 +53,7 @@ class SideNav extends StatefulWidget {
 class _SideNavState extends State<SideNav> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> items = [];
+  String? _displayUsername;
 
   @override
   didChangeDependencies() {
@@ -65,6 +68,54 @@ class _SideNavState extends State<SideNav> {
       });
     } else {
       searchItems("");
+      print("calling _fetchUsername()");
+      _fetchUsername();
+    }
+  }
+
+  Future<void> _fetchUsername() async {
+    print("hey");
+    if (widget.userId == null || widget.token == null) return;
+    print("fetching username");
+
+    try {
+      final response = await UserService.getUserById(
+        widget.userId!,
+        widget.token!,
+      );
+
+      print("response: $response");
+      if (response["success"] && response["data"] != null) {
+        print("data : ${response["data"]}");
+        final userData = response["data"]["user"];
+        if (userData is Map<String, dynamic> &&
+            userData.containsKey("username")) {
+          setState(() {
+            _displayUsername = userData["username"];
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching username: $e');
+    }
+  }
+
+  // Handle logout - clear SharedPreferences and navigate to login screen
+  Future<void> _handleLogout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (!mounted) return;
+
+      // Show success message
+      widget.showSnackBar(context, 'Logged out successfully');
+
+      // Navigate to login screen
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      widget.showSnackBar(context, 'Error logging out: $e');
     }
   }
 
@@ -273,15 +324,13 @@ class _SideNavState extends State<SideNav> {
                     ),
               ),
             ),
-            title: const Text(
-              "User Name",
+            title: Text(
+              _displayUsername ?? "User Name",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             trailing: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: _handleLogout,
               icon: SvgPicture.asset(
                 "assets/icons/logout-icon.svg",
                 semanticsLabel: "Logout Icon",
