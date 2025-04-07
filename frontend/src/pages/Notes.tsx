@@ -257,6 +257,7 @@ const Notes = () => {
           getSelectedNote={getSelectedNote}
           page="Notes"
           closeNav={setSideNavOpen}
+          setDisplayList={setDisplayList}
         />
       )}
 
