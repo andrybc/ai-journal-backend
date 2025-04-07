@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import "../components/sidenav_profile.dart";
+import "../components/sidenav.dart";
 import 'package:shared_preferences/shared_preferences.dart';
 import "../services/profile_service.dart";
 

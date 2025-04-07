@@ -20,6 +20,46 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool isSubmitted = false;
 
+  // Check for existing auth token and redirect if found
+  Future<void> checkExistingLogin() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token != null && token.isNotEmpty) {
+        print('Found existing auth token, redirecting to home');
+
+        // Small delay for better UX
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      print('Error checking existing login: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if user is already logged in
+    checkExistingLogin();
+  }
+
   void handleLogin() async {
     setState(() {
       isSubmitted = true;
