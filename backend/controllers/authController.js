@@ -2,6 +2,8 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
 const sendEmail = require("../services/sendEmail");
+const verificationEmailTemplate = require("../services/emailTemplates/verificationEmail");
+const resetPasswordEmailTemplate = require("../services/emailTemplates/resetPasswordEmail");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -36,13 +38,15 @@ exports.register = async (req, res) => {
     );
 
     const verificationLink = `${process.env.BASE_URL}/verify-email?token=${verificationToken}`;
-    const emailContent = `
-    <h1>Verify Your Email</h1>
-    <p>Click the link below to verify your email:</p>
-    <a href="${verificationLink}">Verify Email</a>
-    `;
 
-    await sendEmail(newUser.email, "Email Verification", emailContent);
+    // Use the new verification email template
+    const emailContent = verificationEmailTemplate(verificationLink);
+
+    await sendEmail(
+      newUser.email,
+      "Verify Your Journal Organizer Account",
+      emailContent,
+    );
     res.status(201).json({
       message:
         "User registered successfully. Please check email for verification.",
@@ -111,13 +115,15 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     const resetLink = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
-    const resetContent = `
-    <h1>Reset Your Password</h1>
-    <p>Click the link below to reset your password:</p>
-    <a href="${resetLink}">Reset Password</a>
-    `;
 
-    await sendEmail(user.email, "Password Reset", resetContent);
+    // Use the new password reset email template
+    const resetContent = resetPasswordEmailTemplate(resetLink);
+
+    await sendEmail(
+      user.email,
+      "Reset Your Journal Organizer Password",
+      resetContent,
+    );
 
     // In production, send this token via email to the user
     res.json({ message: "Password reset email sent." });
