@@ -1,17 +1,20 @@
 const searchJournal = async (query: string) => {
   const userID = localStorage.getItem("userId");
-  if (!userID) {
-    console.error("User ID is missing.");
+  const token = localStorage.getItem("token");
+  if (!userID || !token) {
+    console.error("User ID or Auth Token is missing.");
+    window.location.href = "/login";
     return null;
   }
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/journal/search?userId=${userID}&query=${query}`,
+      `${import.meta.env.VITE_API_URL}/journal/search?userId=${userID}&query=${encodeURIComponent(query)}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       },
     );
@@ -25,6 +28,7 @@ const searchJournal = async (query: string) => {
 
     const data = await response.json();
     console.log(data.message);
+
     return data.notebooks;
   } catch (error) {
     console.error("Error:", error);
