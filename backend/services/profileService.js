@@ -70,7 +70,11 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
       });
 
       if (profile) {
-        if (!profile.notebookIDs.some(id => id.toString() === notebook._id.toString())) {
+        if (
+          !profile.notebookIDs.some(
+            (id) => id.toString() === notebook._id.toString(),
+          )
+        ) {
           profile.notebookIDs.push(notebook._id);
         }
       } else {
@@ -116,7 +120,8 @@ exports.updateProfilesForNotebook = async (notebook, operation) => {
           notebookContents,
         );
         if (profileData) {
-          profile.profileTitle = profileData.name?.trim() || profile.profileTitle;
+          profile.profileTitle =
+            profileData.name?.trim() || profile.profileTitle;
           profile.profileContent = formatProfileContent(profileData);
         }
         profile.timeUpdated = Date.now();

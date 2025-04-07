@@ -65,7 +65,6 @@ async function extractTags(journalContent) {
   }
 }
 
-
 function buildProfilePrompt(name, notebookContents) {
   const combinedNotes = notebookContents.join("\n\n");
   return [
@@ -114,7 +113,6 @@ ${combinedNotes}
     },
   ];
 }
-
 
 async function createProfile(name, notebookContents) {
   const messages = buildProfilePrompt(name, notebookContents);
