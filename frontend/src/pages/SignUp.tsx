@@ -94,14 +94,15 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">Sign Up</h2>
 
         {(errorMessages.length > 0 || successMessage) && (
-          <div className="mb-4 text-justify">
+          <div className="mb-4">
             {errorMessages.map((error, index) => (
-              <p key={index} className="text-sm text-red-600">
+              <p key={index} className="text-sm text-red-600 text-justify">
                 {error}
               </p>
             ))}
+            
             {successMessage && (
-              <p className="text-sm font-bold text-neutral-100">
+              <p className="text-sm font-bold text-neutral-100 text-center">
                 {successMessage}
               </p>
             )}
