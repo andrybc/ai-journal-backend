@@ -7,16 +7,10 @@ class AppTextStyle {
   static const List<String> fontFamilyFallbacks = ["sans-serif"];
 
   // Regular text styles
-  static const TextStyle body = TextStyle(
-    fontSize: 18,
-    height: 1.6,
-  );
-  
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 16,
-    height: 1.5,
-  );
-  
+  static const TextStyle body = TextStyle(fontSize: 18, height: 1.6);
+
+  static const TextStyle bodySmall = TextStyle(fontSize: 16, height: 1.5);
+
   // Heading styles
   static const TextStyle h1 = TextStyle(
     fontWeight: FontWeight.w600,
@@ -25,7 +19,7 @@ class AppTextStyle {
     fontFamily: primaryFontFamily,
     fontFamilyFallback: fontFamilyFallbacks,
   );
-  
+
   static const TextStyle h2 = TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 28,
@@ -33,7 +27,7 @@ class AppTextStyle {
     fontFamily: primaryFontFamily,
     fontFamilyFallback: fontFamilyFallbacks,
   );
-  
+
   static const TextStyle h3 = TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 24,
@@ -41,7 +35,7 @@ class AppTextStyle {
     fontFamily: primaryFontFamily,
     fontFamilyFallback: fontFamilyFallbacks,
   );
-  
+
   // Title styles
   static const TextStyle appBarTitle = TextStyle(
     fontWeight: FontWeight.w600,

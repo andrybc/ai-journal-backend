@@ -256,9 +256,7 @@ class _NoteScreenState extends State<NoteScreen> {
         );
 
         if (mounted) {
-          Navigator.of(
-            context,
-          ).pop(true);
+          Navigator.of(context).pop(true);
         }
       } else {
         setState(() {
@@ -356,9 +354,7 @@ class _NoteScreenState extends State<NoteScreen> {
             IconButton(
               onPressed: _isSaving ? null : _saveNotebook,
               icon:
-                  _isSaving
-                      ? AppUI.loadingIndicator()
-                      : const Icon(Icons.save),
+                  _isSaving ? AppUI.loadingIndicator() : const Icon(Icons.save),
               tooltip: 'Save notebook',
             ),
         ],
@@ -396,24 +392,22 @@ class _NoteScreenState extends State<NoteScreen> {
       body:
           _noNoteSelected
               ? AppUI.emptyState(
-                  icon: "assets/icons/ghost-icon.svg",
-                  title: "No Note Selected",
-                  subtitle: 'Select a note from the sidebar or create a new one',
-                  onActionPressed: () {
-                    setState(() {
-                      _noNoteSelected = false;
-                      _isEditMode = true;
-                      _titleController.text = 'New Note';
-                      _editingController.text = '';
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        FocusScope.of(
-                          context,
-                        ).requestFocus(_titleFocusNode);
-                      });
+                icon: "assets/icons/ghost-icon.svg",
+                title: "No Note Selected",
+                subtitle: 'Select a note from the sidebar or create a new one',
+                onActionPressed: () {
+                  setState(() {
+                    _noNoteSelected = false;
+                    _isEditMode = true;
+                    _titleController.text = 'New Note';
+                    _editingController.text = '';
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      FocusScope.of(context).requestFocus(_titleFocusNode);
                     });
-                  },
-                  actionText: "Create New Note",
-                )
+                  });
+                },
+                actionText: "Create New Note",
+              )
               : SafeArea(
                 child: Column(
                   children: [
@@ -444,13 +438,18 @@ class _NoteScreenState extends State<NoteScreen> {
                                               focusNode: _contentFocusNode,
                                               maxLines: null,
                                               style: AppTextStyle.body,
-                                              decoration: AppMarkdownStyle.editorDecoration(),
+                                              decoration:
+                                                  AppMarkdownStyle.editorDecoration(),
                                             )
                                             : MarkdownBody(
                                               data: _editingController.text,
                                               selectable: true,
-                                              styleSheet: AppMarkdownStyle.markdownStyleSheet(colorScheme),
-                                              extensionSet: AppMarkdownStyle.extensionSet,
+                                              styleSheet:
+                                                  AppMarkdownStyle.markdownStyleSheet(
+                                                    colorScheme,
+                                                  ),
+                                              extensionSet:
+                                                  AppMarkdownStyle.extensionSet,
                                             ),
                                   ),
                                 ),

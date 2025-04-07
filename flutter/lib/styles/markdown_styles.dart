@@ -40,9 +40,7 @@ class AppMarkdownStyle {
   /// Creates a TextField decoration for markdown editing
   static InputDecoration editorDecoration() {
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       hintText: 'Edit your markdown here',
       contentPadding: const EdgeInsets.all(16),
     );

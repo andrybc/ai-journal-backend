@@ -47,7 +47,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Verify Email", style: AppTextStyle.appBarTitle),
@@ -69,14 +69,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                
+
                 Text(
                   "A verification email has been sent to ${widget.email}",
                   style: AppTextStyle.body,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 36),
-                
+
                 TextField(
                   controller: codeController,
                   decoration: InputDecoration(
@@ -89,16 +89,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 if (error != null || success)
                   AppUI.messageCard(
                     context: context,
                     message: success ? "Email verified successfully!" : error,
                     isError: !success,
                   ),
-                  
+
                 const SizedBox(height: 32),
-                
+
                 FilledButton(
                   onPressed: verifyCode,
                   style: FilledButton.styleFrom(

@@ -94,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!response['success']) {
         setState(() {
           _error =
-              response['error'] ?? 'Login failed. Please check your credentials.';
+              response['error'] ??
+              'Login failed. Please check your credentials.';
           _isLoading = false;
         });
         return;
@@ -175,7 +176,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Extract user ID - JWT tokens typically have user ID as 'id', 'sub', or 'user_id'
       final userId =
-          decodedData['id'] ?? decodedData['sub'] ?? decodedData['userId'] ?? 'unknown_user';
+          decodedData['id'] ??
+          decodedData['sub'] ??
+          decodedData['userId'] ??
+          'unknown_user';
 
       return userId.toString();
     } catch (e) {
@@ -243,7 +247,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           onFieldSubmitted: (_) {
-                            FocusScope.of(context).requestFocus(_passwordFocusNode);
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(_passwordFocusNode);
                           },
                         ),
                         const SizedBox(height: 16),
@@ -262,8 +268,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             filled: true,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _showPassword ? Icons.visibility : Icons.visibility_off,
-                                semanticLabel: _showPassword ? 'Hide password' : 'Show password',
+                                _showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                semanticLabel:
+                                    _showPassword
+                                        ? 'Hide password'
+                                        : 'Show password',
                               ),
                               onPressed: () {
                                 setState(() {
@@ -310,9 +321,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: _isLoading
-                              ? AppUI.loadingIndicator()
-                              : const Text("Login"),
+                          child:
+                              _isLoading
+                                  ? AppUI.loadingIndicator()
+                                  : const Text("Login"),
                         ),
                         const SizedBox(height: 20),
 
@@ -325,12 +337,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: AppTextStyle.bodySmall,
                             ),
                             TextButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const SignupScreen(),
-                                ),
-                              ),
+                              onPressed:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const SignupScreen(),
+                                    ),
+                                  ),
                               child: const Text("Sign up"),
                             ),
                           ],
