@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'signup_screen.dart';
 import '../services/auth_service.dart'; // Updated import to use AuthService specifically
-import 'home_screen.dart'; // Import your home screen
+import 'note_screen.dart'; // Import your home screen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const NoteScreen()),
         );
       }
     } catch (e) {
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const NoteScreen()),
     );
   }
 

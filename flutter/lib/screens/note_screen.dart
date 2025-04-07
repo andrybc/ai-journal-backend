@@ -3,12 +3,14 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/journal_service.dart';
+import '../components/sidenav.dart';
+import '../screens/profile_screen.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({
     super.key,
-    required this.title,
-    required this.content,
+    this.title = '',
+    this.content = '',
     this.notebookId,
   });
 
@@ -31,6 +33,7 @@ class _NoteScreenState extends State<NoteScreen> {
   late final TextEditingController _titleController;
   String? _authToken;
   String? _userId;
+  bool _noNoteSelected = false;
 
   // Custom extension set with emoji support
   final _markdownExtensionSet = md.ExtensionSet(
@@ -47,6 +50,10 @@ class _NoteScreenState extends State<NoteScreen> {
     // Initialize controllers with the journal entry content
     _editingController = TextEditingController(text: widget.content);
     _titleController = TextEditingController(text: widget.title);
+    _noNoteSelected =
+        widget.notebookId == null &&
+        widget.title.isEmpty &&
+        widget.content.isEmpty;
     _loadAuthToken();
   }
 
@@ -210,7 +217,9 @@ class _NoteScreenState extends State<NoteScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this notebook? This action cannot be undone.'),
+          content: const Text(
+            'Are you sure you want to delete this notebook? This action cannot be undone.',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -249,10 +258,12 @@ class _NoteScreenState extends State<NoteScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Navigate back to previous screen
         if (mounted) {
-          Navigator.of(context).pop(true); // Pop with result to refresh previous screen
+          Navigator.of(
+            context,
+          ).pop(true); // Pop with result to refresh previous screen
         }
       } else {
         setState(() {
@@ -266,6 +277,34 @@ class _NoteScreenState extends State<NoteScreen> {
         _errorMessage = 'Network error: $e';
       });
     }
+  }
+
+  void _loadNotebook(String notebookId) {
+    if (_authToken != null) {
+      _fetchNotebookContent(notebookId, _authToken!);
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+    );
+  }
+
+  // Notebook-specific search function
+  Future<Map<String, dynamic>> _searchNotebooks(
+    String query,
+    String token,
+    String userId,
+  ) async {
+    return JournalService.searchNotebooks(query, token, userId);
+  }
+
+  // Notebook-specific title extractor
+  String _extractNotebookTitle(Map<String, dynamic> notebook) {
+    return notebook["title"] ?? "Untitled";
   }
 
   @override
@@ -290,104 +329,184 @@ class _NoteScreenState extends State<NoteScreen> {
                     border: InputBorder.none,
                   ),
                 )
-                : Text(_titleController.text),
+                : Text(
+                  _noNoteSelected ? 'No Note Selected' : _titleController.text,
+                ),
         actions: [
           // Delete button
-          if (widget.notebookId != null) // Only show delete for existing notebooks
+          if (widget.notebookId !=
+              null) // Only show delete for existing notebooks
             IconButton(
               onPressed: _isSaving ? null : _deleteNotebook,
-              icon: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.delete, color: Colors.red),
+              icon:
+                  _isSaving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.delete, color: Colors.red),
               tooltip: 'Delete notebook',
             ),
           // Save button
-          IconButton(
-            onPressed: _isSaving ? null : _saveNotebook,
-            icon:
-                _isSaving
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : const Icon(Icons.save),
-            tooltip: 'Save notebook',
-          ),
+          if (!_noNoteSelected)
+            IconButton(
+              onPressed: _isSaving ? null : _saveNotebook,
+              icon:
+                  _isSaving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.save),
+              tooltip: 'Save notebook',
+            ),
         ],
+      ),
+      drawer: SideNav(
+        userId: _userId,
+        selectedItemId: widget.notebookId,
+        token: _authToken,
+        showSnackBar: _showSnackBar,
+        searchFunction: _searchNotebooks,
+        titleExtractor: _extractNotebookTitle,
+        searchPlaceholder: "Search Notebooks",
+        dataKey: "notebooks",
+        onItemSelected: _loadNotebook,
+        isNotesActive: true,
+        isPeopleActive: false,
+        onNotesPageSelected: () {
+          // Already on notes page, just close drawer
+          Navigator.pop(context);
+        },
+        onPeoplePageSelected: () {
+          // Navigate to relationship page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RelationshipPage()),
+          );
+        },
+        onItemTap: (context, noteId) {
+          // Navigate to selected note
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NoteScreen(notebookId: noteId),
+            ),
+          );
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            if (_successMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  _successMessage!,
-                  style: const TextStyle(color: Colors.green),
-                ),
-              ),
-            Expanded(
-              child:
-                  _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : _isEditMode
-                      ? TextField(
-                        controller: _editingController,
-                        maxLines: null,
-                        expands: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Edit your markdown here',
-                        ),
-                      )
-                      : Markdown(
-                        data: _editingController.text,
-                        selectable: true,
-                        extensionSet: _markdownExtensionSet,
-                        onTapText: () {
-                          try {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Text tapped')),
-                            );
-                          } catch (e) {
-                            // Handle the error, e.g., show an error message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: ${e.toString()}')),
-                            );
-                          }
-                        },
+        child:
+            _noNoteSelected
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.note_alt_outlined,
+                        size: 64,
+                        color: Colors.grey,
                       ),
-            ),
-          ],
-        ),
+                      SizedBox(height: 16),
+                      Text(
+                        'No note selected',
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Select a note from the sidebar or create a new one',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    if (_successMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          _successMessage!,
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                      ),
+                    Expanded(
+                      child:
+                          _isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : _isEditMode
+                              ? TextField(
+                                controller: _editingController,
+                                maxLines: null,
+                                expands: true,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Edit your markdown here',
+                                ),
+                              )
+                              : Markdown(
+                                data: _editingController.text,
+                                selectable: true,
+                                extensionSet: _markdownExtensionSet,
+                                onTapText: () {
+                                  try {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Text tapped'),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    // Handle the error, e.g., show an error message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error: ${e.toString()}'),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                    ),
+                  ],
+                ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _isEditMode = !_isEditMode;
-            // Clear messages when toggling edit mode
-            _errorMessage = null;
-            _successMessage = null;
-          });
-        },
-        tooltip: _isEditMode ? 'View' : 'Edit',
-        child: Icon(_isEditMode ? Icons.visibility : Icons.edit),
-      ),
+      floatingActionButton:
+          !_noNoteSelected
+              ? FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    _isEditMode = !_isEditMode;
+                    // Clear messages when toggling edit mode
+                    _errorMessage = null;
+                    _successMessage = null;
+                  });
+                },
+                tooltip: _isEditMode ? 'View' : 'Edit',
+                child: Icon(_isEditMode ? Icons.visibility : Icons.edit),
+              )
+              : FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    _noNoteSelected = false;
+                    _isEditMode = true;
+                    _titleController.text = 'New Note';
+                    _editingController.text = '';
+                  });
+                },
+                tooltip: 'Create New Note',
+                child: Icon(Icons.add),
+              ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import "../components/sidenav.dart";
 import 'package:shared_preferences/shared_preferences.dart';
 import "../services/profile_service.dart";
+import "../screens/note_screen.dart";
 
 class RelationshipPage extends StatefulWidget {
   const RelationshipPage({super.key});
@@ -109,6 +110,20 @@ class _RelationshipPageState extends State<RelationshipPage> {
     }
   }
 
+  // Profile-specific search function
+  Future<Map<String, dynamic>> _searchProfiles(
+    String query,
+    String token,
+    String userId,
+  ) async {
+    return ProfileService.searchProfiles(query, token, userId);
+  }
+
+  // Profile-specific title extractor
+  String _extractProfileTitle(Map<String, dynamic> profile) {
+    return profile["profileTitle"] ?? "Untitled";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,13 +223,35 @@ class _RelationshipPageState extends State<RelationshipPage> {
                 ),
               ),
 
-      // SideNav bar
-      drawer: SideNavProfile(
+      // Use the dynamic SideNav with profile-specific functions and callbacks
+      drawer: SideNav(
         userId: _userId,
-        onProfileSelected: (profileId) => getProfilesFunct(profileId),
-        selectedProfileId: selectedRelationship["_id"],
+        selectedItemId: selectedRelationship["_id"],
         token: _authToken,
         showSnackBar: showSnackBar,
+        searchFunction: _searchProfiles,
+        titleExtractor: _extractProfileTitle,
+        searchPlaceholder: "Search Profiles",
+        dataKey: "profiles",
+        onItemSelected: getProfilesFunct,
+        isNotesActive: false,
+        isPeopleActive: true,
+        onNotesPageSelected: () {
+          // Navigate to note screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const NoteScreen()),
+          );
+        },
+        onPeoplePageSelected: () {
+          // Already on people page, just close drawer
+          Navigator.pop(context);
+        },
+        onItemTap: (context, profileId) {
+          // Load profile data and close,
+          getProfilesFunct(profileId);
+          Navigator.pop(context);
+        },
       ),
     );
   }

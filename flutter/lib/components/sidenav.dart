@@ -1,39 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import "../services/profile_service.dart";
-import "../screens/home_screen.dart";
 
-class SideNavProfile extends StatefulWidget {
+class SideNav extends StatefulWidget {
   final String? userId;
-  final Function(String) onProfileSelected;
-  final String? selectedProfileId;
+  final String? selectedItemId;
   final String? token;
   final Function(BuildContext context, String message) showSnackBar;
 
-  const SideNavProfile({
+  // Service functions and customization properties
+  final Future<Map<String, dynamic>> Function(String, String, String)
+  searchFunction;
+  final String Function(Map<String, dynamic>) titleExtractor;
+  final String searchPlaceholder;
+  final String
+  dataKey; // The key to extract data from response (e.g. "profiles" or "notebooks")
+
+  // Navigation callbacks
+  final Function(String) onItemSelected; // Callback when an item is selected
+  final VoidCallback
+  onNotesPageSelected; // Callback when notes page button is tapped
+  final VoidCallback
+  onPeoplePageSelected; // Callback when people page button is tapped
+  final bool isNotesActive; // Whether notes view is active (for highlighting)
+  final bool isPeopleActive; // Whether people view is active (for highlighting)
+  final Function(BuildContext, String)
+  onItemTap; // Callback when an item is tapped (for navigation)
+
+  const SideNav({
     required this.userId,
-    required this.onProfileSelected,
-    required this.selectedProfileId,
+    required this.selectedItemId,
     required this.token,
     required this.showSnackBar,
+    required this.searchFunction,
+    required this.titleExtractor,
+    required this.searchPlaceholder,
+    required this.dataKey,
+    required this.onItemSelected,
+    required this.onNotesPageSelected,
+    required this.onPeoplePageSelected,
+    required this.isNotesActive,
+    required this.isPeopleActive,
+    required this.onItemTap,
     super.key,
   });
 
   @override
-  State<SideNavProfile> createState() => _SideNavProfileState();
+  State<SideNav> createState() => _SideNavState();
 }
 
-class _SideNavProfileState extends State<SideNavProfile> {
+class _SideNavState extends State<SideNav> {
   final TextEditingController _searchController = TextEditingController();
-  late String? userId;
-  late String? token;
-  List<Map<String, dynamic>> profiles = [];
+  List<Map<String, dynamic>> items = [];
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (userId == null || token == null) {
+    if (widget.userId == null || widget.token == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.showSnackBar(
           context,
@@ -41,12 +64,12 @@ class _SideNavProfileState extends State<SideNavProfile> {
         );
       });
     } else {
-      searchProfilesFunct("");
+      searchItems("");
     }
   }
 
-  void searchProfilesFunct(String query) async {
-    if (token == null || userId == null) {
+  void searchItems(String query) async {
+    if (widget.userId == null || widget.token == null) {
       widget.showSnackBar(
         context,
         "Authentication token or User ID not found.",
@@ -54,31 +77,38 @@ class _SideNavProfileState extends State<SideNavProfile> {
       return;
     }
 
-    final response = await ProfileService.searchProfiles(
-      query,
-      token!,
-      userId!,
-    );
-
-    if (response["success"]) {
-      final profileList = response["data"]["profiles"];
-      setState(() {
-        profiles = List<Map<String, dynamic>>.from(profileList ?? []);
-      });
-    } else if (mounted) {
-      widget.showSnackBar(
-        context,
-        response["error"] ?? "Failed to search profiles",
+    try {
+      // Use the provided search function
+      print("userId: ${widget.userId}");
+      print("token: ${widget.token}");
+      final response = await widget.searchFunction(
+        query,
+        widget.token!,
+        widget.userId!,
       );
+
+      if (response["success"]) {
+        // Use the provided data key to extract items
+        final itemList = response["data"][widget.dataKey];
+        setState(() {
+          items = List<Map<String, dynamic>>.from(itemList ?? []);
+        });
+      } else if (mounted) {
+        widget.showSnackBar(
+          context,
+          response["error"] ?? "Failed to search items",
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.showSnackBar(context, "Error searching: $e");
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-
-    userId = widget.userId;
-    token = widget.token;
   }
 
   @override
@@ -135,13 +165,12 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    backgroundColor:
+                        widget.isNotesActive
+                            ? Colors.white.withOpacity(0.2)
+                            : Colors.transparent,
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  },
+                  onPressed: widget.onNotesPageSelected,
                   icon: SvgPicture.asset(
                     "assets/icons/notes-page-icon.svg",
                     semanticsLabel: "Notes Page Icon",
@@ -168,10 +197,12 @@ class _SideNavProfileState extends State<SideNavProfile> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    backgroundColor:
+                        widget.isPeopleActive
+                            ? Colors.white.withOpacity(0.2)
+                            : Colors.transparent,
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: widget.onPeoplePageSelected,
                   icon: SvgPicture.asset(
                     "assets/icons/people-relationship-icon.svg",
                     semanticsLabel: "People Relationship Icon",
@@ -201,7 +232,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
-                searchProfilesFunct(value);
+                searchItems(value);
               },
               cursorHeight: 24,
               cursorColor: Colors.white,
@@ -213,7 +244,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                   vertical: 4,
                   horizontal: 10,
                 ),
-                hintText: "Search Profiles",
+                hintText: widget.searchPlaceholder,
                 hintStyle: TextStyle(fontSize: 16, height: 1.5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -229,16 +260,16 @@ class _SideNavProfileState extends State<SideNavProfile> {
 
           SizedBox(height: 14),
 
-          // List of Profiles
+          // List of Items (Profiles or Notebooks)
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 14),
-              itemCount: profiles.length,
+              itemCount: items.length,
               itemBuilder: (context, index) {
                 return Container(
                   margin: EdgeInsets.only(bottom: 4),
 
-                  //Individual Profile
+                  //Individual Item
                   child: TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.all(0),
@@ -246,15 +277,16 @@ class _SideNavProfileState extends State<SideNavProfile> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       backgroundColor:
-                          widget.selectedProfileId == profiles[index]["_id"]
+                          widget.selectedItemId == items[index]["_id"]
                               ? Color.fromRGBO(209, 213, 219, 1)
                               : Colors.transparent,
                     ),
                     onPressed: () {
-                      setState(() {
-                        widget.onProfileSelected(profiles[index]["_id"]);
-                        Navigator.pop(context);
-                      });
+                      // Call onItemSelected with the ID
+                      widget.onItemSelected(items[index]["_id"]);
+
+                      // Call onItemTap with context and ID for navigation
+                      widget.onItemTap(context, items[index]["_id"]);
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -262,7 +294,7 @@ class _SideNavProfileState extends State<SideNavProfile> {
                         vertical: 8,
                       ),
                       child: Text(
-                        "${profiles[index]["profileTitle"]}",
+                        widget.titleExtractor(items[index]),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white,
