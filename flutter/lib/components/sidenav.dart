@@ -74,9 +74,7 @@ class _SideNavState extends State<SideNav> {
   }
 
   Future<void> _fetchUsername() async {
-    print("hey");
     if (widget.userId == null || widget.token == null) return;
-    print("fetching username");
 
     try {
       final response = await UserService.getUserById(
@@ -84,16 +82,11 @@ class _SideNavState extends State<SideNav> {
         widget.token!,
       );
 
-      print("response: $response");
       if (response["success"] && response["data"] != null) {
         print("data : ${response["data"]}");
-        final userData = response["data"]["user"];
-        if (userData is Map<String, dynamic> &&
-            userData.containsKey("username")) {
-          setState(() {
-            _displayUsername = userData["username"];
-          });
-        }
+        setState(() {
+          _displayUsername = response["data"]["username"];
+        });
       }
     } catch (e) {
       debugPrint('Error fetching username: $e');
