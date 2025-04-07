@@ -1,12 +1,9 @@
-import { useNavigate } from "react-router";
-
 const searchJournal = async (query: string) => {
   const userID = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
-  const navigate = useNavigate();
   if (!userID || !token) {
     console.error("User ID or Auth Token is missing.");
-    navigate("/login");
+    window.location.href = '/login';
     return null;
   }
 
