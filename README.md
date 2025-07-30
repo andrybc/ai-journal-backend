@@ -1,6 +1,15 @@
 # AI-Powered Journal with Automatic Profile Generation
 
 This is a forked version of a full-stack journaling and relationship profiling platform originally created as a team project. The system uses OpenAI to analyze journal content and generate detailed structured profiles automatically. It includes user authentication, notebook and profile CRUD functionality, mobile support, and robust API testing.
+---
+## Original Repository
+
+This project is a fork of [https://github.com/journal-organizer/journal-organizer], shared with permission. All backend OpenAI integration and the contributions listed above were developed during the collaborative development period.
+Link to Original Repo's contributor graph (andrybc):
+
+[https://github.com/journal-organizer/journal-organizer/graphs/contributors] 
+
+---
 
 ## Project Overview
 
@@ -64,8 +73,6 @@ I was solely responsible for designing, developing, and integrating the OpenAI-p
 - SwaggerHub for API documentation
 - Flutter (mobile frontend)
 
----
 
-## Original Repository
 
-This project is a fork of [https://github.com/journal-organizer/journal-organizer], shared with permission. All backend OpenAI integration and the contributions listed above were developed during the collaborative development period.
+
