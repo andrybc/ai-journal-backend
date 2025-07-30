@@ -1,78 +1,91 @@
-## AI-Powered Journal with Automatic Profile Generation
+# AI-Powered Journal with Automatic Profile Generation
 
-This is a forked version of a full-stack journaling and relationship profiling platform originally created as a team project. The system uses OpenAI to analyze journal content and generate detailed structured profiles automatically. It includes user authentication, notebook and profile CRUD functionality, mobile support, and robust API testing.
----
-## Original Repository
+This is a **forked version** of a full-stack journaling and relationship profiling platform originally created as a team project. The system uses OpenAI to analyze journal content and automatically generate detailed, structured profiles. The platform includes:
 
-This project is a fork of [https://github.com/journal-organizer/journal-organizer], shared with permission. All backend OpenAI integration and the contributions listed above were developed during the collaborative development period.
-
-Link to Original Repo's contributor graph (andrybc):
-[https://github.com/journal-organizer/journal-organizer/graphs/contributors] 
+- User authentication
+- Notebook and profile CRUD functionality
+- Mobile support
+- Robust API testing and documentation
 
 ---
 
-## Project Overview
+## 🔗 Original Repository
 
-The application enables users to create and manage journal entries, while an AI backend analyzes those entries and automatically generates structured profiles of individuals, places, and topics mentioned. These profiles evolve dynamically based on new journal content and are linked to specific notebooks in the database.
+This project is a fork of the original repository:  
+**[journal-organizer/journal-organizer](https://github.com/journal-organizer/journal-organizer)**  
+Forked and showcased with permission.
 
-Features include:
-- OpenAI GPT-4o-mini integration for natural language understanding
-- JWT-secured authentication
-- MongoDB with Mongoose for database schema management
-- Mobile frontend support
-- SwaggerHub API documentation
-- Docker and PM2 deployment setup
+See contributor graph (including contributions under `andrybc`):  
+**[GitHub Contributor Graph](https://github.com/journal-organizer/journal-organizer/graphs/contributors)**
 
 ---
 
-## My Contributions
+## 📌 Project Overview
 
-### Full OpenAI Backend Development and Integration
-I was solely responsible for designing, developing, and integrating the OpenAI-powered profile generation system within the backend. This includes:
-- Creating `openaiService.js` to wrap the OpenAI Node.js SDK
-- Defining `extractTags`, `buildProfilePrompt`, and `createProfile` functions
-- Using the GPT-4o-mini model with Zod schemas to produce structured JSON
-- Implementing profile automation:
-  - Profiles are created, updated, or deleted in response to notebook activity
-  - Profiles are validated and linked to their source notebooks
+The application allows users to create and manage journal entries. An integrated OpenAI backend analyzes each entry and automatically generates structured profiles for individuals, places, and topics mentioned. These profiles evolve as the user adds more entries, and are linked to specific notebooks in the system.
 
-### Backend Development (Node.js / Express / MongoDB)
-- Built and secured backend API routes for:
-  - Authentication (register, login, email verification, password reset)
-  - Notebooks (create, update, delete, read)
-  - Profiles (manual and AI-generated CRUD)
-- Defined and implemented Mongoose schemas for `User`, `Notebook`, and `Profile`
-- Integrated `.env` configuration and managed secure keys
-
-### API Testing and Debugging
-- Wrote and executed test scripts using `curl`
-- Validated and debugged JSON payloads, escaping, and formatting
-- Ensured consistent behavior across manual and AI-triggered CRUD operations
-
-### Deployment and Documentation
-- Configured Docker Compose for local MongoDB service
-- Deployed the backend with PM2 in a production environment
-- Authored and updated SwaggerHub documentation for new routes and models
-- Structured the backend codebase using Express controllers and services
-
-### Frontend and Team Collaboration
-- Developed mobile-friendly UI components in Flutter
-- Added frontend token-based auth handling and fetch integration
-- Participated in team presentations and sprint check-ins
-- Contributed to Git workflow, pull request documentation, and progress tracking
+### Key Features:
+- GPT-4o-mini integration for journal analysis and profile creation
+- Secure authentication with JWT
+- MongoDB + Mongoose schema-driven data modeling
+- Dockerized MongoDB setup with PM2 deployment
+- Mobile-friendly frontend (Flutter)
+- Documented APIs with SwaggerHub
 
 ---
 
-## Tech Stack
+## 🛠️ My Contributions
 
-- Node.js, Express.js
-- MongoDB, Mongoose
-- OpenAI GPT-4o-mini + Zod
+### 🧠 Full OpenAI Backend Development & Integration
+- Designed and implemented the full OpenAI integration system
+- Created `openaiService.js` to handle GPT requests and structured output
+- Defined `extractTags`, `buildProfilePrompt`, and `createProfile` functions
+- Used Zod for schema validation of AI-generated profile JSON
+- Enabled automatic profile creation/updates on notebook changes
+
+### 💻 Backend Development (Node.js / Express / MongoDB)
+- Built secure API routes for:
+  - Authentication: register, login, email verification, reset password
+  - Notebooks: create, update, delete, read
+  - Profiles: manual and AI-driven CRUD
+- Defined Mongoose schemas: `User`, `Notebook`, `Profile`
+- Managed `.env` key integration for secure config
+
+### 🧪 API Testing & Debugging
+- Developed and executed `curl` test scripts
+- Debugged JSON parsing, escaping, and formatting issues
+- Ensured proper operation of manual and automated CRUD routes
+
+### 🚀 Deployment & Documentation
+- Configured Docker Compose for local MongoDB deployment
+- Used PM2 for backend deployment and logging
+- Created and maintained SwaggerHub docs for the backend API
+- Structured backend code using modular Express controllers and services
+
+### 📱 Frontend Integration & Team Collaboration
+- Developed mobile functionality using Flutter
+- Integrated token-based auth into frontend fetch requests
+- Participated in team meetings and sprint presentations
+- Helped manage Git workflow, PR documentation, and task tracking
+
+---
+
+## 🧰 Tech Stack
+
+**Backend:**
+- Node.js
+- Express.js
+- MongoDB + Mongoose
+- OpenAI (GPT-4o-mini)
+- Zod
 - JWT Authentication
-- Docker, PM2
-- SwaggerHub for API documentation
-- Flutter (mobile frontend)
+- PM2
+- Docker
 
+**Frontend:**
+- Flutter (mobile interface)
 
-
-
+**Tooling & Documentation:**
+- SwaggerHub
+- `curl` for API testing
+- GitHub Projects for task management
