@@ -1,4 +1,4 @@
-# AI-Powered Journal with Automatic Profile Generation
+## AI-Powered Journal with Automatic Profile Generation
 
 This is a forked version of a full-stack journaling and relationship profiling platform originally created as a team project. The system uses OpenAI to analyze journal content and generate detailed structured profiles automatically. It includes user authentication, notebook and profile CRUD functionality, mobile support, and robust API testing.
 ---
