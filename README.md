@@ -5,8 +5,8 @@ This is a forked version of a full-stack journaling and relationship profiling p
 ## Original Repository
 
 This project is a fork of [https://github.com/journal-organizer/journal-organizer], shared with permission. All backend OpenAI integration and the contributions listed above were developed during the collaborative development period.
-Link to Original Repo's contributor graph (andrybc):
 
+Link to Original Repo's contributor graph (andrybc):
 [https://github.com/journal-organizer/journal-organizer/graphs/contributors] 
 
 ---
