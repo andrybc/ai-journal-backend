@@ -6,19 +6,26 @@ This is a fork of a team project, published with permission. The original reposi
 
 ## What I built
 
-| Area | Files | Scope |
-|---|---|---|
-| OpenAI integration | `backend/services/openaiService.js` | Entire file. Zod `ProfileSchema`, `extractTags`, `buildProfilePrompt`, `createProfile`, structured-output wiring |
-| Profile lifecycle | `backend/services/profileService.js` | Entire file. Notebook-to-profile regeneration, dedup, case-insensitive user-scoped lookup, delete cascade |
-| Notebook hooks | `backend/routes/journal.js` | Calls into the profile service on create, update, and delete |
-| Profile routes | `backend/routes/profile.js` | Manual and AI-driven profile CRUD |
-| Auth routes | `backend/routes/auth.js` | Register, login, email verification, password reset |
-| Schemas | `backend/models/` | `User`, `Notebook`, `Summary` (profile) |
-| Deployment | `docker-compose.yml`, PM2 config | Local MongoDB, backend process management |
-| Documentation | SwaggerHub / OpenAPI | Auth and notebook endpoints |
+I set up the project's backend foundation (first commits, February 2025) and
+owned the AI and profile systems through July 2025.
 
-Work done on the `openai-api` branch of the original repository. The React
-frontend and parts of the Flutter client were built by other team members.
+| Area | Files | Commits |
+|---|---|---|
+| Backend foundation and API structure | `backend/server.js` | 14 |
+| OpenAI integration | `backend/services/openaiService.js`, `.cjs`, `testOpenAI.js` | 12 |
+| Profile lifecycle | `backend/services/profileService.js`, `models/summary.js`, `testProfile.js` | 12 |
+| Profile API | `backend/controllers/profileController.js`, `routes/profileRoutes.js`, `routes/profile.js` | 11 |
+| Auth and users | `backend/controllers/authController.js`, `userController.js`, `models/user.js`, `routes/users.js`, `middleware/authenticateToken.js` | 18 |
+| Deployment | `docker-compose.yml`, `init-mongo.js`, `start-mongodb.sh`, `deploy.sh`, PM2 | 12 |
+| Flutter auth client | `login_screen.dart`, `signup_screen.dart`, `email_verification_screen.dart`, `api_service.dart` | 7 |
+
+I also integrated the profile service into the notebook CRUD routes so profile
+creation, update, and deletion happen automatically on journal changes, and
+maintained OpenAPI documentation on SwaggerHub.
+
+Work was done primarily on the `openai-api`, `profile-update1`, `user-crud`,
+and `flutter-demon` branches. The React frontend and the notebook routes
+themselves were built by other team members.
 ---
 
 ## The problem
